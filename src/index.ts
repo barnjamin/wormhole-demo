@@ -1,6 +1,8 @@
 import algosdk from 'algosdk';
 import  {
   CHAIN_ID_ETH,
+  CHAIN_ID_ALGORAND,
+  CHAIN_ID_AVAX,
 } from '@certusone/wormhole-sdk';
 
 
@@ -14,8 +16,11 @@ const client = new algosdk.Algodv2(token, server, port);
     //const sp = await client.getTransactionParams().do()
     //console.log(sp)
 
+    
 
     console.log(CHAIN_ID_ETH)
+    console.log(CHAIN_ID_ALGORAND)
+    console.log(CHAIN_ID_AVAX)
 
     //// Submit transaction - results in a Wormhole message being published
     //const transaction = await transferFromSolana(
