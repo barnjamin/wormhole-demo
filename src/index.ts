@@ -1,27 +1,45 @@
+import { Wormhole, Signer, WormholeAsset, WormholeMessage, WormholeMessageType } from './wormhole';
 import algosdk from 'algosdk';
-import  {
-  CHAIN_ID_ETH,
-  CHAIN_ID_ALGORAND,
-  CHAIN_ID_AVAX,
-} from '@certusone/wormhole-sdk';
-
-
-const token = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
-const server = 'http://127.0.0.1';
-const port = 4001;
-const client = new algosdk.Algodv2(token, server, port);
+import {Ethereum} from './ethereum'
+import {Algorand} from './algorand'
 
 (async function(){
 
+    // Main wh interface, allows for mirror/transmit/receive
+    const wh = new Wormhole()
+
+    // Chain specific implementations of `WormholeChain` interface
+    // they wrap specific methods and handle any weirdness 
+    const algo = new Algorand()
+    const eth = new Ethereum()
+
+    // TODO: figure out a nice way to provide signer interface
+    const algo_sgn = {} as Signer
+    const eth_sgn = {} as Signer
+
+    // TODO: obv invalid for algo
+    // Maybe util method on WormholeChain to spit this out?
+    const algo_asset = {
+      chain: algo,
+      contract: "0xdeadbeef",
+    } as WormholeAsset
+
+    // Make sure the asset exists on the target chain
+    // Should check first either here or in method?
+    const mirrored = await wh.mirror(algo_sgn, algo_asset, eth_sgn, eth)
+
+    // transmit from src chain into wormhole
+    // receipt is the VAA to be used on target chain
+    const receipt = await wh.transmit({type: WormholeMessageType.TokenTransfer} as WormholeMessage)
+
+    // Finally receive the asset on the target chain 
+    // Using the VAA receipt we got above
+    const received = await wh.receive(eth_sgn, receipt)
+
+
+
     //const sp = await client.getTransactionParams().do()
     //console.log(sp)
-
-    
-
-    console.log(CHAIN_ID_ETH)
-    console.log(CHAIN_ID_ALGORAND)
-    console.log(CHAIN_ID_AVAX)
-
     //// Submit transaction - results in a Wormhole message being published
     //const transaction = await transferFromSolana(
     //connection,
