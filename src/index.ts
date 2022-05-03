@@ -1,74 +1,68 @@
-import { Wormhole, Signer, WormholeAsset, WormholeMessage, WormholeMessageType } from './wormhole';
-import algosdk from 'algosdk';
-import {Ethereum} from './ethereum'
-import {Algorand} from './algorand'
+import {
+  Wormhole,
+  Signer,
+  WormholeAsset,
+  WormholeMessage,
+  WormholeMessageType,
+} from "./wormhole";
+import { Ethereum, getEthProvider } from "./ethereum";
+import { Algorand } from "./algorand";
+import algosdk, { generateAccount } from "algosdk";
+import { ethers } from "ethers";
 
-(async function(){
+class AlgoSigner {
+  account: algosdk.Account;
 
-    // Main wh interface, allows for mirror/transmit/receive
-    const wh = new Wormhole()
+  constructor() {
+    this.account = generateAccount();
+  }
 
-    // Chain specific implementations of `WormholeChain` interface
-    // they wrap specific methods and handle any weirdness 
-    const algo = new Algorand()
-    const eth = new Ethereum()
+  getAddress(): string {
+    return this.account.addr;
+  }
 
-    // TODO: figure out a nice way to provide signer interface
-    const algo_sgn = {} as Signer
-    const eth_sgn = {} as Signer
+  async signTxn(txn: algosdk.Transaction): Promise<Uint8Array> {
+    return txn.signTxn(this.account.sk);
+  }
+}
 
-    // TODO: obv invalid for algo
-    // Maybe util method on WormholeChain to spit this out?
-    const algo_asset = {
-      chain: algo,
-      contract: "0xdeadbeef",
-    } as WormholeAsset
+function getEthSigner(provider: any) {
+  const ETH_PRIVATE_KEY =
+    "0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d";
+  return new ethers.Wallet(ETH_PRIVATE_KEY, provider);
+}
 
-    // Make sure the asset exists on the target chain
-    // Should check first either here or in method?
-    const mirrored = await wh.mirror(algo_sgn, algo_asset, eth_sgn, eth)
+(async function () {
+  // Main wh interface, allows for mirror/transmit/receive
+  const wh = new Wormhole();
 
-    // transmit from src chain into wormhole
-    // receipt is the VAA to be used on target chain
-    const receipt = await wh.transmit({type: WormholeMessageType.TokenTransfer} as WormholeMessage)
+  // Chain specific implementations of `WormholeChain` interface
+  // they wrap specific methods and handle any weirdness
+  const algo = new Algorand();
+  const eth = new Ethereum();
 
-    // Finally receive the asset on the target chain 
-    // Using the VAA receipt we got above
-    const received = await wh.receive(eth_sgn, receipt)
+  // TODO: figure out a nice way to provide signer interface
+  const algo_sgn = new AlgoSigner();
+  const eth_sgn = getEthSigner(getEthProvider());
 
+  // TODO: obv invalid for algo
+  // Maybe util method on WormholeChain to spit this out?
+  const algo_asset = {
+    chain: algo,
+    contract: BigInt(0),
+  } as WormholeAsset;
 
+  // Make sure the asset exists on the target chain
+  // Should check first either here or in method?
+  const mirrored = await wh.mirror(algo_sgn, algo_asset, eth_sgn, eth);
 
-    //const sp = await client.getTransactionParams().do()
-    //console.log(sp)
-    //// Submit transaction - results in a Wormhole message being published
-    //const transaction = await transferFromSolana(
-    //connection,
-    //SOL_BRIDGE_ADDRESS,
-    //SOL_TOKEN_BRIDGE_ADDRESS,
-    //payerAddress,
-    //fromAddress,
-    //mintAddress,
-    //amount,
-    //targetAddress,
-    //CHAIN_ID_ETH,
-    //originAddress,
-    //originChain
-    //);
-    //const signed = await wallet.signTransaction(transaction);
-    //const txid = await connection.sendRawTransaction(signed.serialize());
-    //await connection.confirmTransaction(txid);
-    //// Get the sequence number and emitter address required to fetch the signedVAA of our message
-    //const info = await connection.getTransaction(txid);
-    //const sequence = parseSequenceFromLogSolana(info);
-    //const emitterAddress = await getEmitterAddressSolana(SOL_TOKEN_BRIDGE_ADDRESS);
-    //// Fetch the signedVAA from the Wormhole Network (this may require retries while you wait for confirmation)
-    //const { signedVAA } = await getSignedVAA(
-    //WORMHOLE_RPC_HOST,
-    //CHAIN_ID_SOLANA,
-    //emitterAddress,
-    //sequence
-    //);
-    //// Redeem on Ethereum
-    //await redeemOnEth(ETH_TOKEN_BRIDGE_ADDRESS, signer, signedVAA);
+  // transmit from src chain into wormhole
+  // receipt is the VAA to be used on target chain
+  const receipt = await wh.transmit({
+    type: WormholeMessageType.TokenTransfer,
+  } as WormholeMessage);
 
-})()
+  // Finally receive the asset on the target chain
+  // Using the VAA receipt we got above
+  const received = await wh.receive(eth_sgn, receipt);
+})();

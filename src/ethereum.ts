@@ -21,18 +21,12 @@ import {
   WormholeTokenTransfer,
 } from "./wormhole";
 
-function getEthProvider(): any {
+const ETH_TOKEN_BRIDGE_ADDRESS = "0x0290FB167208Af455bB137780163b7B7a9a10C16";
+
+export function getEthProvider(): any {
   const ETH_NODE_URL = "";
   return new ethers.providers.WebSocketProvider(ETH_NODE_URL) as any;
 }
-
-function getEthSigner(provider: any) {
-  const ETH_PRIVATE_KEY =
-    "0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d";
-  return new ethers.Wallet(ETH_PRIVATE_KEY, provider);
-}
-
-const ETH_TOKEN_BRIDGE_ADDRESS = "0x0290FB167208Af455bB137780163b7B7a9a10C16";
 
 export class Ethereum implements WormholeChain {
   coreId: string = ETH_BRIDGE_ADDRESS;
@@ -86,15 +80,15 @@ export class Ethereum implements WormholeChain {
     signer: ethers.Signer,
     receipt: WormholeReceipt
   ): Promise<WormholeAsset> {
-    await createWrappedOnEth(this.tokenBridgeAddress, signer, receipt.VAA);
-    return {} as WormholeAsset;
+    const {contractAddress} = await createWrappedOnEth(this.tokenBridgeAddress, signer, receipt.VAA);
+    return { chain: this, contract: contractAddress };
   }
   async updateWrapped(
     signer: ethers.Signer,
     receipt: WormholeReceipt
   ): Promise<WormholeAsset> {
-    await updateWrappedOnEth(this.tokenBridgeAddress, signer, receipt.VAA);
-    return {} as WormholeAsset;
+    const {contractAddress} = await updateWrappedOnEth(this.tokenBridgeAddress, signer, receipt.VAA);
+    return { chain: this, contract: contractAddress };
   }
 
   async transactionComplete(receipt: WormholeReceipt): Promise<boolean> {

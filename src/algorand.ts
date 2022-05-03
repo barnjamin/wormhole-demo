@@ -7,6 +7,7 @@ import {
   parseSequenceFromLogAlgorand,
   getEmitterAddressAlgorand,
   nativeToHexString,
+  getIsTransferCompletedAlgorand,
 } from "@certusone/wormhole-sdk";
 import { TransactionSignerPair } from "@certusone/wormhole-sdk/lib/cjs/algorand";
 import algosdk, { Algodv2, Transaction, waitForConfirmation } from "algosdk";
@@ -22,9 +23,8 @@ import {
 
 export function getAlgoClient(): Algodv2 {
   const token = "";
-  const server = "";
-  const port = 4001;
-  return new Algodv2(token, server, port);
+  const server = "https://testnet-api.algonode.cloud";
+  return new Algodv2(token, server);
 }
 
 export async function signSendWait(
@@ -148,7 +148,11 @@ export class Algorand implements WormholeChain {
     throw new Error("Method not implemented.");
   }
 
-  transactionComplete(receipt: WormholeReceipt): Promise<boolean> {
-    throw new Error("Method not implemented.");
+  async transactionComplete(receipt: WormholeReceipt): Promise<boolean> {
+    return await getIsTransferCompletedAlgorand(
+      this.client,
+      this.tokenBridgeId,
+      receipt.VAA
+    );
   }
 }
