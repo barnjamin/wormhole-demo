@@ -4,10 +4,12 @@ import {
   WormholeMessage,
   WormholeMessageType,
 } from "./wormhole";
+import { WORMHOLE_RPC_HOSTS } from "./consts";
 import { Ethereum } from "./ethereum";
 import { Algorand } from "./algorand";
 import algosdk, { generateAccount } from "algosdk";
 import { ethers } from "ethers";
+import { getOriginalAssetEth } from "@certusone/wormhole-sdk";
 
 class AlgoSigner {
   account: algosdk.Account;
@@ -35,16 +37,23 @@ function getAlgoSigner(acct?: algosdk.Account): AlgoSigner {
   return new AlgoSigner(acct);
 }
 
+
+const ETH_NODE_RPC = "https://main-rpc.linkpool.io";
+
+
 (async function () {
   // Main wh interface, allows for {mirror, transmit, receive, getVaa}
   // TODO: What config should we pass? RPC address?
-  const wh = new Wormhole();
+  const wh = new Wormhole(WORMHOLE_RPC_HOSTS);
+
+  console.log("Made wormhole")
 
   // Chain specific implementations of `WormholeChain` interface
   // they wrap specific methods and handle any weirdness
   // TODO: What config? RPC address? signers?
   const algo = new Algorand();
-  const eth = new Ethereum();
+  const eth = new Ethereum(ETH_NODE_RPC);
+  console.log("Created WormholeChains")
 
   // Considering also:
   // wh.connect(algo, eth)
@@ -54,6 +63,7 @@ function getAlgoSigner(acct?: algosdk.Account): AlgoSigner {
   // Get chain specific signers
   const algo_sgn = getAlgoSigner();
   const eth_sgn = getEthSigner(eth.provider);
+  console.log("Created Signers")
 
   // Asset we want to transfer
   const algo_asset: WormholeAsset = {
@@ -71,7 +81,11 @@ function getAlgoSigner(acct?: algosdk.Account): AlgoSigner {
       receiver: eth_sgn,
     },
   };
-  const eth_asset = await wh.send(attestMsg);
+  console.log("Created attest msg: ", attestMsg)
+
+  const eth_asset: WormholeAsset = {chain: eth, contract: ""} 
+  //const eth_asset = await wh.send(attestMsg);
+  console.log("Attest successful")
   // Alternatively:
   // const eth_asset = await wh.mirror(attestMsg.attestation)
 
@@ -89,7 +103,8 @@ function getAlgoSigner(acct?: algosdk.Account): AlgoSigner {
     },
   };
 
-  await wh.send(xferMsg);
+  console.log("Created xfer message:", xferMsg)
+  //await wh.send(xferMsg);
 
   // Alternatively:
   // await wg.receive(eth_sgn, await wg.transmit(xferMsg.tokenTransfer))

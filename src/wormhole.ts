@@ -1,6 +1,5 @@
 import { NodeHttpTransport } from "@improbable-eng/grpc-web-node-http-transport";
 import { getSignedVAAWithRetry, ChainId } from "@certusone/wormhole-sdk";
-import { WORMHOLE_RPC_HOSTS } from "./consts";
 import { ethers } from "ethers";
 
 export interface AlgorandSigner {
@@ -71,7 +70,9 @@ export interface WormholeChain {
 }
 
 export class Wormhole {
-  constructor() {
+  rpcHosts: string[];
+  constructor(rpc: string[]) {
+    this.rpcHosts = rpc
     // Config? RPC addr?
     // List of acceptable chains?
   }
@@ -81,7 +82,7 @@ export class Wormhole {
     chain: WormholeChain
   ): Promise<WormholeReceipt> {
     const { vaaBytes } = await getSignedVAAWithRetry(
-      WORMHOLE_RPC_HOSTS,
+      this.rpcHosts,
       chain.id,
       chain.emitterAddress(),
       sequence,

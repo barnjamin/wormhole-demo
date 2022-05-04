@@ -12,7 +12,7 @@ import {
   attestFromEth,
 } from "@certusone/wormhole-sdk";
 import { ethers } from "ethers";
-import { ETH_BRIDGE_ADDRESS } from "./consts";
+import { ETH_BRIDGE_ADDRESS, ETH_TOKEN_BRIDGE_ADDRESS } from "./consts";
 import {
   WormholeAsset,
   WormholeAttestation,
@@ -21,7 +21,6 @@ import {
   WormholeTokenTransfer,
 } from "./wormhole";
 
-const ETH_TOKEN_BRIDGE_ADDRESS = "0x0290FB167208Af455bB137780163b7B7a9a10C16";
 
 export class Ethereum implements WormholeChain {
   coreId: string = ETH_BRIDGE_ADDRESS;
@@ -30,10 +29,8 @@ export class Ethereum implements WormholeChain {
 
   provider: any;
 
-  constructor(nodeUrl?: string) {
-    this.provider = new ethers.providers.WebSocketProvider(
-      (nodeUrl ||= "")
-    ) as any;
+  constructor(network?: string) {
+    this.provider = ethers.getDefaultProvider(network||='ropsten');
   }
 
   emitterAddress(): string {

@@ -11,6 +11,7 @@ import {
 } from "@certusone/wormhole-sdk";
 import { TransactionSignerPair } from "@certusone/wormhole-sdk/lib/cjs/algorand";
 import algosdk, { Algodv2, waitForConfirmation } from "algosdk";
+import { ALGORAND_BRIDGE_ID, ALGORAND_HOST, ALGORAND_TOKEN_BRIDGE_ID } from "./consts";
 import {
   AlgorandSigner,
   WormholeAsset,
@@ -20,11 +21,7 @@ import {
   WormholeTokenTransfer,
 } from "./wormhole";
 
-export function getAlgoClient(): Algodv2 {
-  const token = "";
-  const server = "https://testnet-api.algonode.cloud";
-  return new Algodv2(token, server);
-}
+
 
 export async function signSendWait(
   client: Algodv2,
@@ -58,15 +55,16 @@ export async function signSendWait(
 }
 
 export class Algorand implements WormholeChain {
-  coreId: bigint = BigInt(5);
-  tokenBridgeId: bigint = BigInt(6);
+  coreId: bigint = BigInt(ALGORAND_BRIDGE_ID);
+  tokenBridgeId: bigint = BigInt(ALGORAND_TOKEN_BRIDGE_ID);
 
   id: ChainId = CHAIN_ID_ALGORAND;
 
   client: Algodv2;
 
   constructor() {
-    this.client = getAlgoClient();
+    const {algodToken, algodServer, algodPort} = ALGORAND_HOST
+    this.client = new Algodv2(algodToken, algodServer, algodPort);
   }
 
   emitterAddress(): string {
