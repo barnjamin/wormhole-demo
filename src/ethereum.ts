@@ -24,11 +24,6 @@ import {
 
 const ETH_TOKEN_BRIDGE_ADDRESS = "0x0290FB167208Af455bB137780163b7B7a9a10C16";
 
-export function getEthProvider(): any {
-  const ETH_NODE_URL = "";
-  return new ethers.providers.WebSocketProvider(ETH_NODE_URL) as any;
-}
-
 export class Ethereum implements WormholeChain {
   coreId: string = ETH_BRIDGE_ADDRESS;
   tokenBridgeAddress: string = ETH_TOKEN_BRIDGE_ADDRESS;
@@ -36,8 +31,10 @@ export class Ethereum implements WormholeChain {
 
   provider: any;
 
-  constructor(){
-    this.provider = getEthProvider()
+  constructor(nodeUrl?: string) {
+    this.provider = new ethers.providers.WebSocketProvider(
+      (nodeUrl ||= "")
+    ) as any;
   }
 
   emitterAddress(): string {
@@ -90,8 +87,12 @@ export class Ethereum implements WormholeChain {
     signer: ethers.Signer,
     receipt: WormholeReceipt
   ): Promise<WormholeAsset> {
-    const {contractAddress} = await redeemOnEth(this.tokenBridgeAddress, signer, receipt.VAA);
-    return {chain: this, contract: contractAddress} as WormholeAsset
+    const { contractAddress } = await redeemOnEth(
+      this.tokenBridgeAddress,
+      signer,
+      receipt.VAA
+    );
+    return { chain: this, contract: contractAddress } as WormholeAsset;
   }
 
   async createWrapped(

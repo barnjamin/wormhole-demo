@@ -4,7 +4,7 @@ import {
   WormholeMessage,
   WormholeMessageType,
 } from "./wormhole";
-import { Ethereum, getEthProvider } from "./ethereum";
+import { Ethereum } from "./ethereum";
 import { Algorand } from "./algorand";
 import algosdk, { generateAccount } from "algosdk";
 import { ethers } from "ethers";
@@ -13,7 +13,7 @@ class AlgoSigner {
   account: algosdk.Account;
 
   constructor(acct?: algosdk.Account) {
-    this.account = acct === undefined? generateAccount(): acct;
+    this.account = acct === undefined ? generateAccount() : acct;
   }
 
   getAddress(): string {
@@ -35,36 +35,42 @@ function getAlgoSigner(acct?: algosdk.Account): AlgoSigner {
   return new AlgoSigner(acct);
 }
 
-
 (async function () {
-  // Main wh interface, allows for mirror/transmit/receive
+  // Main wh interface, allows for {mirror, transmit, receive, getVaa}
+  // TODO: What config should we pass? RPC address?
   const wh = new Wormhole();
 
   // Chain specific implementations of `WormholeChain` interface
   // they wrap specific methods and handle any weirdness
+  // TODO: What config? RPC address? signers?
   const algo = new Algorand();
   const eth = new Ethereum();
 
-  // Get chain specific signers
-  const algo_sgn = getAlgoSigner(); 
-  const eth_sgn = getEthSigner(getEthProvider());
+  // Considering also:
+  // wh.connect(algo, eth)
+  // Then omit `chain` from subsequent calls
+  // as we just use
 
-  // Asset we want to transfer 
+  // Get chain specific signers
+  const algo_sgn = getAlgoSigner();
+  const eth_sgn = getEthSigner(eth.provider);
+
+  // Asset we want to transfer
   const algo_asset: WormholeAsset = {
     chain: algo,
     contract: BigInt(0),
-  } 
+  };
 
-  // Create Attestation 
+  // Create Attestation
   const attestMsg: WormholeMessage = {
     type: WormholeMessageType.Attestation,
     attestation: {
       origin: algo_asset,
       sender: algo_sgn,
       destination: eth,
-      receiver: eth_sgn
-    }
-  }
+      receiver: eth_sgn,
+    },
+  };
   const eth_asset = await wh.send(attestMsg);
   // Alternatively:
   // const eth_asset = await wh.mirror(attestMsg.attestation)
@@ -80,8 +86,8 @@ function getAlgoSigner(acct?: algosdk.Account): AlgoSigner {
       receiver: eth_sgn,
       // TODO: note? App call?
       amount: BigInt(100),
-    }
-  }
+    },
+  };
 
   await wh.send(xferMsg);
 

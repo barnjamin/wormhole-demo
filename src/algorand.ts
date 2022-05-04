@@ -75,7 +75,6 @@ export class Algorand implements WormholeChain {
   }
 
   async attest(attestation: WormholeAttestation): Promise<string> {
-
     if (typeof attestation.origin.contract !== "bigint")
       throw new Error("Expected bigint for asset, got string");
 
@@ -87,17 +86,22 @@ export class Algorand implements WormholeChain {
       attestation.origin.contract
     );
 
-    const result = await signSendWait(this.client, txs, attestation.sender as AlgorandSigner);
+    const result = await signSendWait(
+      this.client,
+      txs,
+      attestation.sender as AlgorandSigner
+    );
     return parseSequenceFromLogAlgorand(result);
   }
 
-  async transfer(
-    msg: WormholeTokenTransfer
-  ): Promise<string> {
+  async transfer(msg: WormholeTokenTransfer): Promise<string> {
+    if (typeof msg.origin.contract !== "bigint")
+      throw new Error("Expected bigint for asset, got string");
 
-    if (typeof(msg.origin.contract) !== "bigint") throw new Error("Expected bigint for asset, got string")
-
-    const hexStr = nativeToHexString(await msg.receiver.getAddress(), msg.destination.chain.id);
+    const hexStr = nativeToHexString(
+      await msg.receiver.getAddress(),
+      msg.destination.chain.id
+    );
     if (!hexStr) throw new Error("Failed to convert to hexStr");
 
     const fee = 0;
@@ -109,12 +113,16 @@ export class Algorand implements WormholeChain {
       await msg.sender.getAddress(),
       msg.origin.contract,
       msg.amount,
-      hexStr, 
+      hexStr,
       msg.destination.chain.id,
       BigInt(fee)
     );
 
-    const transferResult = await signSendWait(this.client, transferTxs, msg.sender as AlgorandSigner);
+    const transferResult = await signSendWait(
+      this.client,
+      transferTxs,
+      msg.sender as AlgorandSigner
+    );
     return parseSequenceFromLogAlgorand(transferResult);
   }
 
@@ -122,7 +130,6 @@ export class Algorand implements WormholeChain {
     signer: AlgorandSigner,
     receipt: WormholeReceipt
   ): Promise<WormholeAsset> {
-
     const redeemTxs = await redeemOnAlgorand(
       this.client,
       this.tokenBridgeId,
@@ -131,8 +138,8 @@ export class Algorand implements WormholeChain {
       signer.getAddress()
     );
     const result = await signSendWait(this.client, redeemTxs, signer);
-    //TODO
-    return {chain: this, contract: BigInt(0)} as WormholeAsset;
+    //TODO: find asset id from resulting txids
+    return { chain: this, contract: BigInt(0) } as WormholeAsset;
   }
 
   createWrapped(
@@ -156,5 +163,4 @@ export class Algorand implements WormholeChain {
       receipt.VAA
     );
   }
-
 }
