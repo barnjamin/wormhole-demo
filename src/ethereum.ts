@@ -7,7 +7,6 @@ import {
   transferFromEth,
   createWrappedOnEth,
   updateWrappedOnEth,
-  approveEth,
   parseSequenceFromLogEth,
   nativeToHexString,
   attestFromEth,

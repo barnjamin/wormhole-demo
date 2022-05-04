@@ -10,13 +10,12 @@ import {
   getIsTransferCompletedAlgorand,
 } from "@certusone/wormhole-sdk";
 import { TransactionSignerPair } from "@certusone/wormhole-sdk/lib/cjs/algorand";
-import algosdk, { Algodv2, Transaction, waitForConfirmation } from "algosdk";
+import algosdk, { Algodv2, waitForConfirmation } from "algosdk";
 import {
   AlgorandSigner,
   WormholeAsset,
   WormholeAttestation,
   WormholeChain,
-  WormholeMessage,
   WormholeReceipt,
   WormholeTokenTransfer,
 } from "./wormhole";

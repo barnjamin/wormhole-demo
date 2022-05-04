@@ -115,13 +115,15 @@ export class Wormhole {
   // transmit Transfers tokens or arbitrary message into WormHole
   // Accepts Signer interface and a WormholeMessage
   // returns signed VAA
-  async transmit(transfer: WormholeTokenTransfer): Promise<WormholeReceipt> {
+  async transfer(transfer: WormholeTokenTransfer): Promise<WormholeReceipt> {
     const origin = transfer.origin.chain;
 
     const sequence = await origin.transfer(transfer);
     return await this.getVAA(sequence, origin);
   }
 
+  // TODO: Send is not a great name, since we transmit AND receive, 
+  // maybe perform? 
   async send(msg: WormholeMessage): Promise<WormholeAsset> {
     switch (msg.type) {
       case WormholeMessageType.Attestation:
@@ -131,7 +133,7 @@ export class Wormhole {
       case WormholeMessageType.TokenTransfer:
         if (msg.tokenTransfer === undefined)
           throw new Error("Type TokenTransfer but was undefined");
-        const receipt = await this.transmit(msg.tokenTransfer);
+        const receipt = await this.transfer(msg.tokenTransfer);
         return this.receive(msg.tokenTransfer.receiver, receipt);
     }
     return {} as WormholeAsset;
