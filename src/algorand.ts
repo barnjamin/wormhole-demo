@@ -31,7 +31,7 @@ export async function signSendWait(
   client: Algodv2,
   txns: TransactionSignerPair[],
   acct: AlgorandSigner
-) {
+): Promise<any[]> {
   algosdk.assignGroupID(
     txns.map((tx) => {
       return tx.tx;
@@ -47,15 +47,15 @@ export async function signSendWait(
     }
   }
 
+  const txids = txns.map((tx) => tx.tx.txID());
+
   await client.sendRawTransaction(signedTxns).do();
 
-  const result = await waitForConfirmation(
-    client,
-    txns[txns.length - 1].tx.txID(),
-    1
+  return Promise.all(
+    txids.map((txid) => {
+      waitForConfirmation(client, txid, 2);
+    })
   );
-
-  return result;
 }
 
 export class Algorand implements WormholeChain {
