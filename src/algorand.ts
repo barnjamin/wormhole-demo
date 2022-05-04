@@ -121,7 +121,7 @@ export class Algorand implements WormholeChain {
   async redeem(
     signer: AlgorandSigner,
     receipt: WormholeReceipt
-  ): Promise<boolean> {
+  ): Promise<WormholeAsset> {
 
     const redeemTxs = await redeemOnAlgorand(
       this.client,
@@ -130,8 +130,9 @@ export class Algorand implements WormholeChain {
       receipt.VAA,
       signer.getAddress()
     );
-    await signSendWait(this.client, redeemTxs, signer);
-    return true;
+    const result = await signSendWait(this.client, redeemTxs, signer);
+    //TODO
+    return {chain: this, contract: BigInt(0)} as WormholeAsset;
   }
 
   createWrapped(
@@ -155,4 +156,5 @@ export class Algorand implements WormholeChain {
       receipt.VAA
     );
   }
+
 }

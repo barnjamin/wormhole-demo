@@ -1,6 +1,5 @@
 import {
   Wormhole,
-  Signer,
   WormholeAsset,
   WormholeMessage,
   WormholeMessageType,
@@ -13,8 +12,8 @@ import { ethers } from "ethers";
 class AlgoSigner {
   account: algosdk.Account;
 
-  constructor() {
-    this.account = generateAccount();
+  constructor(acct?: algosdk.Account) {
+    this.account = acct === undefined? generateAccount(): acct;
   }
 
   getAddress(): string {
@@ -32,6 +31,11 @@ function getEthSigner(provider: any) {
   return new ethers.Wallet(ETH_PRIVATE_KEY, provider);
 }
 
+function getAlgoSigner(acct?: algosdk.Account): AlgoSigner {
+  return new AlgoSigner(acct);
+}
+
+
 (async function () {
   // Main wh interface, allows for mirror/transmit/receive
   const wh = new Wormhole();
@@ -41,28 +45,46 @@ function getEthSigner(provider: any) {
   const algo = new Algorand();
   const eth = new Ethereum();
 
-  // TODO: figure out a nice way to provide signer interface
-  const algo_sgn = new AlgoSigner();
+  // Get chain specific signers
+  const algo_sgn = getAlgoSigner(); 
   const eth_sgn = getEthSigner(getEthProvider());
 
-  // TODO: obv invalid for algo
-  // Maybe util method on WormholeChain to spit this out?
-  const algo_asset = {
+  // Asset we want to transfer 
+  const algo_asset: WormholeAsset = {
     chain: algo,
     contract: BigInt(0),
-  } as WormholeAsset;
+  } 
 
-  // Make sure the asset exists on the target chain
-  // Should check first either here or in method?
-  const mirrored = await wh.mirror(algo_sgn, algo_asset, eth_sgn, eth);
+  // Create Attestation 
+  const attestMsg: WormholeMessage = {
+    type: WormholeMessageType.Attestation,
+    attestation: {
+      origin: algo_asset,
+      sender: algo_sgn,
+      destination: eth,
+      receiver: eth_sgn
+    }
+  }
+  const eth_asset = await wh.send(attestMsg);
+  // Alternatively:
+  // const eth_asset = await wh.mirror(attestMsg.attestation)
 
   // transmit from src chain into wormhole
   // receipt is the VAA to be used on target chain
-  const receipt = await wh.transmit({
+  const xferMsg: WormholeMessage = {
     type: WormholeMessageType.TokenTransfer,
-  } as WormholeMessage);
+    tokenTransfer: {
+      origin: algo_asset,
+      sender: algo_sgn,
+      destination: eth_asset,
+      receiver: eth_sgn,
+      // TODO: note? App call?
+      amount: BigInt(100),
+    }
+  }
 
-  // Finally receive the asset on the target chain
-  // Using the VAA receipt we got above
-  const received = await wh.receive(eth_sgn, receipt);
+  await wh.send(xferMsg);
+
+  // Alternatively:
+  // await wg.receive(eth_sgn, await wg.transmit(xferMsg.tokenTransfer))
 })();

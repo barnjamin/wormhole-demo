@@ -57,7 +57,7 @@ export interface WormholeChain {
   attest(asset: WormholeAttestation): Promise<string>;
   transfer(msg: WormholeTokenTransfer): Promise<string>;
 
-  redeem(signer: Signer, receipt: WormholeReceipt): Promise<boolean>;
+  redeem(signer: Signer, receipt: WormholeReceipt): Promise<WormholeAsset>;
   createWrapped(signer: Signer, receipt: WormholeReceipt): Promise<WormholeAsset>;
   updateWrapped(signer: Signer, receipt: WormholeReceipt): Promise<WormholeAsset>;
 
@@ -88,58 +88,53 @@ export class Wormhole {
 
   // mirrors an asset from one chain to another
   // Returns the wormhole asset on the other chain
-  async mirror(
-    originSigner: Signer,
-    asset: WormholeAsset,
-    destSigner: Signer,
-    dest: WormholeChain
-  ): Promise<WormholeAsset> {
-    // TODO: Check if necessary?
+  async mirror(attestation: WormholeAttestation): Promise<WormholeAsset> {
+    // TODO: Check if this is even necessary?
 
-    const sequence = await asset.chain.attest({
-      origin: asset, 
-      sender: originSigner,
-      destination: dest,
-      receiver: destSigner,
-    });
+    const origin = attestation.origin.chain
+    const destination = attestation.destination
 
-    const receipt = await this.getVAA(sequence, asset.chain);
+    const sequence = await origin.attest(attestation);
+
+    const receipt = await this.getVAA(sequence, origin);
 
     try {
-      await dest.createWrapped(destSigner, receipt)
+      return await destination.createWrapped(attestation.receiver, receipt)
     }catch(e){
-      //
+      // 
     }
 
-    try {
-      await dest.updateWrapped(destSigner, receipt)
-    }catch(e){
-      //
-    }
-
-    return {} as WormholeAsset;
+    return await destination.updateWrapped(attestation.receiver, receipt)
   }
 
   // transmit Transfers tokens or arbitrary message into WormHole
   // Accepts Signer interface and a WormholeMessage
   // returns signed VAA
   async transmit(
-    msg: WormholeMessage
+    transfer: WormholeTokenTransfer 
   ): Promise<WormholeReceipt> {
+    const origin = transfer.origin.chain
 
-    if (msg.type !== WormholeMessageType.TokenTransfer || msg.tokenTransfer === undefined) throw new Error("Expected token transfer message");
-
-    const origin = msg.tokenTransfer.origin.chain
-
-    const sequence = await origin.transfer(msg.tokenTransfer);
-
+    const sequence = await origin.transfer(transfer);
     return await this.getVAA(sequence, origin)
+  }
+  
+  async send(msg: WormholeMessage): Promise<WormholeAsset> {
+    switch(msg.type){
+      case WormholeMessageType.Attestation:
+        if(msg.attestation === undefined) throw new Error("Type Attestation but was undefined")
+        return this.mirror(msg.attestation);
+      case WormholeMessageType.TokenTransfer:
+        if(msg.tokenTransfer === undefined) throw new Error("Type TokenTransfer but was undefined")
+        const receipt = await this.transmit(msg.tokenTransfer);
+        return this.receive(msg.tokenTransfer.receiver, receipt)
+    }
+    return {} as WormholeAsset
   }
 
   // Claims tokens or arbitrary message from wormhole given VAA
-  // Return TxId (?) from claim
-  async receive(signer: Signer, receipt: WormholeReceipt): Promise<string> {
-    const thing = await receipt.destination.redeem(signer, receipt);
-    return "";
+  async receive(signer: Signer, receipt: WormholeReceipt): Promise<WormholeAsset> {
+    return await receipt.destination.redeem(signer, receipt);
   }
+
 }

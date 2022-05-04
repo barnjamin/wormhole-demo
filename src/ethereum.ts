@@ -10,6 +10,7 @@ import {
   approveEth,
   parseSequenceFromLogEth,
   nativeToHexString,
+  attestFromEth,
 } from "@certusone/wormhole-sdk";
 import { ethers } from "ethers";
 import { ETH_BRIDGE_ADDRESS } from "./consts";
@@ -33,12 +34,30 @@ export class Ethereum implements WormholeChain {
   tokenBridgeAddress: string = ETH_TOKEN_BRIDGE_ADDRESS;
   id: ChainId = CHAIN_ID_ETH;
 
+  provider: any;
+
+  constructor(){
+    this.provider = getEthProvider()
+  }
+
   emitterAddress(): string {
     return getEmitterAddressEth(ETH_TOKEN_BRIDGE_ADDRESS);
   }
 
-  async attest(msg: WormholeAttestation): Promise<string> {
-    throw new Error("Method not implemented.");
+  async attest(attestation: WormholeAttestation): Promise<string> {
+    if (typeof attestation.origin.contract !== "string")
+      throw new Error("Expected bigint for asset, got string");
+
+    if (!(attestation.sender instanceof ethers.Signer))
+      throw new Error("Expected ethers.Signer");
+
+    const receipt = await attestFromEth(
+      this.tokenBridgeAddress,
+      attestation.sender,
+      attestation.origin.contract
+    );
+
+    return parseSequenceFromLogEth(receipt, this.tokenBridgeAddress);
   }
 
   async transfer(msg: WormholeTokenTransfer): Promise<string> {
@@ -70,32 +89,38 @@ export class Ethereum implements WormholeChain {
   async redeem(
     signer: ethers.Signer,
     receipt: WormholeReceipt
-  ): Promise<boolean> {
-    const provider = getEthProvider();
-    await redeemOnEth(this.tokenBridgeAddress, signer, receipt.VAA);
-    return true;
+  ): Promise<WormholeAsset> {
+    const {contractAddress} = await redeemOnEth(this.tokenBridgeAddress, signer, receipt.VAA);
+    return {chain: this, contract: contractAddress} as WormholeAsset
   }
 
   async createWrapped(
     signer: ethers.Signer,
     receipt: WormholeReceipt
   ): Promise<WormholeAsset> {
-    const {contractAddress} = await createWrappedOnEth(this.tokenBridgeAddress, signer, receipt.VAA);
+    const { contractAddress } = await createWrappedOnEth(
+      this.tokenBridgeAddress,
+      signer,
+      receipt.VAA
+    );
     return { chain: this, contract: contractAddress };
   }
   async updateWrapped(
     signer: ethers.Signer,
     receipt: WormholeReceipt
   ): Promise<WormholeAsset> {
-    const {contractAddress} = await updateWrappedOnEth(this.tokenBridgeAddress, signer, receipt.VAA);
+    const { contractAddress } = await updateWrappedOnEth(
+      this.tokenBridgeAddress,
+      signer,
+      receipt.VAA
+    );
     return { chain: this, contract: contractAddress };
   }
 
   async transactionComplete(receipt: WormholeReceipt): Promise<boolean> {
-    const provider = getEthProvider();
     return await getIsTransferCompletedEth(
       this.tokenBridgeAddress,
-      provider,
+      this.provider,
       receipt.VAA
     );
   }
