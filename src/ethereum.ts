@@ -51,12 +51,7 @@ export class Ethereum implements WormholeChain {
     let assetBytes: Uint8Array;
 
     if (typeof asset === "bigint") {
-      const a = parseInt(asset.toString());
-      const originAssetHex = (
-        "0000000000000000000000000000000000000000000000000000000000000000" +
-        a.toString(16)
-      ).slice(-64);
-      console.log(originAssetHex);
+      const originAssetHex = ("0".repeat(64), asset.toString(16)).slice(-64);
       assetBytes = hexToUint8Array(originAssetHex);
     } else {
       assetBytes = hexToUint8Array(asset);

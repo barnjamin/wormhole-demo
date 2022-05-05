@@ -11,11 +11,39 @@ This repo just formalizes the API and hides specific chain details in a Wormhole
 
 ### TODO:
 
-Actually test it
+- [ ] Algo: 
 
-Implement more chains
+    - [x] - Attest new asset 
+    - [ ] - Xfer out 
+    - [ ] - Claim VAA 
+    - [ ] - Find original Asset
 
-Add other message types (payload 3?)
+- [ ] Eth:
+
+    - [ ] - Attest new asset 
+    - [ ] - Xfer out 
+    - [ ] - Claim VAA
+
+- [ ] Sol:
+
+    - [ ] - Attest new asset 
+    - [ ] - Xfer out 
+    - [ ] - Claim VAA
+
+- [ ] Terra:
+
+    - [ ] - Attest new asset 
+    - [ ] - Xfer out 
+    - [ ] - Claim VAA
+
+- [ ] Avalanche:
+    - [ ] - Attest new asset 
+    - [ ] - Xfer out 
+    - [ ] - Claim VAA
+
+- [ ] Tests? (lol)
+
+- [ ] Payload 3? 
 
 Build some demo programs for fun stuff 
 
