@@ -123,7 +123,14 @@ export class Wormhole {
   // Returns the wormhole asset on the other chain
   async mirror(attestation: WormholeAttestation): Promise<WormholeAsset> {
     // TODO: Check if this is even necessary?
-    //await this.lookup(attestation.origin)
+    //const wi = await this.getOrigin(attestation.origin)
+    //if(wi.isWrapped) throw new Error("This is a wrapped asset, mirror from the origin chain: " + JSON.stringify(wi))
+    //try {
+    //  const mirrored = await this.getMirrored(attestation.origin, attestation.destination)
+    //  //throw a new error?
+    //}catch(e){
+    //  // Not found, 
+    //}
 
     const origin = attestation.origin.chain;
     const destination = attestation.destination;

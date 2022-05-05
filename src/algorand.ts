@@ -10,11 +10,9 @@ import {
   getIsTransferCompletedAlgorand,
   WormholeWrappedInfo,
   getForeignAssetAlgorand,
-  getIsWrappedAssetAlgorand,
   getOriginalAssetAlgorand,
 } from "@certusone/wormhole-sdk";
 import { TransactionSignerPair } from "@certusone/wormhole-sdk/lib/cjs/algorand";
-import { WormholeInterface } from "@certusone/wormhole-sdk/lib/cjs/ethers-contracts/Wormhole";
 import algosdk, { Algodv2, waitForConfirmation } from "algosdk";
 import {
   ALGORAND_BRIDGE_ID,
