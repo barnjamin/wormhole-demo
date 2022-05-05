@@ -15,9 +15,10 @@ import {
   hexToUint8Array,
   getForeignAssetEth,
   CHAIN_ID_ETHEREUM_ROPSTEN,
+  approveEth,
 } from "@certusone/wormhole-sdk";
 import { ethers } from "ethers";
-import { ETH_BRIDGE_ADDRESS, ETH_TOKEN_BRIDGE_ADDRESS, ROPSTEN_ETH_BRIDGE_ADDRESS, ROPSTEN_ETH_NETWORK_CHAIN_ID, ROPSTEN_ETH_TOKEN_BRIDGE_ADDRESS } from "./consts";
+import { ROPSTEN_ETH_BRIDGE_ADDRESS, ROPSTEN_ETH_TOKEN_BRIDGE_ADDRESS } from "./consts";
 import {
   WormholeAsset,
   WormholeAttestation,
@@ -34,7 +35,8 @@ export class Ethereum implements WormholeChain {
   provider: any;
 
   constructor(network?: string) {
-    this.provider = ethers.getDefaultProvider(network ||= "ropsten");
+    const apiKey = "2JKQAWARYH6QSI5QX5485DPHP3SN2EAI9Q"
+    this.provider = new ethers.providers.EtherscanProvider(network||= "ropsten", apiKey);
   }
   async lookupOriginal(asset: string): Promise<WormholeWrappedInfo> {
     return await getOriginalAssetEth(
@@ -68,7 +70,7 @@ export class Ethereum implements WormholeChain {
   }
 
   emitterAddress(): string {
-    return getEmitterAddressEth(ETH_TOKEN_BRIDGE_ADDRESS);
+    return getEmitterAddressEth(this.coreId);
   }
 
   async attest(attestation: WormholeAttestation): Promise<string> {
@@ -101,11 +103,13 @@ export class Ethereum implements WormholeChain {
 
     if (hexStr === null) throw new Error("Couldnt parse address for receiver");
 
+    await approveEth(this.tokenBridgeAddress, msg.origin.contract, msg.sender, msg.amount)
+
     const receipt = await transferFromEth(
       this.tokenBridgeAddress,
       msg.sender,
       msg.origin.contract,
-      msg.amount.toString(),
+      msg.amount,
       msg.destination.chain.id,
       new Uint8Array(Buffer.from(hexStr, "hex"))
     );
@@ -117,11 +121,13 @@ export class Ethereum implements WormholeChain {
     signer: ethers.Signer,
     receipt: WormholeReceipt
   ): Promise<WormholeAsset> {
+    console.log("Here")
     const { contractAddress } = await redeemOnEth(
       this.tokenBridgeAddress,
       signer,
       receipt.VAA
     );
+    console.log(contractAddress)
     return { chain: this, contract: contractAddress } as WormholeAsset;
   }
 

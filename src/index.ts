@@ -12,12 +12,17 @@ import { Ethereum } from "./ethereum";
 import { Algorand } from "./algorand";
 import algosdk, {
   generateAccount,
-  mnemonicFromSeed,
   mnemonicToSecretKey,
-  secretKeyToMnemonic,
 } from "algosdk";
 import { ethers } from "ethers";
-import { getOriginalAssetEth } from "@certusone/wormhole-sdk";
+
+import {
+  Connection,
+  Keypair,
+  PublicKey,
+  TokenAccountsFilter,
+  Transaction,
+} from "@solana/web3.js";
 
 class AlgoSigner {
   account: algosdk.Account;
@@ -35,9 +40,27 @@ class AlgoSigner {
   }
 }
 
+
+class SolanaSigner {
+  keypair: Keypair;
+  constructor(privateKey: Uint8Array){
+      this.keypair = Keypair.fromSecretKey(privateKey);
+  }
+
+  getAddress(){
+      return this.keypair.publicKey.toString();    
+  }
+  async signTxn(txn: Transaction): Promise<Buffer> {
+    txn.partialSign(this.keypair)
+    return txn.serialize()
+  }
+
+}
+
+
 function getEthSigner(provider: any) {
-  const ETH_PRIVATE_KEY =
-    "0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d";
+  //const ETH_PRIVATE_KEY = "0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d";
+  const ETH_PRIVATE_KEY = "0x3f493e59e81db1be4ebbe18b28ba8fdd066ef44139420ead59f37f5dacb80719";
   return new ethers.Wallet(ETH_PRIVATE_KEY, provider);
 }
 
@@ -48,8 +71,7 @@ function getAlgoSigner(acct?: algosdk.Account): AlgoSigner {
 }
 
 (async function () {
-  // Main wh interface, allows for {mirror, transmit, receive, getVaa}
-  // TODO: What config should we pass? RPC address?
+  // Main wh interface, allows for {mirror, transfer, and attest, receive, getVaa}
   const wh = new Wormhole(WORMHOLE_RPC_HOSTS);
   console.log(WORMHOLE_RPC_HOSTS);
 
@@ -62,8 +84,8 @@ function getAlgoSigner(acct?: algosdk.Account): AlgoSigner {
 
   // Get chain specific signers
   const algo_sgn = getAlgoSigner();
-  console.log(algo_sgn.getAddress())
   const eth_sgn = getEthSigner(eth.provider);
+
   console.log("Created Signers ");
 
   // Asset we want to transfer
@@ -71,9 +93,6 @@ function getAlgoSigner(acct?: algosdk.Account): AlgoSigner {
     chain: algo,
     contract: BigInt(0),
   };
-
-  //console.log(await wh.getOrigin(algo_asset));
-  //console.log(await wh.getMirrored(algo_asset, eth));
 
   // Create Attestation
   const attestation: WormholeAttestation = {
@@ -91,30 +110,50 @@ function getAlgoSigner(acct?: algosdk.Account): AlgoSigner {
   const receipt = await wh.getVAA(seq, algo);
   console.log("Got VAA: ", receipt);
 
-  const eth_asset = await eth.createWrapped(eth_sgn, receipt);
-  console.log("Successfully wrapped")
-  console.log(eth_asset)
+  const eth_asset = await wh.getMirrored(algo_asset, eth)
 
-  // Alternatively:
-  // const eth_asset = await wh.mirror(attestMsg.attestation)
+  //let eth_asset: WormholeAsset;
+  //try {
+  //  eth_asset = await eth.createWrapped(eth_sgn, receipt);
+  //}catch(e){
+  //  //console.error("Failed: ", e)
+  //}
+  //eth_asset = await eth.updateWrapped(eth_sgn, receipt);
+  //console.log("Successfully wrapped")
+  //console.log(eth_asset)
 
   // transmit from src chain into wormhole
   // receipt is the VAA to be used on target chain
-  //const xferMsg: WormholeMessage = {
-  //  type: WormholeMessageType.TokenTransfer,
-  //  tokenTransfer: {
-  //    origin: algo_asset,
-  //    sender: algo_sgn,
-  //    destination: eth_asset,
-  //    receiver: eth_sgn,
-  //    // TODO: note? App call?
-  //    amount: BigInt(100),
-  //  },
-  //};
+  const xferAlgoEth: WormholeMessage = {
+    type: WormholeMessageType.TokenTransfer,
+    tokenTransfer: {
+      origin: algo_asset,
+      sender: algo_sgn,
+      destination: eth_asset,
+      receiver: eth_sgn,
+      amount: BigInt(100),
+    },
+  };
+  const xferEthAlgo: WormholeMessage = {
+    type: WormholeMessageType.TokenTransfer,
+    tokenTransfer: {
+      destination: algo_asset,
+      receiver: algo_sgn,
+      origin: eth_asset,
+      sender: eth_sgn,
+      amount: BigInt(100),
+    },
+  };
 
-  //console.log("Created xfer message:", xferMsg)
-  ////await wh.send(xferMsg);
+  console.log("Getting vaa for 29")
+  const vaa = await wh.getVAA("29", algo)
+  console.log("Got vaa ", vaa)
 
-  //// Alternatively:
-  //// await wg.receive(eth_sgn, await wg.transmit(xferMsg.tokenTransfer))
+  console.log(await eth.redeem(eth_sgn, vaa))
+  
+  //console.log(await wh.send(xferAlgoEth));
+  //console.log(await wh.send(xferEthAlgo));
+
+  // Alternatively:
+  // await wh.receive(eth_sgn, await wh.transmit(xferMsg.tokenTransfer))
 })();

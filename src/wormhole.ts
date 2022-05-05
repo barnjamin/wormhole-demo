@@ -12,7 +12,12 @@ export interface AlgorandSigner {
   signTxn(txn: any): Promise<Uint8Array>;
 }
 
-export type Signer = AlgorandSigner | ethers.Signer;
+export interface SolanaSigner {
+  getAddress(): string;
+  signTxn(txn: any): Promise<Buffer>;
+}
+
+export type Signer = AlgorandSigner | ethers.Signer | SolanaSigner;
 
 export type WormholeAsset = {
   chain: WormholeChain;
@@ -153,7 +158,9 @@ export class Wormhole {
   async transfer(transfer: WormholeTokenTransfer): Promise<WormholeReceipt> {
     const origin = transfer.origin.chain;
     const sequence = await origin.transfer(transfer);
-    return await this.getVAA(sequence, origin);
+    console.log("Transferred with sequence: ", sequence)
+    const receipt = await this.getVAA(sequence, origin)
+    return {...receipt, destination: transfer.destination.chain} as WormholeReceipt;
   }
 
   // TODO: Send is not a great name, since we transmit AND receive,
@@ -168,6 +175,7 @@ export class Wormhole {
         if (msg.tokenTransfer === undefined)
           throw new Error("Type TokenTransfer but was undefined");
         const receipt = await this.transfer(msg.tokenTransfer);
+        console.log("Got receipt: ", receipt)
         return this.receive(msg.tokenTransfer.receiver, receipt);
     }
     return {} as WormholeAsset;
@@ -178,6 +186,7 @@ export class Wormhole {
     signer: Signer,
     receipt: WormholeReceipt
   ): Promise<WormholeAsset> {
+    console.log("Redeeming on ", receipt.destination)
     return await receipt.destination.redeem(signer, receipt);
   }
 

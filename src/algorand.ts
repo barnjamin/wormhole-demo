@@ -11,6 +11,7 @@ import {
   WormholeWrappedInfo,
   getForeignAssetAlgorand,
   getOriginalAssetAlgorand,
+  createWrappedOnAlgorand,
 } from "@certusone/wormhole-sdk";
 import { TransactionSignerPair } from "@certusone/wormhole-sdk/lib/cjs/algorand";
 import algosdk, { Algodv2, waitForConfirmation } from "algosdk";
@@ -152,7 +153,7 @@ export class Algorand implements WormholeChain {
       transferTxs,
       msg.sender as AlgorandSigner
     );
-    return parseSequenceFromLogAlgorand(transferResult);
+    return parseSequenceFromLogAlgorand(transferResult[transferResult.length - 1]);
   }
 
   async redeem(
@@ -171,11 +172,24 @@ export class Algorand implements WormholeChain {
     return { chain: this, contract: BigInt(0) } as WormholeAsset;
   }
 
-  createWrapped(
+  async createWrapped(
     signer: AlgorandSigner,
     receipt: WormholeReceipt
   ): Promise<WormholeAsset> {
-    throw new Error("Method not implemented.");
+      const txs = await createWrappedOnAlgorand(
+          this.client,
+          this.tokenBridgeId,
+          this.coreId,
+          signer.getAddress(),
+          receipt.VAA 
+        );
+      const results = await signSendWait(this.client, txs, signer)
+      console.log(results)
+      for(const result in results){
+        // Find created asset id
+      }
+
+      return {} as WormholeAsset
   }
 
   updateWrapped(
