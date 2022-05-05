@@ -10,6 +10,10 @@ import {
   parseSequenceFromLogEth,
   nativeToHexString,
   attestFromEth,
+  WormholeWrappedInfo,
+  getOriginalAssetEth,
+  hexToUint8Array,
+  getForeignAssetEth,
 } from "@certusone/wormhole-sdk";
 import { ethers } from "ethers";
 import { ETH_BRIDGE_ADDRESS, ETH_TOKEN_BRIDGE_ADDRESS } from "./consts";
@@ -21,7 +25,6 @@ import {
   WormholeTokenTransfer,
 } from "./wormhole";
 
-
 export class Ethereum implements WormholeChain {
   coreId: string = ETH_BRIDGE_ADDRESS;
   tokenBridgeAddress: string = ETH_TOKEN_BRIDGE_ADDRESS;
@@ -30,7 +33,41 @@ export class Ethereum implements WormholeChain {
   provider: any;
 
   constructor(network?: string) {
-    this.provider = ethers.getDefaultProvider(network||='ropsten');
+    this.provider = ethers.getDefaultProvider((network ||= "ropsten"));
+  }
+  async getOrigin(asset: string): Promise<WormholeWrappedInfo> {
+    return await getOriginalAssetEth(
+      this.tokenBridgeAddress,
+      this.provider,
+      asset,
+      this.id
+    );
+  }
+
+  async getWrapped(
+    asset: string | bigint,
+    chain: WormholeChain
+  ): Promise<string | bigint | null> {
+    let assetBytes: Uint8Array;
+
+    if (typeof asset === "bigint") {
+      const a = parseInt(asset.toString());
+      const originAssetHex = (
+        "0000000000000000000000000000000000000000000000000000000000000000" +
+        a.toString(16)
+      ).slice(-64);
+      console.log(originAssetHex);
+      assetBytes = hexToUint8Array(originAssetHex);
+    } else {
+      assetBytes = hexToUint8Array(asset);
+    }
+
+    return getForeignAssetEth(
+      this.tokenBridgeAddress,
+      this.provider,
+      chain.id,
+      assetBytes
+    );
   }
 
   emitterAddress(): string {

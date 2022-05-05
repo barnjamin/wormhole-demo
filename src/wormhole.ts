@@ -1,5 +1,10 @@
 import { NodeHttpTransport } from "@improbable-eng/grpc-web-node-http-transport";
-import { getSignedVAAWithRetry, ChainId } from "@certusone/wormhole-sdk";
+import {
+  getSignedVAAWithRetry,
+  ChainId,
+  WormholeWrappedInfo,
+  getOriginalAssetAlgorand,
+} from "@certusone/wormhole-sdk";
 import { ethers } from "ethers";
 
 export interface AlgorandSigner {
@@ -66,15 +71,19 @@ export interface WormholeChain {
     receipt: WormholeReceipt
   ): Promise<WormholeAsset>;
 
+  getOrigin(asset: string | bigint): Promise<WormholeWrappedInfo>;
+  getWrapped(
+    asset: string | bigint,
+    chain: WormholeChain
+  ): Promise<string | bigint | null>;
+
   transactionComplete(receipt: WormholeReceipt): Promise<boolean>;
 }
 
 export class Wormhole {
   rpcHosts: string[];
   constructor(rpc: string[]) {
-    this.rpcHosts = rpc
-    // Config? RPC addr?
-    // List of acceptable chains?
+    this.rpcHosts = rpc;
   }
 
   async getVAA(
@@ -86,16 +95,27 @@ export class Wormhole {
       chain.id,
       chain.emitterAddress(),
       sequence,
-      { transport: NodeHttpTransport() }
+      { transport: NodeHttpTransport(), debug: true }
     );
 
     return { VAA: vaaBytes, origin: chain } as WormholeReceipt;
+  }
+
+  async lookup(
+    asset: WormholeAsset,
+    chain?: WormholeChain
+  ): Promise<WormholeWrappedInfo> {
+    if (chain === undefined) return asset.chain.getOrigin(asset.contract);
+    const wrapped = await chain.getWrapped(asset.contract, asset.chain);
+    if (wrapped === null) throw new Error("Couldnt find the asset");
+    return await chain.getOrigin(wrapped);
   }
 
   // mirrors an asset from one chain to another
   // Returns the wormhole asset on the other chain
   async mirror(attestation: WormholeAttestation): Promise<WormholeAsset> {
     // TODO: Check if this is even necessary?
+    //await this.lookup(attestation.origin)
 
     const origin = attestation.origin.chain;
     const destination = attestation.destination;
@@ -123,8 +143,8 @@ export class Wormhole {
     return await this.getVAA(sequence, origin);
   }
 
-  // TODO: Send is not a great name, since we transmit AND receive, 
-  // maybe perform? 
+  // TODO: Send is not a great name, since we transmit AND receive,
+  // maybe perform?
   async send(msg: WormholeMessage): Promise<WormholeAsset> {
     switch (msg.type) {
       case WormholeMessageType.Attestation:

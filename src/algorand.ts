@@ -8,10 +8,18 @@ import {
   getEmitterAddressAlgorand,
   nativeToHexString,
   getIsTransferCompletedAlgorand,
+  WormholeWrappedInfo,
+  getForeignAssetAlgorand,
+  getIsWrappedAssetAlgorand,
+  getOriginalAssetAlgorand,
 } from "@certusone/wormhole-sdk";
 import { TransactionSignerPair } from "@certusone/wormhole-sdk/lib/cjs/algorand";
 import algosdk, { Algodv2, waitForConfirmation } from "algosdk";
-import { ALGORAND_BRIDGE_ID, ALGORAND_HOST, ALGORAND_TOKEN_BRIDGE_ID } from "./consts";
+import {
+  ALGORAND_BRIDGE_ID,
+  ALGORAND_HOST,
+  ALGORAND_TOKEN_BRIDGE_ID,
+} from "./consts";
 import {
   AlgorandSigner,
   WormholeAsset,
@@ -21,37 +29,39 @@ import {
   WormholeTokenTransfer,
 } from "./wormhole";
 
-
-
 export async function signSendWait(
   client: Algodv2,
   txns: TransactionSignerPair[],
   acct: AlgorandSigner
 ): Promise<any[]> {
-  algosdk.assignGroupID(
-    txns.map((tx) => {
-      return tx.tx;
-    })
-  );
+  const txs = txns.map((tx) => {
+    return tx.tx;
+  });
+  algosdk.assignGroupID(txs);
 
   const signedTxns: Uint8Array[] = [];
-  for (const tx of txns) {
-    if (tx.signer) {
-      signedTxns.push(await tx.signer.signTxn(tx.tx));
+  for (const idx in txns) {
+    const txn = txns[idx];
+    const tx = txs[idx];
+    if (txn.signer) {
+      signedTxns.push(await txn.signer.signTxn(tx));
     } else {
-      signedTxns.push(await acct.signTxn(tx.tx));
+      signedTxns.push(await acct.signTxn(tx));
     }
   }
 
-  const txids = txns.map((tx) => tx.tx.txID());
+  const txids = txs.map((tx) => tx.txID());
 
   await client.sendRawTransaction(signedTxns).do();
 
-  return Promise.all(
-    txids.map((txid) => {
-      waitForConfirmation(client, txid, 2);
+  const results = await Promise.all(
+    txids.map(async (txid) => {
+      console.log(txid);
+      return await waitForConfirmation(client, txid, 2);
     })
   );
+  console.log(results);
+  return results;
 }
 
 export class Algorand implements WormholeChain {
@@ -63,8 +73,28 @@ export class Algorand implements WormholeChain {
   client: Algodv2;
 
   constructor() {
-    const {algodToken, algodServer, algodPort} = ALGORAND_HOST
+    const { algodToken, algodServer, algodPort } = ALGORAND_HOST;
     this.client = new Algodv2(algodToken, algodServer, algodPort);
+  }
+
+  async getOrigin(asset: bigint): Promise<WormholeWrappedInfo> {
+    return await getOriginalAssetAlgorand(
+      this.client,
+      this.tokenBridgeId,
+      asset
+    );
+  }
+
+  async getWrapped(
+    asset: string,
+    chain: WormholeChain
+  ): Promise<bigint | null> {
+    return await getForeignAssetAlgorand(
+      this.client,
+      this.tokenBridgeId,
+      chain.id,
+      asset
+    );
   }
 
   emitterAddress(): string {
@@ -88,7 +118,8 @@ export class Algorand implements WormholeChain {
       txs,
       attestation.sender as AlgorandSigner
     );
-    return parseSequenceFromLogAlgorand(result);
+    // Parse only the last one since it'll have the logged message
+    return parseSequenceFromLogAlgorand(result[result.length - 1]);
   }
 
   async transfer(msg: WormholeTokenTransfer): Promise<string> {
