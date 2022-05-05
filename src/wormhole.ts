@@ -71,13 +71,19 @@ export interface WormholeChain {
     receipt: WormholeReceipt
   ): Promise<WormholeAsset>;
 
-  getOrigin(asset: string | bigint): Promise<WormholeWrappedInfo>;
-  getWrapped(
+  // Gets the original contract/asset id and chain for this asset locally 
+  lookupOriginal(asset: string | bigint): Promise<WormholeWrappedInfo>;
+  // Get the local contract/asset id for some original asset 
+  lookupMirrored(
     asset: string | bigint,
     chain: WormholeChain
-  ): Promise<string | bigint | null>;
+  ): Promise<WormholeAsset>;
 
   transactionComplete(receipt: WormholeReceipt): Promise<boolean>;
+
+  getAssetAsString(asset: bigint): string;
+  getAssetAsInt(asset: string): bigint;
+
 }
 
 export class Wormhole {
@@ -101,14 +107,16 @@ export class Wormhole {
     return { VAA: vaaBytes, origin: chain } as WormholeReceipt;
   }
 
-  async lookup(
+  async getOrigin(
     asset: WormholeAsset,
-    chain?: WormholeChain
   ): Promise<WormholeWrappedInfo> {
-    if (chain === undefined) return asset.chain.getOrigin(asset.contract);
-    const wrapped = await chain.getWrapped(asset.contract, asset.chain);
-    if (wrapped === null) throw new Error("Couldnt find the asset");
-    return await chain.getOrigin(wrapped);
+    return asset.chain.lookupOriginal(asset.contract);
+  }
+  async getMirrored(
+    asset: WormholeAsset,
+    chain: WormholeChain
+  ): Promise<WormholeAsset> {
+    return await chain.lookupMirrored(asset.contract, asset.chain);
   }
 
   // mirrors an asset from one chain to another
@@ -120,25 +128,23 @@ export class Wormhole {
     const origin = attestation.origin.chain;
     const destination = attestation.destination;
 
-    const sequence = await origin.attest(attestation);
+    const sequence = await destination.attest(attestation);
 
     const receipt = await this.getVAA(sequence, origin);
 
     try {
-      return await destination.createWrapped(attestation.receiver, receipt);
+      return await destination.createWrapped(attestation.sender, receipt);
     } catch (e) {
       //
     }
 
-    return await destination.updateWrapped(attestation.receiver, receipt);
+    return await destination.updateWrapped(attestation.sender, receipt);
   }
 
-  // transmit Transfers tokens or arbitrary message into WormHole
-  // Accepts Signer interface and a WormholeMessage
+  // Transfers tokens into WormHole
   // returns signed VAA
   async transfer(transfer: WormholeTokenTransfer): Promise<WormholeReceipt> {
     const origin = transfer.origin.chain;
-
     const sequence = await origin.transfer(transfer);
     return await this.getVAA(sequence, origin);
   }
@@ -167,4 +173,6 @@ export class Wormhole {
   ): Promise<WormholeAsset> {
     return await receipt.destination.redeem(signer, receipt);
   }
+
+
 }

@@ -14,9 +14,10 @@ import {
   getOriginalAssetEth,
   hexToUint8Array,
   getForeignAssetEth,
+  CHAIN_ID_ETHEREUM_ROPSTEN,
 } from "@certusone/wormhole-sdk";
 import { ethers } from "ethers";
-import { ETH_BRIDGE_ADDRESS, ETH_TOKEN_BRIDGE_ADDRESS } from "./consts";
+import { ETH_BRIDGE_ADDRESS, ETH_TOKEN_BRIDGE_ADDRESS, ROPSTEN_ETH_BRIDGE_ADDRESS, ROPSTEN_ETH_NETWORK_CHAIN_ID, ROPSTEN_ETH_TOKEN_BRIDGE_ADDRESS } from "./consts";
 import {
   WormholeAsset,
   WormholeAttestation,
@@ -26,16 +27,16 @@ import {
 } from "./wormhole";
 
 export class Ethereum implements WormholeChain {
-  coreId: string = ETH_BRIDGE_ADDRESS;
-  tokenBridgeAddress: string = ETH_TOKEN_BRIDGE_ADDRESS;
-  id: ChainId = CHAIN_ID_ETH;
+  coreId: string = ROPSTEN_ETH_BRIDGE_ADDRESS;
+  tokenBridgeAddress: string = ROPSTEN_ETH_TOKEN_BRIDGE_ADDRESS;
+  id: ChainId = CHAIN_ID_ETHEREUM_ROPSTEN;
 
   provider: any;
 
   constructor(network?: string) {
-    this.provider = ethers.getDefaultProvider((network ||= "ropsten"));
+    this.provider = ethers.getDefaultProvider(network ||= "ropsten");
   }
-  async getOrigin(asset: string): Promise<WormholeWrappedInfo> {
+  async lookupOriginal(asset: string): Promise<WormholeWrappedInfo> {
     return await getOriginalAssetEth(
       this.tokenBridgeAddress,
       this.provider,
@@ -44,25 +45,26 @@ export class Ethereum implements WormholeChain {
     );
   }
 
-  async getWrapped(
+  async lookupMirrored(
     asset: string | bigint,
     chain: WormholeChain
-  ): Promise<string | bigint | null> {
+  ): Promise<WormholeAsset> {
     let assetBytes: Uint8Array;
 
     if (typeof asset === "bigint") {
-      const originAssetHex = ("0".repeat(64), asset.toString(16)).slice(-64);
-      assetBytes = hexToUint8Array(originAssetHex);
+      assetBytes = hexToUint8Array(chain.getAssetAsString(asset))
     } else {
       assetBytes = hexToUint8Array(asset);
     }
 
-    return getForeignAssetEth(
+    const fa = await getForeignAssetEth(
       this.tokenBridgeAddress,
       this.provider,
       chain.id,
       assetBytes
     );
+
+    return { chain: this, contract: fa } as WormholeAsset
   }
 
   emitterAddress(): string {
@@ -70,8 +72,8 @@ export class Ethereum implements WormholeChain {
   }
 
   async attest(attestation: WormholeAttestation): Promise<string> {
-    if (typeof attestation.origin.contract !== "string")
-      throw new Error("Expected bigint for asset, got string");
+    if (typeof attestation.origin.contract === "bigint")
+      throw new Error("Expected string contract, got bigint")
 
     if (!(attestation.sender instanceof ethers.Signer))
       throw new Error("Expected ethers.Signer");
@@ -79,10 +81,10 @@ export class Ethereum implements WormholeChain {
     const receipt = await attestFromEth(
       this.tokenBridgeAddress,
       attestation.sender,
-      attestation.origin.contract
+      attestation.origin.contract,
     );
 
-    return parseSequenceFromLogEth(receipt, this.tokenBridgeAddress);
+    return parseSequenceFromLogEth(receipt, this.coreId);
   }
 
   async transfer(msg: WormholeTokenTransfer): Promise<string> {
@@ -152,5 +154,12 @@ export class Ethereum implements WormholeChain {
       this.provider,
       receipt.VAA
     );
+  }
+
+  getAssetAsString(asset: bigint): string {
+    throw new Error("Method not implemented.");
+  }
+  getAssetAsInt(asset: string): bigint {
+    throw new Error("Method not implemented.");
   }
 }

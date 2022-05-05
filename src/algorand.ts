@@ -14,6 +14,7 @@ import {
   getOriginalAssetAlgorand,
 } from "@certusone/wormhole-sdk";
 import { TransactionSignerPair } from "@certusone/wormhole-sdk/lib/cjs/algorand";
+import { WormholeInterface } from "@certusone/wormhole-sdk/lib/cjs/ethers-contracts/Wormhole";
 import algosdk, { Algodv2, waitForConfirmation } from "algosdk";
 import {
   ALGORAND_BRIDGE_ID,
@@ -76,25 +77,26 @@ export class Algorand implements WormholeChain {
     const { algodToken, algodServer, algodPort } = ALGORAND_HOST;
     this.client = new Algodv2(algodToken, algodServer, algodPort);
   }
-
-  async getOrigin(asset: bigint): Promise<WormholeWrappedInfo> {
-    return await getOriginalAssetAlgorand(
+  async lookupOriginal(asset: bigint): Promise<WormholeWrappedInfo> {
+    return getOriginalAssetAlgorand(
       this.client,
       this.tokenBridgeId,
       asset
     );
   }
 
-  async getWrapped(
+  async lookupMirrored(
     asset: string,
     chain: WormholeChain
-  ): Promise<bigint | null> {
-    return await getForeignAssetAlgorand(
+  ): Promise<WormholeAsset> {
+    const fa = await getForeignAssetAlgorand(
       this.client,
       this.tokenBridgeId,
       chain.id,
       asset
     );
+
+    return { chain: this, contract: fa } as WormholeAsset
   }
 
   emitterAddress(): string {
@@ -118,6 +120,7 @@ export class Algorand implements WormholeChain {
       txs,
       attestation.sender as AlgorandSigner
     );
+
     // Parse only the last one since it'll have the logged message
     return parseSequenceFromLogAlgorand(result[result.length - 1]);
   }
@@ -191,4 +194,12 @@ export class Algorand implements WormholeChain {
       receipt.VAA
     );
   }
+  getAssetAsString(asset: bigint): string {
+    return ("0".repeat(64) + asset.toString()).slice(-64);
+  }
+
+  getAssetAsInt(asset: string): bigint {
+    return BigInt(0)
+  }
+
 }

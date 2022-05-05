@@ -71,21 +71,21 @@ function getAlgoSigner(acct?: algosdk.Account): AlgoSigner {
     contract: BigInt(0),
   };
 
-  console.log(await wh.lookup(algo_asset));
-  console.log(await wh.lookup(algo_asset, eth));
-  return;
+  //console.log(await wh.getOrigin(algo_asset));
+  //console.log(await wh.getMirrored(algo_asset, eth));
 
   // Create Attestation
   const attestation: WormholeAttestation = {
     origin: algo_asset,
     sender: algo_sgn,
-
     destination: eth,
-    receiver: eth_sgn,
+    receiver: eth_sgn
   };
 
-  const seq = await algo.attest(attestation);
-  console.log("Got seq: ", seq);
+  //const seq = await algo.attest(attestation);
+  //console.log("Got seq: ", seq);
+
+  const seq = "18"
 
   const vaa = await wh.getVAA(seq, algo);
   console.log("Got VAA: ", vaa);
