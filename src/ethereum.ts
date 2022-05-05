@@ -84,7 +84,7 @@ export class Ethereum implements WormholeChain {
       attestation.origin.contract,
     );
 
-    return parseSequenceFromLogEth(receipt, this.coreId);
+    return parseSequenceFromLogEth(receipt, this.tokenBridgeAddress);
   }
 
   async transfer(msg: WormholeTokenTransfer): Promise<string> {

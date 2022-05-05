@@ -98,7 +98,7 @@ export class Algorand implements WormholeChain {
   }
 
   emitterAddress(): string {
-    return getEmitterAddressAlgorand(this.coreId);
+    return getEmitterAddressAlgorand(this.tokenBridgeId);
   }
 
   async attest(attestation: WormholeAttestation): Promise<string> {

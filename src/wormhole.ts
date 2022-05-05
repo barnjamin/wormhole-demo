@@ -101,7 +101,7 @@ export class Wormhole {
       chain.id,
       chain.emitterAddress(),
       sequence,
-      { transport: NodeHttpTransport(), debug: true }
+      { transport: NodeHttpTransport()}
     );
 
     return { VAA: vaaBytes, origin: chain } as WormholeReceipt;

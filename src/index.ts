@@ -62,8 +62,9 @@ function getAlgoSigner(acct?: algosdk.Account): AlgoSigner {
 
   // Get chain specific signers
   const algo_sgn = getAlgoSigner();
+  console.log(algo_sgn.getAddress())
   const eth_sgn = getEthSigner(eth.provider);
-  console.log("Created Signers");
+  console.log("Created Signers ");
 
   // Asset we want to transfer
   const algo_asset: WormholeAsset = {
@@ -87,12 +88,13 @@ function getAlgoSigner(acct?: algosdk.Account): AlgoSigner {
 
   const seq = "18"
 
-  const vaa = await wh.getVAA(seq, algo);
-  console.log("Got VAA: ", vaa);
+  const receipt = await wh.getVAA(seq, algo);
+  console.log("Got VAA: ", receipt);
 
-  //const eth_asset: WormholeAsset = {chain: eth, contract: ""}
-  //const eth_asset = await wh.send(attestMsg);
-  //console.log("Attest successful")
+  const eth_asset = await eth.createWrapped(eth_sgn, receipt);
+  console.log("Successfully wrapped")
+  console.log(eth_asset)
+
   // Alternatively:
   // const eth_asset = await wh.mirror(attestMsg.attestation)
 
