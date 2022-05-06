@@ -66,14 +66,14 @@ export interface WormholeChain {
   attest(asset: WormholeAttestation): Promise<string>;
   transfer(msg: WormholeTokenTransfer): Promise<string>;
 
-  redeem(signer: Signer, receipt: WormholeReceipt): Promise<WormholeAsset>;
+  redeem(signer: Signer, receipt: WormholeReceipt, asset?: WormholeAsset): Promise<WormholeAsset>;
   createWrapped(
     signer: Signer,
     receipt: WormholeReceipt
   ): Promise<WormholeAsset>;
   updateWrapped(
     signer: Signer,
-    receipt: WormholeReceipt
+    receipt: WormholeReceipt,
   ): Promise<WormholeAsset>;
 
   // Gets the original contract/asset id and chain for this asset locally 
@@ -99,17 +99,18 @@ export class Wormhole {
 
   async getVAA(
     sequence: string,
-    chain: WormholeChain
+    origin: WormholeChain,
+    destination: WormholeChain
   ): Promise<WormholeReceipt> {
     const { vaaBytes } = await getSignedVAAWithRetry(
       this.rpcHosts,
-      chain.id,
-      chain.emitterAddress(),
+      origin.id,
+      origin.emitterAddress(),
       sequence,
       { transport: NodeHttpTransport()}
     );
 
-    return { VAA: vaaBytes, origin: chain } as WormholeReceipt;
+    return { VAA: vaaBytes, origin: origin, destination: destination } as WormholeReceipt;
   }
 
   async getOrigin(
@@ -142,7 +143,7 @@ export class Wormhole {
 
     const sequence = await destination.attest(attestation);
 
-    const receipt = await this.getVAA(sequence, origin);
+    const receipt = await this.getVAA(sequence, origin, destination);
 
     try {
       return await destination.createWrapped(attestation.sender, receipt);
@@ -157,9 +158,10 @@ export class Wormhole {
   // returns signed VAA
   async transfer(transfer: WormholeTokenTransfer): Promise<WormholeReceipt> {
     const origin = transfer.origin.chain;
+    const destination = transfer.destination.chain
     const sequence = await origin.transfer(transfer);
     console.log("Transferred with sequence: ", sequence)
-    const receipt = await this.getVAA(sequence, origin)
+    const receipt = await this.getVAA(sequence, origin, destination)
     return {...receipt, destination: transfer.destination.chain} as WormholeReceipt;
   }
 

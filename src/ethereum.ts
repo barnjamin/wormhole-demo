@@ -27,6 +27,8 @@ import {
   WormholeTokenTransfer,
 } from "./wormhole";
 
+export type EthereumSigner = ethers.Signer
+
 export class Ethereum implements WormholeChain {
   coreId: string = ROPSTEN_ETH_BRIDGE_ADDRESS;
   tokenBridgeAddress: string = ROPSTEN_ETH_TOKEN_BRIDGE_ADDRESS;

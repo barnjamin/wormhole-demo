@@ -14,20 +14,37 @@ import {
   createWrappedOnAlgorand,
 } from "@certusone/wormhole-sdk";
 import { TransactionSignerPair } from "@certusone/wormhole-sdk/lib/cjs/algorand";
-import algosdk, { Algodv2, waitForConfirmation } from "algosdk";
+import algosdk, { Algodv2, generateAccount, waitForConfirmation } from "algosdk";
 import {
   ALGORAND_BRIDGE_ID,
   ALGORAND_HOST,
   ALGORAND_TOKEN_BRIDGE_ID,
 } from "./consts";
 import {
-  AlgorandSigner,
   WormholeAsset,
   WormholeAttestation,
   WormholeChain,
   WormholeReceipt,
   WormholeTokenTransfer,
 } from "./wormhole";
+
+
+export class AlgorandSigner {
+  account: algosdk.Account;
+
+  constructor(acct?: algosdk.Account) {
+    this.account = acct === undefined ? generateAccount() : acct;
+  }
+
+  getAddress(): string {
+    return this.account.addr;
+  }
+
+  async signTxn(txn: algosdk.Transaction): Promise<Uint8Array> {
+    return txn.signTxn(this.account.sk);
+  }
+}
+
 
 export async function signSendWait(
   client: Algodv2,

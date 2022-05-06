@@ -23,8 +23,16 @@ import {
   transferFromSolana,
   redeemOnSolana,
   createWrappedOnSolana,
+  setDefaultWasm,
+  postVaaSolana,
+  getIsTransferCompletedSolana,
 } from "@certusone/wormhole-sdk";
-import { SOLANA_HOST, SOL_BRIDGE_ADDRESS, SOL_TOKEN_BRIDGE_ADDRESS } from "./consts";
+import {
+  SOLANA_HOST,
+  SOL_BRIDGE_ADDRESS,
+  SOL_TOKEN_BRIDGE_ADDRESS,
+  VAA_EMITTER_ADDRESSES,
+} from "./consts";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
@@ -43,11 +51,30 @@ import {
   WormholeChain,
   WormholeReceipt,
   WormholeTokenTransfer,
-  SolanaSigner
 } from "./wormhole";
 
+import bs58 from "bs58";
+
+setDefaultWasm("node");
+
+export class SolanaSigner {
+  keypair: Keypair;
+  constructor(key: string) {
+    this.keypair = Keypair.fromSecretKey(bs58.decode(key));
+  }
+
+  getAddress() {
+    return this.keypair.publicKey.toBase58();
+  }
+
+  async signTxn(txn: Transaction): Promise<Buffer> {
+    txn.partialSign(this.keypair);
+    return txn.serialize();
+  }
+}
+
 function isSolSigner(object: any): object is SolanaSigner {
-  return "keypair" in object
+  return "keypair" in object;
 }
 
 export class Solana implements WormholeChain {
@@ -59,6 +86,7 @@ export class Solana implements WormholeChain {
 
   constructor() {
     this.connection = new Connection(SOLANA_HOST, "confirmed");
+    console.log(SOLANA_HOST);
   }
 
   async lookupOriginal(asset: string): Promise<WormholeWrappedInfo> {
@@ -76,7 +104,7 @@ export class Solana implements WormholeChain {
     let assetBytes: Uint8Array;
 
     if (typeof asset === "bigint") {
-      assetBytes = hexToUint8Array(chain.getAssetAsString(asset))
+      assetBytes = hexToUint8Array(chain.getAssetAsString(asset));
     } else {
       assetBytes = hexToUint8Array(asset);
     }
@@ -88,31 +116,28 @@ export class Solana implements WormholeChain {
       assetBytes
     );
 
-    if (fa === null) throw new Error("Couldnt find that asset")
+    if (fa === null) throw new Error("Couldnt find that asset");
 
-    return { chain: this, contract: fa } as WormholeAsset
+    return { chain: this, contract: fa } as WormholeAsset;
   }
 
   emitterAddress(): string {
     return getEmitterAddressEth(this.coreId);
   }
 
-
-
   async attest(attestation: WormholeAttestation): Promise<string> {
-    if(!isSolSigner(attestation.sender)) 
-      throw new Error("Expected solana signer")
+    if (!isSolSigner(attestation.sender))
+      throw new Error("Expected solana signer");
 
     if (typeof attestation.origin.contract !== "string")
-      throw new Error("Expected string contract, got bigint")
-
+      throw new Error("Expected string contract, got bigint");
 
     const transaction = await attestFromSolana(
       this.connection,
       this.coreId,
       this.tokenBridgeAddress,
       attestation.sender.getAddress(),
-      attestation.origin.contract,
+      attestation.origin.contract
     );
 
     const txid = await this.connection.sendRawTransaction(
@@ -122,14 +147,14 @@ export class Solana implements WormholeChain {
     await this.connection.confirmTransaction(txid);
     const info = await this.connection.getTransaction(txid);
 
-    if(info === null)throw new Error("Couldnt get info for transaction: "+txid)
+    if (info === null)
+      throw new Error("Couldnt get info for transaction: " + txid);
 
     return parseSequenceFromLogSolana(info);
   }
 
   async transfer(msg: WormholeTokenTransfer): Promise<string> {
-    if(!isSolSigner(msg.sender)) 
-      throw new Error("Expected solana signer")
+    if (!isSolSigner(msg.sender)) throw new Error("Expected solana signer");
 
     if (typeof msg.origin.contract !== "string")
       throw new Error("Expected string for contract");
@@ -141,12 +166,16 @@ export class Solana implements WormholeChain {
 
     if (hexStr === null) throw new Error("Couldnt parse address for receiver");
 
+    const fromAddr = await this.getTokenAddress(
+      msg.sender,
+      msg.origin.contract
+    );
     const transaction = await transferFromSolana(
       this.connection,
       this.coreId,
       this.tokenBridgeAddress,
       msg.sender.getAddress(),
-      msg.sender.getAddress(), // from addr?
+      fromAddr.toString(),
       msg.origin.contract,
       msg.amount,
       new Uint8Array(Buffer.from(hexStr, "hex")),
@@ -159,15 +188,36 @@ export class Solana implements WormholeChain {
 
     await this.connection.confirmTransaction(txid);
     const info = await this.connection.getTransaction(txid);
-    if(info === null) throw new Error("Couldnt get infor for transaction: "+txid)
+    if (info === null)
+      throw new Error("Couldnt get infor for transaction: " + txid);
 
     return parseSequenceFromLogSolana(info);
   }
 
   async redeem(
     signer: SolanaSigner,
-    receipt: WormholeReceipt
+    receipt: WormholeReceipt,
+    asset: WormholeAsset
   ): Promise<WormholeAsset> {
+    //const parsedVAA = parse_vaa(receipt.VAA)
+    //console.log(parsedVAA)
+    if (typeof asset.contract !== "string")
+      throw new Error("Expected string contract");
+
+    await this.createTokenAddress(signer, asset.contract);
+
+    // post vaa to Solana
+    await postVaaSolana(
+      this.connection,
+      async (transaction) => {
+        transaction.partialSign(signer.keypair);
+        return transaction;
+      },
+      this.coreId,
+      signer.getAddress(),
+      Buffer.from(receipt.VAA)
+    );
+
     const transaction = await redeemOnSolana(
       this.connection,
       this.coreId,
@@ -175,15 +225,61 @@ export class Solana implements WormholeChain {
       signer.getAddress(),
       receipt.VAA
     );
+    console.log(transaction);
+    const signed = await signer.signTxn(transaction);
 
-    const txid = await this.connection.sendRawTransaction(
-      await signer.signTxn(transaction)
-    );
+    console.log(signed);
+
+    const txid = await this.connection.sendRawTransaction(signed);
+    console.log(txid);
 
     await this.connection.confirmTransaction(txid);
     const info = await this.connection.getTransaction(txid);
-    if (info === null) throw new Error("Couldnt get transaction: "+txid)
-    return {  } as WormholeAsset;
+    console.log(info);
+    if (info === null) throw new Error("Couldnt get transaction: " + txid);
+    return {} as WormholeAsset;
+  }
+
+  async createTokenAddress(signer: SolanaSigner, token: string) {
+    const recipient = await this.getTokenAddress(signer, token);
+
+    // create the associated token account if it doesn't exist
+    const associatedAddressInfo = await this.connection.getAccountInfo(
+      recipient
+    );
+    if (!associatedAddressInfo) {
+      const transaction = new Transaction().add(
+        await Token.createAssociatedTokenAccountInstruction(
+          ASSOCIATED_TOKEN_PROGRAM_ID,
+          TOKEN_PROGRAM_ID,
+          new PublicKey(token),
+          recipient,
+          signer.keypair.publicKey, // owner
+          signer.keypair.publicKey // payer
+        )
+      );
+
+      const { blockhash } = await this.connection.getLatestBlockhash();
+      transaction.recentBlockhash = blockhash;
+      transaction.feePayer = signer.keypair.publicKey;
+      // sign, send, and confirm transaction
+      const txid = await this.connection.sendRawTransaction(
+        await signer.signTxn(transaction)
+      );
+      await this.connection.confirmTransaction(txid);
+    }
+  }
+
+  async getTokenAddress(
+    signer: SolanaSigner,
+    token: string
+  ): Promise<PublicKey> {
+    return Token.getAssociatedTokenAddress(
+      ASSOCIATED_TOKEN_PROGRAM_ID,
+      TOKEN_PROGRAM_ID,
+      new PublicKey(token),
+      signer.keypair.publicKey
+    );
   }
 
   async createWrapped(
@@ -197,14 +293,14 @@ export class Solana implements WormholeChain {
       signer.getAddress(),
       receipt.VAA
     );
-    return {} as WormholeAsset
+    return {} as WormholeAsset;
     //return { chain: this, contract: contractAddress };
   }
   async updateWrapped(
     signer: SolanaSigner,
     receipt: WormholeReceipt
   ): Promise<WormholeAsset> {
-    return {} as WormholeAsset
+    return {} as WormholeAsset;
     //const { contractAddress } = await updateWrappedOnEth(
     //  this.tokenBridgeAddress,
     //  signer,
