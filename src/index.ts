@@ -12,7 +12,7 @@ import { WORMHOLE_RPC_HOSTS } from "./consts";
 import { Ethereum, EthereumSigner } from "./ethereum";
 import { Algorand, AlgorandSigner } from "./algorand";
 import { Solana, SolanaSigner } from "./solana";
-import algosdk, { mnemonicToSecretKey } from "algosdk";
+import { mnemonicToSecretKey } from "algosdk";
 
 import { ethers } from "ethers";
 

@@ -11,35 +11,41 @@ This repo just formalizes the API and hides specific chain details in a Wormhole
 
 ### TODO:
 
-- [ ] Algo: 
+- [x] Algo: 
 
     - [x] - Attest new asset 
-    - [ ] - Xfer out 
-    - [ ] - Claim VAA 
-    - [ ] - Find original Asset
+    - [x] - Xfer out 
+    - [x] - Redeem with VAA 
+    - [x] - Find original Asset
 
 - [ ] Eth:
 
     - [ ] - Attest new asset 
-    - [ ] - Xfer out 
-    - [ ] - Claim VAA
+    - [x] - Xfer out 
+    - [x] - Redeem with VAA 
+    - [x] - Find original asset
 
 - [ ] Sol:
 
     - [ ] - Attest new asset 
-    - [ ] - Xfer out 
-    - [ ] - Claim VAA
+    - [x] - Xfer out 
+    - [x] - Redeem with VAA 
+    - [x] - Find original asset
+ 
 
 - [ ] Terra:
 
     - [ ] - Attest new asset 
     - [ ] - Xfer out 
-    - [ ] - Claim VAA
+    - [ ] - Redeem with VAA 
+    - [ ] - Find original asset
 
 - [ ] Avalanche:
+
     - [ ] - Attest new asset 
     - [ ] - Xfer out 
-    - [ ] - Claim VAA
+    - [ ] - Redeem with VAA 
+    - [ ] - Find original asset
 
 - [ ] Tests? (lol)
 
