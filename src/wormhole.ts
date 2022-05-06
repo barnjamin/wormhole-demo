@@ -105,6 +105,7 @@ export class Wormhole {
     origin: WormholeChain,
     destination: WormholeChain
   ): Promise<WormholeReceipt> {
+    console.time("get vaa")
     const { vaaBytes } = await getSignedVAAWithRetry(
       this.rpcHosts,
       origin.id,
@@ -113,6 +114,7 @@ export class Wormhole {
       { transport: NodeHttpTransport() }
     );
 
+    console.timeEnd("get vaa")
     return {
       VAA: vaaBytes,
       origin: origin,
@@ -150,6 +152,7 @@ export class Wormhole {
 
     const receipt = await this.getVAA(sequence, origin, destination);
 
+
     try {
       return await destination.createWrapped(attestation.sender, receipt);
     } catch (e) {
@@ -179,11 +182,16 @@ export class Wormhole {
       case WormholeMessageType.TokenTransfer:
         if (msg.tokenTransfer === undefined)
           throw new Error("Type TokenTransfer but was undefined");
-        return this.claim(
-          msg.tokenTransfer.receiver,
-          await this.transfer(msg.tokenTransfer),
-          msg.tokenTransfer.destination
-        );
+          
+        console.time("xfer")
+        const receipt = await this.transfer(msg.tokenTransfer)
+        console.timeEnd("xfer")
+
+        console.time("claim")
+        const asset = await this.claim( msg.tokenTransfer.receiver, receipt, msg.tokenTransfer.destination);
+        console.time("claim")
+
+        return asset
     }
     return {} as WormholeAsset;
   }

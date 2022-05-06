@@ -38,7 +38,7 @@ export class Ethereum implements WormholeChain {
 
   constructor(network?: string) {
     const apiKey = "2JKQAWARYH6QSI5QX5485DPHP3SN2EAI9Q"
-    this.provider = new ethers.providers.EtherscanProvider(network||= "ropsten", apiKey);
+    this.provider = new ethers.providers.EtherscanProvider(network||="ropsten", apiKey);
   }
   async lookupOriginal(asset: string): Promise<WormholeWrappedInfo> {
     return await getOriginalAssetEth(
@@ -72,7 +72,7 @@ export class Ethereum implements WormholeChain {
   }
 
   async emitterAddress(): Promise<string> {
-    return getEmitterAddressEth(this.coreId);
+    return getEmitterAddressEth(this.tokenBridgeAddress);
   }
 
   async attest(attestation: WormholeAttestation): Promise<string> {
@@ -116,7 +116,7 @@ export class Ethereum implements WormholeChain {
       new Uint8Array(Buffer.from(hexStr, "hex"))
     );
 
-    return parseSequenceFromLogEth(receipt, this.tokenBridgeAddress);
+    return parseSequenceFromLogEth(receipt, this.coreId);
   }
 
   async redeem(

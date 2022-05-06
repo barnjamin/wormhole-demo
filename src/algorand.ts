@@ -52,7 +52,7 @@ export async function signSendWait(
   client: Algodv2,
   txns: TransactionSignerPair[],
   acct: AlgorandSigner
-): Promise<any[]> {
+): Promise<any> {
   const txs = txns.map((tx) => {
     return tx.tx;
   });
@@ -71,14 +71,12 @@ export async function signSendWait(
 
   const txids = txs.map((tx) => tx.txID());
 
+
   await client.sendRawTransaction(signedTxns).do();
 
-  const results = await Promise.all(
-    txids.map(async (txid) => {
-      return await waitForConfirmation(client, txid, 2);
-    })
-  );
-  return results;
+  // Only need the last on
+  const txid = txids[txids.length - 1]
+  return await waitForConfirmation(client, txid, 2);
 }
 
 export class Algorand implements WormholeChain {
@@ -138,7 +136,7 @@ export class Algorand implements WormholeChain {
     );
 
     // Parse only the last one since it'll have the logged message
-    return parseSequenceFromLogAlgorand(result[result.length - 1]);
+    return parseSequenceFromLogAlgorand(result);
   }
 
   async transfer(msg: WormholeTokenTransfer): Promise<string> {
@@ -160,6 +158,7 @@ export class Algorand implements WormholeChain {
 
     const fee = 0;
 
+    console.time("Creating transactions")
     const transferTxs = await transferFromAlgorand(
       this.client,
       this.tokenBridgeId,
@@ -171,13 +170,16 @@ export class Algorand implements WormholeChain {
       msg.destination.chain.id,
       BigInt(fee)
     );
+    console.timeEnd("Creating transactions")
 
-    const transferResult = await signSendWait(
+    console.time("Signing and sending")
+    const result = await signSendWait(
       this.client,
       transferTxs,
       msg.sender as AlgorandSigner
     );
-    return parseSequenceFromLogAlgorand(transferResult[transferResult.length - 1]);
+    console.timeEnd("Signing and sending")
+    return parseSequenceFromLogAlgorand(result);
   }
 
   async redeem(
@@ -185,6 +187,7 @@ export class Algorand implements WormholeChain {
     receipt: WormholeReceipt,
     asset: WormholeAsset
   ): Promise<WormholeAsset> {
+    console.time("Creating Redeem txns")
     const redeemTxs = await redeemOnAlgorand(
       this.client,
       this.tokenBridgeId,
@@ -192,7 +195,10 @@ export class Algorand implements WormholeChain {
       receipt.VAA,
       signer.getAddress()
     );
+    console.timeEnd("Creating Redeem txns")
+    console.time("Signing and sending")
     await signSendWait(this.client, redeemTxs, signer);
+    console.timeEnd("Signing and sending")
 
     return asset
   }
@@ -208,10 +214,7 @@ export class Algorand implements WormholeChain {
           signer.getAddress(),
           receipt.VAA 
         );
-      const results = await signSendWait(this.client, txs, signer)
-      for(const result in results){
-        // Find created asset id
-      }
+      await signSendWait(this.client, txs, signer)
 
       return {} as WormholeAsset
   }
