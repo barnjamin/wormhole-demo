@@ -15,21 +15,33 @@ This repo just formalizes the API and hides specific chain details in a Wormhole
 
     - [x] - Attest new asset 
     - [x] - Xfer out 
+<<<<<<< HEAD
     - [x] - Redeem with VAA 
+=======
+    - [x] - Claim VAA 
+>>>>>>> 1cca41f723f7a293a58d0159481fb7af0ff0da33
     - [x] - Find original Asset
 
 - [ ] Eth:
 
     - [ ] - Attest new asset 
     - [x] - Xfer out 
+<<<<<<< HEAD
     - [x] - Redeem with VAA 
+=======
+    - [x] - Claim VAA
+>>>>>>> 1cca41f723f7a293a58d0159481fb7af0ff0da33
     - [x] - Find original asset
 
 - [ ] Sol:
 
     - [ ] - Attest new asset 
     - [x] - Xfer out 
+<<<<<<< HEAD
     - [x] - Redeem with VAA 
+=======
+    - [x] - Claim VAA
+>>>>>>> 1cca41f723f7a293a58d0159481fb7af0ff0da33
     - [x] - Find original asset
  
 
