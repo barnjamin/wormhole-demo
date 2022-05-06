@@ -61,7 +61,7 @@ export type WormholeMessage = {
 export interface WormholeChain {
   id: ChainId;
 
-  emitterAddress(): string;
+  emitterAddress(): Promise<string>;
 
   attest(asset: WormholeAttestation): Promise<string>;
   transfer(msg: WormholeTokenTransfer): Promise<string>;
@@ -86,8 +86,8 @@ export interface WormholeChain {
 
   transactionComplete(receipt: WormholeReceipt): Promise<boolean>;
 
-  getAssetAsString(asset: bigint): string;
-  getAssetAsInt(asset: string): bigint;
+  getAssetAsString(asset: bigint | string): string;
+  getAssetAsInt(asset: string | bigint): bigint;
 
 }
 
@@ -105,7 +105,7 @@ export class Wormhole {
     const { vaaBytes } = await getSignedVAAWithRetry(
       this.rpcHosts,
       origin.id,
-      origin.emitterAddress(),
+      await origin.emitterAddress(),
       sequence,
       { transport: NodeHttpTransport()}
     );
@@ -161,8 +161,7 @@ export class Wormhole {
     const destination = transfer.destination.chain
     const sequence = await origin.transfer(transfer);
     console.log("Transferred with sequence: ", sequence)
-    const receipt = await this.getVAA(sequence, origin, destination)
-    return {...receipt, destination: transfer.destination.chain} as WormholeReceipt;
+    return await this.getVAA(sequence, origin, destination)
   }
 
   // TODO: Send is not a great name, since we transmit AND receive,
@@ -178,7 +177,7 @@ export class Wormhole {
           throw new Error("Type TokenTransfer but was undefined");
         const receipt = await this.transfer(msg.tokenTransfer);
         console.log("Got receipt: ", receipt)
-        return this.receive(msg.tokenTransfer.receiver, receipt);
+        return this.receive(msg.tokenTransfer.receiver, receipt, msg.tokenTransfer.destination);
     }
     return {} as WormholeAsset;
   }
@@ -186,10 +185,11 @@ export class Wormhole {
   // Claims tokens or arbitrary message from wormhole given VAA
   async receive(
     signer: Signer,
-    receipt: WormholeReceipt
+    receipt: WormholeReceipt,
+    asset: WormholeAsset
   ): Promise<WormholeAsset> {
     console.log("Redeeming on ", receipt.destination)
-    return await receipt.destination.redeem(signer, receipt);
+    return await receipt.destination.redeem(signer, receipt, asset);
   }
 
 

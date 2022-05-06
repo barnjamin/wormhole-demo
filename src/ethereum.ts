@@ -71,7 +71,7 @@ export class Ethereum implements WormholeChain {
     return { chain: this, contract: fa } as WormholeAsset
   }
 
-  emitterAddress(): string {
+  async emitterAddress(): Promise<string> {
     return getEmitterAddressEth(this.coreId);
   }
 
@@ -121,16 +121,15 @@ export class Ethereum implements WormholeChain {
 
   async redeem(
     signer: ethers.Signer,
-    receipt: WormholeReceipt
+    receipt: WormholeReceipt,
+    asset: WormholeAsset
   ): Promise<WormholeAsset> {
-    console.log("Here")
     const { contractAddress } = await redeemOnEth(
       this.tokenBridgeAddress,
       signer,
       receipt.VAA
     );
-    console.log(contractAddress)
-    return { chain: this, contract: contractAddress } as WormholeAsset;
+    return asset
   }
 
   async createWrapped(
@@ -164,7 +163,7 @@ export class Ethereum implements WormholeChain {
     );
   }
 
-  getAssetAsString(asset: bigint): string {
+  getAssetAsString(asset: bigint | string): string {
     throw new Error("Method not implemented.");
   }
   getAssetAsInt(asset: string): bigint {

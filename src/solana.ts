@@ -26,6 +26,7 @@ import {
   setDefaultWasm,
   postVaaSolana,
   getIsTransferCompletedSolana,
+  getEmitterAddressSolana,
 } from "@certusone/wormhole-sdk";
 import {
   SOLANA_HOST,
@@ -67,13 +68,22 @@ export class SolanaSigner {
     return this.keypair.publicKey.toBase58();
   }
 
+ async getTokenAddress(token: string): Promise<PublicKey> {
+    return Token.getAssociatedTokenAddress(
+      ASSOCIATED_TOKEN_PROGRAM_ID,
+      TOKEN_PROGRAM_ID,
+      new PublicKey(token),
+      this.keypair.publicKey
+    );
+  }
+
   async signTxn(txn: Transaction): Promise<Buffer> {
     txn.partialSign(this.keypair);
     return txn.serialize();
   }
 }
 
-function isSolSigner(object: any): object is SolanaSigner {
+export function isSolSigner(object: any): object is SolanaSigner {
   return "keypair" in object;
 }
 
@@ -121,8 +131,8 @@ export class Solana implements WormholeChain {
     return { chain: this, contract: fa } as WormholeAsset;
   }
 
-  emitterAddress(): string {
-    return getEmitterAddressEth(this.coreId);
+  async emitterAddress(): Promise<string> {
+    return await getEmitterAddressSolana(this.tokenBridgeAddress);
   }
 
   async attest(attestation: WormholeAttestation): Promise<string> {
@@ -155,9 +165,7 @@ export class Solana implements WormholeChain {
 
   async transfer(msg: WormholeTokenTransfer): Promise<string> {
     if (!isSolSigner(msg.sender)) throw new Error("Expected solana signer");
-
-    if (typeof msg.origin.contract !== "string")
-      throw new Error("Expected string for contract");
+    if (typeof msg.origin.contract !== "string") throw new Error("Expected string for contract");
 
     const hexStr = nativeToHexString(
       await msg.receiver.getAddress(),
@@ -166,10 +174,7 @@ export class Solana implements WormholeChain {
 
     if (hexStr === null) throw new Error("Couldnt parse address for receiver");
 
-    const fromAddr = await this.getTokenAddress(
-      msg.sender,
-      msg.origin.contract
-    );
+    const fromAddr = await msg.sender.getTokenAddress(msg.origin.contract);
     const transaction = await transferFromSolana(
       this.connection,
       this.coreId,
@@ -178,7 +183,9 @@ export class Solana implements WormholeChain {
       fromAddr.toString(),
       msg.origin.contract,
       msg.amount,
-      new Uint8Array(Buffer.from(hexStr, "hex")),
+      hexToUint8Array(hexStr),
+      msg.destination.chain.id,
+      hexToUint8Array(msg.destination.chain.getAssetAsString(msg.destination.contract)),
       msg.destination.chain.id
     );
 
@@ -241,7 +248,7 @@ export class Solana implements WormholeChain {
   }
 
   async createTokenAddress(signer: SolanaSigner, token: string) {
-    const recipient = await this.getTokenAddress(signer, token);
+    const recipient = await signer.getTokenAddress(token);
 
     // create the associated token account if it doesn't exist
     const associatedAddressInfo = await this.connection.getAccountInfo(
@@ -268,18 +275,6 @@ export class Solana implements WormholeChain {
       );
       await this.connection.confirmTransaction(txid);
     }
-  }
-
-  async getTokenAddress(
-    signer: SolanaSigner,
-    token: string
-  ): Promise<PublicKey> {
-    return Token.getAssociatedTokenAddress(
-      ASSOCIATED_TOKEN_PROGRAM_ID,
-      TOKEN_PROGRAM_ID,
-      new PublicKey(token),
-      signer.keypair.publicKey
-    );
   }
 
   async createWrapped(

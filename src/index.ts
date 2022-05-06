@@ -6,6 +6,7 @@ import {
   WormholeAttestation,
   WormholeMessage,
   WormholeMessageType,
+  WormholeTokenTransfer,
 } from "./wormhole";
 import { WORMHOLE_RPC_HOSTS } from "./consts";
 import { Ethereum, EthereumSigner } from "./ethereum";
@@ -69,41 +70,31 @@ function getAlgoSigner(): AlgorandSigner {
 
   const sol_asset = await wh.getMirrored(algo_asset, sol)
 
-  // transmit from src chain into wormhole
-  // receipt is the VAA to be used on target chain
-  const xferAlgoSol: WormholeMessage = {
-    type: WormholeMessageType.TokenTransfer,
-    tokenTransfer: {
+  const xferAlgoSol: WormholeTokenTransfer = {
       origin: algo_asset,
       sender: algo_sgn,
       destination: sol_asset,
       receiver: sol_sgn,
       amount: BigInt(100),
-    },
   };
 
-  const xferSolAlgo: WormholeMessage = {
-    type: WormholeMessageType.TokenTransfer,
-    tokenTransfer: {
+  const xferSolAlgo: WormholeTokenTransfer = {
       destination: algo_asset,
       receiver: algo_sgn,
       origin: sol_asset,
       sender: sol_sgn,
       amount: BigInt(100),
-    },
-  };
+  }
 
 
-  const receipt = await wh.getVAA("31", algo, sol)
-  const redeemed = await sol.redeem(sol_sgn, receipt, sol_asset)
+  //const receipt = await wh.transfer(xferSolAlgo)
+  const receipt = await wh.getVAA("1303", sol, algo)
+  console.log(receipt)
+  const redeemed = await wh.receive(algo_sgn, receipt, algo_asset);
   console.log(redeemed)
 
-
-
+  //const redeemed = await sol.redeem(sol_sgn, receipt, sol_asset)
+  //console.log(redeemed)
   //console.log(await wh.send(xferAlgoSol));
-
   //console.log(await wh.send(xferSolAlgo));
-
-  // Alternatively:
-  // await wh.receive(eth_sgn, await wh.transmit(xferMsg.tokenTransfer))
 })();

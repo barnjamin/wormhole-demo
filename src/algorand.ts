@@ -12,6 +12,7 @@ import {
   getForeignAssetAlgorand,
   getOriginalAssetAlgorand,
   createWrappedOnAlgorand,
+  CHAIN_ID_SOLANA,
 } from "@certusone/wormhole-sdk";
 import { TransactionSignerPair } from "@certusone/wormhole-sdk/lib/cjs/algorand";
 import algosdk, { Algodv2, generateAccount, waitForConfirmation } from "algosdk";
@@ -20,6 +21,7 @@ import {
   ALGORAND_HOST,
   ALGORAND_TOKEN_BRIDGE_ID,
 } from "./consts";
+import { isSolSigner } from "./solana";
 import {
   WormholeAsset,
   WormholeAttestation,
@@ -115,7 +117,7 @@ export class Algorand implements WormholeChain {
     return { chain: this, contract: fa } as WormholeAsset
   }
 
-  emitterAddress(): string {
+  async emitterAddress(): Promise<string> {
     return getEmitterAddressAlgorand(this.tokenBridgeId);
   }
 
@@ -145,8 +147,15 @@ export class Algorand implements WormholeChain {
     if (typeof msg.origin.contract !== "bigint")
       throw new Error("Expected bigint for asset, got string");
 
+    let rcv = await msg.receiver.getAddress()
+
+    if(isSolSigner(msg.receiver) && typeof msg.destination.contract == "string"){
+      const pk = await msg.receiver.getTokenAddress(msg.destination.contract)
+      rcv = pk.toString()
+    }
+
     const hexStr = nativeToHexString(
-      await msg.receiver.getAddress(),
+      rcv,
       msg.destination.chain.id
     );
     if (!hexStr) throw new Error("Failed to convert to hexStr");
@@ -175,7 +184,8 @@ export class Algorand implements WormholeChain {
 
   async redeem(
     signer: AlgorandSigner,
-    receipt: WormholeReceipt
+    receipt: WormholeReceipt,
+    asset: WormholeAsset
   ): Promise<WormholeAsset> {
     const redeemTxs = await redeemOnAlgorand(
       this.client,
@@ -184,9 +194,9 @@ export class Algorand implements WormholeChain {
       receipt.VAA,
       signer.getAddress()
     );
-    const result = await signSendWait(this.client, redeemTxs, signer);
-    //TODO: find asset id from resulting txids
-    return { chain: this, contract: BigInt(0) } as WormholeAsset;
+    await signSendWait(this.client, redeemTxs, signer);
+
+    return asset
   }
 
   async createWrapped(
@@ -223,7 +233,8 @@ export class Algorand implements WormholeChain {
       receipt.VAA
     );
   }
-  getAssetAsString(asset: bigint): string {
+  getAssetAsString(asset: bigint | string): string {
+    if(typeof asset == "string") return asset
     return ("0".repeat(64) + asset.toString()).slice(-64);
   }
 
