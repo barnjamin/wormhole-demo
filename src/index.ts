@@ -41,15 +41,11 @@ function getAlgoSigner(): AlgorandSigner {
   // Chain specific implementations of `WormholeChain` interface
   // they wrap specific methods and handle any weirdness
   const algo = new Algorand();
-  const eth = new Ethereum();
   const sol = new Solana();
 
   // Get chain specific signers
   const algo_sgn = getAlgoSigner();
-  const eth_sgn = getEthSigner(eth.provider);
   const sol_sgn = getSolSigner();
-
-  //console.log(sol_sgn.getAddress());
 
   // Asset we want to transfer
   const algo_asset: WormholeAsset = {
@@ -58,18 +54,15 @@ function getAlgoSigner(): AlgorandSigner {
   };
 
   // Create Attestation
-  const attestation: WormholeAttestation = {
-    origin: algo_asset,
-    sender: algo_sgn,
-    destination: sol,
-    receiver: sol_sgn
-  };
+  //const attestation: WormholeAttestation = {
+  //  origin: algo_asset,
+  //  sender: algo_sgn,
+  //  destination: sol,
+  //  receiver: sol_sgn
+  //};
 
-  //const seq = await algo.attest(attestation);
-  //console.log("Got seq: ", seq);
 
   const sol_asset = await wh.getMirrored(algo_asset, sol)
-
   const xferAlgoSol: WormholeTokenTransfer = {
       origin: algo_asset,
       sender: algo_sgn,
@@ -86,15 +79,7 @@ function getAlgoSigner(): AlgorandSigner {
       amount: BigInt(100),
   }
 
+  console.log("Algo=>Sol", await wh.claim(sol_sgn, await wh.transfer(xferAlgoSol), sol_asset));
+  console.log("Sol=>Algo", await wh.claim(algo_sgn, await wh.transfer(xferSolAlgo), algo_asset));
 
-  //const receipt = await wh.transfer(xferSolAlgo)
-  const receipt = await wh.getVAA("1303", sol, algo)
-  console.log(receipt)
-  const redeemed = await wh.receive(algo_sgn, receipt, algo_asset);
-  console.log(redeemed)
-
-  //const redeemed = await sol.redeem(sol_sgn, receipt, sol_asset)
-  //console.log(redeemed)
-  //console.log(await wh.send(xferAlgoSol));
-  //console.log(await wh.send(xferSolAlgo));
 })();

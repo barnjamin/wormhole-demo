@@ -75,11 +75,9 @@ export async function signSendWait(
 
   const results = await Promise.all(
     txids.map(async (txid) => {
-      console.log(txid);
       return await waitForConfirmation(client, txid, 2);
     })
   );
-  console.log(results);
   return results;
 }
 
@@ -211,7 +209,6 @@ export class Algorand implements WormholeChain {
           receipt.VAA 
         );
       const results = await signSendWait(this.client, txs, signer)
-      console.log(results)
       for(const result in results){
         // Find created asset id
       }

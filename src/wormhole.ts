@@ -66,19 +66,23 @@ export interface WormholeChain {
   attest(asset: WormholeAttestation): Promise<string>;
   transfer(msg: WormholeTokenTransfer): Promise<string>;
 
-  redeem(signer: Signer, receipt: WormholeReceipt, asset?: WormholeAsset): Promise<WormholeAsset>;
+  redeem(
+    signer: Signer,
+    receipt: WormholeReceipt,
+    asset?: WormholeAsset
+  ): Promise<WormholeAsset>;
   createWrapped(
     signer: Signer,
     receipt: WormholeReceipt
   ): Promise<WormholeAsset>;
   updateWrapped(
     signer: Signer,
-    receipt: WormholeReceipt,
+    receipt: WormholeReceipt
   ): Promise<WormholeAsset>;
 
-  // Gets the original contract/asset id and chain for this asset locally 
+  // Gets the original contract/asset id and chain for this asset locally
   lookupOriginal(asset: string | bigint): Promise<WormholeWrappedInfo>;
-  // Get the local contract/asset id for some original asset 
+  // Get the local contract/asset id for some original asset
   lookupMirrored(
     asset: string | bigint,
     chain: WormholeChain
@@ -88,7 +92,6 @@ export interface WormholeChain {
 
   getAssetAsString(asset: bigint | string): string;
   getAssetAsInt(asset: string | bigint): bigint;
-
 }
 
 export class Wormhole {
@@ -107,15 +110,17 @@ export class Wormhole {
       origin.id,
       await origin.emitterAddress(),
       sequence,
-      { transport: NodeHttpTransport()}
+      { transport: NodeHttpTransport() }
     );
 
-    return { VAA: vaaBytes, origin: origin, destination: destination } as WormholeReceipt;
+    return {
+      VAA: vaaBytes,
+      origin: origin,
+      destination: destination,
+    } as WormholeReceipt;
   }
 
-  async getOrigin(
-    asset: WormholeAsset,
-  ): Promise<WormholeWrappedInfo> {
+  async getOrigin(asset: WormholeAsset): Promise<WormholeWrappedInfo> {
     return asset.chain.lookupOriginal(asset.contract);
   }
   async getMirrored(
@@ -135,7 +140,7 @@ export class Wormhole {
     //  const mirrored = await this.getMirrored(attestation.origin, attestation.destination)
     //  //throw a new error?
     //}catch(e){
-    //  // Not found, 
+    //  // Not found,
     //}
 
     const origin = attestation.origin.chain;
@@ -158,10 +163,9 @@ export class Wormhole {
   // returns signed VAA
   async transfer(transfer: WormholeTokenTransfer): Promise<WormholeReceipt> {
     const origin = transfer.origin.chain;
-    const destination = transfer.destination.chain
+    const destination = transfer.destination.chain;
     const sequence = await origin.transfer(transfer);
-    console.log("Transferred with sequence: ", sequence)
-    return await this.getVAA(sequence, origin, destination)
+    return await this.getVAA(sequence, origin, destination);
   }
 
   // TODO: Send is not a great name, since we transmit AND receive,
@@ -175,22 +179,21 @@ export class Wormhole {
       case WormholeMessageType.TokenTransfer:
         if (msg.tokenTransfer === undefined)
           throw new Error("Type TokenTransfer but was undefined");
-        const receipt = await this.transfer(msg.tokenTransfer);
-        console.log("Got receipt: ", receipt)
-        return this.receive(msg.tokenTransfer.receiver, receipt, msg.tokenTransfer.destination);
+        return this.claim(
+          msg.tokenTransfer.receiver,
+          await this.transfer(msg.tokenTransfer),
+          msg.tokenTransfer.destination
+        );
     }
     return {} as WormholeAsset;
   }
 
   // Claims tokens or arbitrary message from wormhole given VAA
-  async receive(
+  async claim(
     signer: Signer,
     receipt: WormholeReceipt,
     asset: WormholeAsset
   ): Promise<WormholeAsset> {
-    console.log("Redeeming on ", receipt.destination)
     return await receipt.destination.redeem(signer, receipt, asset);
   }
-
-
 }
