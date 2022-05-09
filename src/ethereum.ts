@@ -1,6 +1,5 @@
 import {
   ChainId,
-  CHAIN_ID_ETH,
   getEmitterAddressEth,
   getIsTransferCompletedEth,
   redeemOnEth,
@@ -8,8 +7,8 @@ import {
   createWrappedOnEth,
   updateWrappedOnEth,
   parseSequenceFromLogEth,
-  nativeToHexString,
   attestFromEth,
+  tryNativeToHexString,
   WormholeWrappedInfo,
   getOriginalAssetEth,
   hexToUint8Array,
@@ -36,9 +35,8 @@ export class Ethereum implements WormholeChain {
 
   provider: any;
 
-  constructor(network?: string) {
-    const apiKey = "2JKQAWARYH6QSI5QX5485DPHP3SN2EAI9Q"
-    this.provider = new ethers.providers.EtherscanProvider(network||="ropsten", apiKey);
+  constructor(provider: any) {
+    this.provider = provider
   }
   async lookupOriginal(asset: string): Promise<WormholeWrappedInfo> {
     return await getOriginalAssetEth(
@@ -98,7 +96,7 @@ export class Ethereum implements WormholeChain {
     if (typeof msg.origin.contract !== "string")
       throw new Error("Expected string for contract");
 
-    const hexStr = nativeToHexString(
+    const hexStr = tryNativeToHexString(
       await msg.receiver.getAddress(),
       msg.destination.chain.id
     );

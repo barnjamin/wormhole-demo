@@ -6,16 +6,20 @@ import {
   redeemOnAlgorand,
   parseSequenceFromLogAlgorand,
   getEmitterAddressAlgorand,
-  nativeToHexString,
   getIsTransferCompletedAlgorand,
   WormholeWrappedInfo,
   getForeignAssetAlgorand,
   getOriginalAssetAlgorand,
   createWrappedOnAlgorand,
-  CHAIN_ID_SOLANA,
+  tryNativeToHexString,
 } from "@certusone/wormhole-sdk";
 import { TransactionSignerPair } from "@certusone/wormhole-sdk/lib/cjs/algorand";
-import algosdk, { Algodv2, generateAccount, waitForConfirmation } from "algosdk";
+import algosdk, {
+  Algod,
+  Algodv2,
+  generateAccount,
+  waitForConfirmation,
+} from "algosdk";
 import {
   ALGORAND_BRIDGE_ID,
   ALGORAND_HOST,
@@ -29,7 +33,6 @@ import {
   WormholeReceipt,
   WormholeTokenTransfer,
 } from "./wormhole";
-
 
 export class AlgorandSigner {
   account: algosdk.Account;
@@ -47,35 +50,35 @@ export class AlgorandSigner {
   }
 }
 
-
 export async function signSendWait(
   client: Algodv2,
   txns: TransactionSignerPair[],
   acct: AlgorandSigner
 ): Promise<any> {
+
+  // Signer empty, take just tx
   const txs = txns.map((tx) => {
     return tx.tx;
   });
+
+  // Group txns atomically
   algosdk.assignGroupID(txs);
 
-  const signedTxns: Uint8Array[] = [];
-  for (const idx in txns) {
-    const txn = txns[idx];
-    const tx = txs[idx];
-    if (txn.signer) {
-      signedTxns.push(await txn.signer.signTxn(tx));
-    } else {
-      signedTxns.push(await acct.signTxn(tx));
-    }
-  }
+  // Take the last txns id
+  const txid: string = txs[txs.length - 1].txID();
 
-  const txids = txs.map((tx) => tx.txID());
-
+  const signedTxns: Uint8Array[] = await Promise.all(
+    txns.map(async (tx) => {
+      if (tx.signer) {
+        return await tx.signer.signTxn(tx.tx);
+      } else {
+        return await acct.signTxn(tx.tx);
+      }
+    })
+  );
 
   await client.sendRawTransaction(signedTxns).do();
 
-  // Only need the last on
-  const txid = txids[txids.length - 1]
   return await waitForConfirmation(client, txid, 2);
 }
 
@@ -87,16 +90,11 @@ export class Algorand implements WormholeChain {
 
   client: Algodv2;
 
-  constructor() {
-    const { algodToken, algodServer, algodPort } = ALGORAND_HOST;
-    this.client = new Algodv2(algodToken, algodServer, algodPort);
+  constructor(client: Algodv2) {
+    this.client = client
   }
   async lookupOriginal(asset: bigint): Promise<WormholeWrappedInfo> {
-    return getOriginalAssetAlgorand(
-      this.client,
-      this.tokenBridgeId,
-      asset
-    );
+    return getOriginalAssetAlgorand(this.client, this.tokenBridgeId, asset);
   }
 
   async lookupMirrored(
@@ -110,7 +108,7 @@ export class Algorand implements WormholeChain {
       asset
     );
 
-    return { chain: this, contract: fa } as WormholeAsset
+    return { chain: this, contract: fa } as WormholeAsset;
   }
 
   async emitterAddress(): Promise<string> {
@@ -143,22 +141,22 @@ export class Algorand implements WormholeChain {
     if (typeof msg.origin.contract !== "bigint")
       throw new Error("Expected bigint for asset, got string");
 
-    let rcv = await msg.receiver.getAddress()
+    let rcv = await msg.receiver.getAddress();
 
-    if(isSolSigner(msg.receiver) && typeof msg.destination.contract == "string"){
-      const pk = await msg.receiver.getTokenAddress(msg.destination.contract)
-      rcv = pk.toString()
+    if (
+      isSolSigner(msg.receiver) &&
+      typeof msg.destination.contract == "string"
+    ) {
+      const pk = await msg.receiver.getTokenAddress(msg.destination.contract);
+      rcv = pk.toString();
     }
 
-    const hexStr = nativeToHexString(
-      rcv,
-      msg.destination.chain.id
-    );
+    const hexStr = tryNativeToHexString(rcv, msg.destination.chain.id);
     if (!hexStr) throw new Error("Failed to convert to hexStr");
 
     const fee = 0;
 
-    console.time("Creating transactions")
+    console.time("Creating transactions");
     const transferTxs = await transferFromAlgorand(
       this.client,
       this.tokenBridgeId,
@@ -170,15 +168,15 @@ export class Algorand implements WormholeChain {
       msg.destination.chain.id,
       BigInt(fee)
     );
-    console.timeEnd("Creating transactions")
+    console.timeEnd("Creating transactions");
 
-    console.time("Signing and sending")
+    console.time("Signing and sending");
     const result = await signSendWait(
       this.client,
       transferTxs,
       msg.sender as AlgorandSigner
     );
-    console.timeEnd("Signing and sending")
+    console.timeEnd("Signing and sending");
     return parseSequenceFromLogAlgorand(result);
   }
 
@@ -187,7 +185,7 @@ export class Algorand implements WormholeChain {
     receipt: WormholeReceipt,
     asset: WormholeAsset
   ): Promise<WormholeAsset> {
-    console.time("Creating Redeem txns")
+    console.time("Creating Redeem txns");
     const redeemTxs = await redeemOnAlgorand(
       this.client,
       this.tokenBridgeId,
@@ -195,28 +193,28 @@ export class Algorand implements WormholeChain {
       receipt.VAA,
       signer.getAddress()
     );
-    console.timeEnd("Creating Redeem txns")
-    console.time("Signing and sending")
+    console.timeEnd("Creating Redeem txns");
+    console.time("Signing and sending");
     await signSendWait(this.client, redeemTxs, signer);
-    console.timeEnd("Signing and sending")
+    console.timeEnd("Signing and sending");
 
-    return asset
+    return asset;
   }
 
   async createWrapped(
     signer: AlgorandSigner,
     receipt: WormholeReceipt
   ): Promise<WormholeAsset> {
-      const txs = await createWrappedOnAlgorand(
-          this.client,
-          this.tokenBridgeId,
-          this.coreId,
-          signer.getAddress(),
-          receipt.VAA 
-        );
-      await signSendWait(this.client, txs, signer)
+    const txs = await createWrappedOnAlgorand(
+      this.client,
+      this.tokenBridgeId,
+      this.coreId,
+      signer.getAddress(),
+      receipt.VAA
+    );
+    await signSendWait(this.client, txs, signer);
 
-      return {} as WormholeAsset
+    return {} as WormholeAsset;
   }
 
   updateWrapped(
@@ -234,12 +232,11 @@ export class Algorand implements WormholeChain {
     );
   }
   getAssetAsString(asset: bigint | string): string {
-    if(typeof asset == "string") return asset
+    if (typeof asset == "string") return asset;
     return ("0".repeat(64) + asset.toString()).slice(-64);
   }
 
   getAssetAsInt(asset: string): bigint {
-    return BigInt(0)
+    return BigInt(0);
   }
-
 }

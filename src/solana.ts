@@ -1,6 +1,5 @@
 import {
   ChainId,
-  nativeToHexString,
   WormholeWrappedInfo,
   getIsTransferCompletedSolana,
   hexToUint8Array,
@@ -15,9 +14,9 @@ import {
   setDefaultWasm,
   postVaaSolana,
   getEmitterAddressSolana,
+  tryNativeToHexString,
 } from "@certusone/wormhole-sdk";
 import {
-  SOLANA_HOST,
   SOL_BRIDGE_ADDRESS,
   SOL_TOKEN_BRIDGE_ADDRESS,
 } from "./consts";
@@ -80,8 +79,8 @@ export class Solana implements WormholeChain {
 
   connection: Connection;
 
-  constructor() {
-    this.connection = new Connection(SOLANA_HOST, "confirmed");
+  constructor(connection: Connection) {
+    this.connection = connection; 
   }
 
   async lookupOriginal(asset: string): Promise<WormholeWrappedInfo> {
@@ -152,7 +151,7 @@ export class Solana implements WormholeChain {
     if (!isSolSigner(msg.sender)) throw new Error("Expected solana signer");
     if (typeof msg.origin.contract !== "string") throw new Error("Expected string for contract");
 
-    const hexStr = nativeToHexString(
+    const hexStr = tryNativeToHexString(
       await msg.receiver.getAddress(),
       msg.destination.chain.id
     );
