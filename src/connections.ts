@@ -1,9 +1,16 @@
 import { Connection } from "@solana/web3.js";
 import { Algodv2 } from "algosdk";
 import { ethers } from "ethers";
-import { ALGORAND_HOST, AVAX_NETWORK_CHAIN_ID, COVALENT_AVAX, SOLANA_HOST, TERRA_HOST } from "./consts";
+import {
+  ALGORAND_HOST,
+  AVAX_NETWORK_CHAIN_ID,
+  COVALENT_AVAX,
+  SOLANA_HOST,
+  TERRA_HOST,
+} from "./consts";
 
 import {
+  Coins,
   LCDClient,
   MnemonicKey,
   MsgExecuteContract,
@@ -26,17 +33,19 @@ export function getEthConnection(network?: string): ethers.providers.Provider {
   );
 }
 
-
 export function getAvaxConnection(): ethers.providers.Provider {
-    const apiKey = "ckey_0ff8d76eaa2d48ae93288faf2a2"
-    return new ethers.providers.JsonRpcProvider(
-        `https://api.covalenthq.com/v1/${AVAX_NETWORK_CHAIN_ID}/?&key=${apiKey}`
-    )
+  const apiKey = "ckey_0ff8d76eaa2d48ae93288faf2a2";
+  return new ethers.providers.JsonRpcProvider(
+    `https://api.covalenthq.com/v1/${AVAX_NETWORK_CHAIN_ID}/?&key=${apiKey}`
+  );
 }
 
 export function getTerraConnection(): LCDClient {
-    return new LCDClient({
-        URL: TERRA_HOST.URL,
-        chainID: TERRA_HOST.chainID,
-    });
+  return new LCDClient({
+    URL: TERRA_HOST.URL,
+    chainID: TERRA_HOST.chainID,
+    gasPrices: {
+      uluna: 0.15,
+    } as Coins.Input,
+  });
 }

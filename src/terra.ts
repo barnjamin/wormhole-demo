@@ -25,6 +25,7 @@ import {
 } from "./wormhole";
 import {
   LCDClient,
+  Key,
   MsgExecuteContract,
   TxInfo,
   Wallet,
@@ -33,8 +34,8 @@ import {
 export class TerraSigner {
   terraWallet: Wallet;
 
-  constructor(wallet: Wallet) {
-    this.terraWallet = wallet;
+  constructor(key: Key, client: LCDClient) {
+    this.terraWallet = client.wallet(key);
   }
 
   async getAddress(): Promise<string> {
@@ -43,7 +44,7 @@ export class TerraSigner {
 }
 
 function isTerraSigner(object: any): object is TerraSigner {
-  return "terrakey" in object;
+  return "terraWallet" in object;
 }
 
 export class Terra implements WormholeChain {
@@ -73,7 +74,7 @@ export class Terra implements WormholeChain {
     }
 
     const fa = await getForeignAssetTerra(
-      this.coreId,
+      this.tokenBridgeAddress,
       this.client,
       chain.id,
       assetBytes
@@ -105,7 +106,7 @@ export class Terra implements WormholeChain {
   }
 
   async transfer(msg: WormholeTokenTransfer): Promise<string> {
-    if (!isTerraSigner(msg.sender)) throw new Error("Expected ethers.Signer");
+    if (!isTerraSigner(msg.sender)) throw new Error("Expected TerraSigner");
 
     if (typeof msg.origin.contract !== "string")
       throw new Error("Expected string for contract");
@@ -141,7 +142,16 @@ export class Terra implements WormholeChain {
       await signer.getAddress(),
       receipt.VAA
     );
+
+    const info = await this.signSendWait([txns], signer)
+
     return asset;
+  }
+
+  getContractAddressFromTxInfo(info: TxInfo): string {
+    if(info.logs === undefined) return "" ;
+    if(info.logs.length === 0)return "";
+    return info.logs[0].eventsByType.from_contract.contract[0]
   }
 
   async createWrapped(
@@ -155,9 +165,11 @@ export class Terra implements WormholeChain {
     );
 
     const info = await this.signSendWait([txns], signer);
-
-    return { chain: this, contract: (info.codespace ||= "") };
+    
+    //const contract_address = this.getContractAddressFromTxInfo(info)
+    return { chain: this, contract: "todo" };
   }
+
   async updateWrapped(
     signer: TerraSigner,
     receipt: WormholeReceipt
@@ -193,8 +205,7 @@ export class Terra implements WormholeChain {
     signer: TerraSigner
   ): Promise<TxInfo> {
     const gasPrices = this.client.config.gasPrices;
-    //TODO??
-    const FeeAsset: string = "uusd";
+    const FeeAsset: string = "uluna";
 
     const feeEstimate = await this.client.tx.estimateFee(
       [
@@ -218,12 +229,11 @@ export class Terra implements WormholeChain {
     });
 
     const result = await this.client.tx.broadcast(executeTx);
+    if(result.code !== 0) throw new Error("Failed to broadcast transaction: " + result.raw_log)
 
     const info = await this.waitForTerraExecution(result.txhash);
 
-    if (!info) {
-      throw new Error("info not found");
-    }
+    if (!info) throw new Error("info not found");
     return info;
   }
 

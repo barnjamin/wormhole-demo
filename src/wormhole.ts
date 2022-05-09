@@ -149,7 +149,7 @@ export class Wormhole {
     const origin = attestation.origin.chain;
     const destination = attestation.destination;
 
-    const sequence = await destination.attest(attestation);
+    const sequence = await origin.attest(attestation);
 
     const receipt = await this.getVAA(sequence, origin, destination);
 

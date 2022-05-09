@@ -12,17 +12,28 @@ import { WORMHOLE_RPC_HOSTS } from "./consts";
 import { Ethereum } from "./ethereum";
 import { Algorand } from "./algorand";
 import { Solana } from "./solana";
-
+import { Terra } from "./terra";
 import { Avalanche } from "./avalanche";
 
-import {getAlgoConnection, getAvaxConnection, getEthConnection, getSolConnection} from './connections'
-import { getAlgoSigner, getEthSigner, getSolSigner } from "./signers";
-
-
+import {
+  getAlgoConnection,
+  getAvaxConnection,
+  getEthConnection,
+  getSolConnection,
+  getTerraConnection,
+} from "./connections";
+import {
+  getAlgoSigner,
+  getEthSigner,
+  getSolSigner,
+  getTerraSigner,
+} from "./signers";
 
 (async function () {
+
+  await round_trip_terra();
   //await round_trip_ethereum();
-  await round_trip_solana()
+  //await round_trip_solana()
   //await round_trip_avalanche()
 })();
 
@@ -132,6 +143,59 @@ async function round_trip_solana() {
   console.timeEnd("Claim Algo on Algo");
 }
 
+async function round_trip_terra() {
+  // Main wh interface, allows for {mirror, transfer, and attest, receive, getVaa}
+  const wh = new Wormhole(WORMHOLE_RPC_HOSTS);
+
+  // Chain specific implementations of `WormholeChain` interface
+  // they wrap specific methods and handle any weirdness
+  const algo = new Algorand(getAlgoConnection());
+  const terra = new Terra(getTerraConnection());
+
+  // Get chain specific signers
+  const algo_sgn = getAlgoSigner();
+  const terra_sgn = getTerraSigner(terra.client);
+
+  // Asset we want to transfer (both sides)
+  const algo_asset: WormholeAsset = {
+    chain: algo,
+    contract: BigInt(0),
+  };
+
+  const terra_asset = await wh.getMirrored(algo_asset, terra);
+
+  const xferAlgoOut: WormholeTokenTransfer = {
+    origin: algo_asset,
+    sender: algo_sgn,
+    destination: terra_asset,
+    receiver: terra_sgn,
+    amount: BigInt(1000),
+  };
+
+  const xferAlgoIn: WormholeTokenTransfer = {
+    destination: algo_asset,
+    receiver: algo_sgn,
+    origin: terra_asset,
+    sender: terra_sgn,
+    amount: BigInt(100),
+  };
+
+  console.time("Transfer Algo on Algo");
+  const receipt_a_s = await wh.transfer(xferAlgoOut);
+  console.timeEnd("Transfer Algo on Algo");
+
+  console.time("Claim Algo on Terra");
+  await wh.claim(terra_sgn, receipt_a_s, terra_asset);
+  console.timeEnd("Claim Algo on Terra");
+
+  console.time("Transfer Algo on Terra");
+  const receipt_s_a = await wh.transfer(xferAlgoIn);
+  console.timeEnd("Transfer Algo on Terra");
+
+  console.time("Claim Algo on Algo");
+  await wh.claim(algo_sgn, receipt_s_a, algo_asset);
+  console.timeEnd("Claim Algo on Algo");
+}
 
 async function round_trip_avalanche() {
   // Main wh interface, allows for {mirror, transfer, and attest, receive, getVaa}

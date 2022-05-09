@@ -1,8 +1,10 @@
+import { MnemonicKey, RawKey } from "@terra-money/terra.js";
 import { mnemonicToSecretKey } from "algosdk";
 import { ethers } from "ethers";
 import { AlgorandSigner } from "./algorand";
 import { EthereumSigner } from "./ethereum";
 import { SolanaSigner } from "./solana";
+import {  TerraSigner } from "./terra";
 
 // Plz dont steal all my testnet money
 export function getSolSigner(): SolanaSigner {
@@ -27,4 +29,10 @@ export function getAvaxSigner(provider: any): EthereumSigner {
   const ETH_PRIVATE_KEY =
     "0x3f493e59e81db1be4ebbe18b28ba8fdd066ef44139420ead59f37f5dacb80719";
   return new ethers.Wallet(ETH_PRIVATE_KEY, provider);
+}
+
+export function getTerraSigner(client: any): TerraSigner{
+    const key = "4676ae913753a7444de03fc4182d3442b2582e584dbe4e0d324dfd51945da8d7"
+    const raw = new RawKey(Buffer.from(key, "hex"))
+    return new TerraSigner(raw, client)
 }
