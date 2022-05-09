@@ -3,8 +3,6 @@ import { Algodv2 } from "algosdk";
 import { ethers } from "ethers";
 import {
   ALGORAND_HOST,
-  AVAX_NETWORK_CHAIN_ID,
-  COVALENT_AVAX,
   SOLANA_HOST,
   TERRA_HOST,
 } from "./consts";
@@ -34,10 +32,8 @@ export function getEthConnection(network?: string): ethers.providers.Provider {
 }
 
 export function getAvaxConnection(): ethers.providers.Provider {
-  const apiKey = "ckey_0ff8d76eaa2d48ae93288faf2a2";
-  return new ethers.providers.JsonRpcProvider(
-    `https://api.covalenthq.com/v1/${AVAX_NETWORK_CHAIN_ID}/?&key=${apiKey}`
-  );
+  const url = "https://speedy-nodes-nyc.moralis.io/236c92ab480d8cafac91f211/avalanche/testnet"
+  return new ethers.providers.JsonRpcProvider(url);
 }
 
 export function getTerraConnection(): LCDClient {

@@ -24,6 +24,7 @@ import {
 } from "./connections";
 import {
   getAlgoSigner,
+  getAvaxSigner,
   getEthSigner,
   getSolSigner,
   getTerraSigner,
@@ -204,46 +205,47 @@ async function round_trip_avalanche() {
   // Chain specific implementations of `WormholeChain` interface
   // they wrap specific methods and handle any weirdness
   const algo = new Algorand(getAlgoConnection());
-  const eth = new Avalanche(getAvaxConnection());
+  const avax = new Avalanche(getAvaxConnection());
 
   // Get chain specific signers
   const algo_sgn = getAlgoSigner();
-  const eth_sgn = getEthSigner(eth.provider);
+  const avax_sgn = getAvaxSigner(avax.provider);
 
   // Asset we want to transfer (both sides)
   const algo_asset: WormholeAsset = {
     chain: algo,
     contract: BigInt(0),
   };
-  const eth_asset = await wh.getMirrored(algo_asset, eth);
+  const avax_asset = await wh.getMirrored(algo_asset, avax);
 
   const xferAlgoOut: WormholeTokenTransfer = {
     origin: algo_asset,
     sender: algo_sgn,
-    destination: eth_asset,
-    receiver: eth_sgn,
+    destination: avax_asset,
+    receiver: avax_sgn,
     amount: BigInt(100),
   };
 
   const xferAlgoIn: WormholeTokenTransfer = {
     destination: algo_asset,
     receiver: algo_sgn,
-    origin: eth_asset,
-    sender: eth_sgn,
+    origin: avax_asset,
+    sender: avax_sgn,
     amount: BigInt(100),
   };
 
+  //const receipt_a_s = await wh.getVAA("57", algo, avax)
   console.time("Transfer Algo on Algo");
   const receipt_a_s = await wh.transfer(xferAlgoOut);
   console.timeEnd("Transfer Algo on Algo");
 
-  console.time("Claim Algo on Eth");
-  await wh.claim(eth_sgn, receipt_a_s, eth_asset);
-  console.timeEnd("Claim Algo on Eth");
+  console.time("Claim Algo on Avax");
+  await wh.claim(avax_sgn, receipt_a_s, avax_asset);
+  console.timeEnd("Claim Algo on Avax");
 
-  console.time("Transfer Algo on Eth");
+  console.time("Transfer Algo on Avax");
   const receipt_s_a = await wh.transfer(xferAlgoIn);
-  console.timeEnd("Transfer Algo on Eth");
+  console.timeEnd("Transfer Algo on Avax");
 
   console.time("Claim Algo on Algo");
   await wh.claim(algo_sgn, receipt_s_a, algo_asset);

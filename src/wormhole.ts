@@ -155,12 +155,12 @@ export class Wormhole {
 
 
     try {
-      return await destination.createWrapped(attestation.sender, receipt);
+      return await destination.createWrapped(attestation.receiver, receipt);
     } catch (e) {
       //
     }
 
-    return await destination.updateWrapped(attestation.sender, receipt);
+    return await destination.updateWrapped(attestation.receiver, receipt);
   }
 
   // Transfers tokens into WormHole
