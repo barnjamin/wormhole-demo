@@ -15,16 +15,11 @@ import {
 } from "@certusone/wormhole-sdk";
 import { TransactionSignerPair } from "@certusone/wormhole-sdk/lib/cjs/algorand";
 import algosdk, {
-  Algod,
   Algodv2,
   generateAccount,
   waitForConfirmation,
 } from "algosdk";
-import {
-  ALGORAND_BRIDGE_ID,
-  ALGORAND_HOST,
-  ALGORAND_TOKEN_BRIDGE_ID,
-} from "./consts";
+import { ALGORAND_BRIDGE_ID, ALGORAND_TOKEN_BRIDGE_ID } from "./consts";
 import { isSolSigner } from "./solana";
 import {
   WormholeAsset,
@@ -50,38 +45,6 @@ export class AlgorandSigner {
   }
 }
 
-export async function signSendWait(
-  client: Algodv2,
-  txns: TransactionSignerPair[],
-  acct: AlgorandSigner
-): Promise<any> {
-
-  // Signer empty, take just tx
-  const txs = txns.map((tx) => {
-    return tx.tx;
-  });
-
-  // Group txns atomically
-  algosdk.assignGroupID(txs);
-
-  // Take the last txns id
-  const txid: string = txs[txs.length - 1].txID();
-
-  const signedTxns: Uint8Array[] = await Promise.all(
-    txns.map(async (tx) => {
-      if (tx.signer) {
-        return await tx.signer.signTxn(tx.tx);
-      } else {
-        return await acct.signTxn(tx.tx);
-      }
-    })
-  );
-
-  await client.sendRawTransaction(signedTxns).do();
-
-  return await waitForConfirmation(client, txid, 2);
-}
-
 export class Algorand implements WormholeChain {
   coreId: bigint = BigInt(ALGORAND_BRIDGE_ID);
   tokenBridgeId: bigint = BigInt(ALGORAND_TOKEN_BRIDGE_ID);
@@ -91,7 +54,7 @@ export class Algorand implements WormholeChain {
   client: Algodv2;
 
   constructor(client: Algodv2) {
-    this.client = client
+    this.client = client;
   }
   async lookupOriginal(asset: bigint): Promise<WormholeWrappedInfo> {
     return getOriginalAssetAlgorand(this.client, this.tokenBridgeId, asset);
@@ -127,8 +90,7 @@ export class Algorand implements WormholeChain {
       attestation.origin.contract
     );
 
-    const result = await signSendWait(
-      this.client,
+    const result = await this.signSendWait(
       txs,
       attestation.sender as AlgorandSigner
     );
@@ -171,8 +133,7 @@ export class Algorand implements WormholeChain {
     console.timeEnd("Creating transactions");
 
     console.time("Signing and sending");
-    const result = await signSendWait(
-      this.client,
+    const result = await this.signSendWait(
       transferTxs,
       msg.sender as AlgorandSigner
     );
@@ -195,7 +156,7 @@ export class Algorand implements WormholeChain {
     );
     console.timeEnd("Creating Redeem txns");
     console.time("Signing and sending");
-    await signSendWait(this.client, redeemTxs, signer);
+    await this.signSendWait(redeemTxs, signer);
     console.timeEnd("Signing and sending");
 
     return asset;
@@ -212,7 +173,7 @@ export class Algorand implements WormholeChain {
       signer.getAddress(),
       receipt.VAA
     );
-    await signSendWait(this.client, txs, signer);
+    await this.signSendWait(txs, signer);
 
     return {} as WormholeAsset;
   }
@@ -238,5 +199,36 @@ export class Algorand implements WormholeChain {
 
   getAssetAsInt(asset: string): bigint {
     return BigInt(0);
+  }
+
+  async signSendWait(
+    txns: TransactionSignerPair[],
+    acct: AlgorandSigner
+  ): Promise<any> {
+    // Signer empty, take just tx
+    const txs = txns.map((tx) => {
+      return tx.tx;
+    });
+
+    // Group txns atomically
+    algosdk.assignGroupID(txs);
+
+    // Take the last txns id
+    const txid: string = txs[txs.length - 1].txID();
+
+    // If it came with a signer, use it
+    const signedTxns: Uint8Array[] = await Promise.all(
+      txns.map(async (tx) => {
+        if (tx.signer) {
+          return await tx.signer.signTxn(tx.tx);
+        } else {
+          return await acct.signTxn(tx.tx);
+        }
+      })
+    );
+
+    await this.client.sendRawTransaction(signedTxns).do();
+
+    return await waitForConfirmation(this.client, txid, 2);
   }
 }

@@ -6,6 +6,7 @@ import {
   getOriginalAssetAlgorand,
 } from "@certusone/wormhole-sdk";
 import { ethers } from "ethers";
+import { TerraSigner } from "./terra";
 
 export interface AlgorandSigner {
   getAddress(): string;
@@ -17,7 +18,7 @@ export interface SolanaSigner {
   signTxn(txn: any): Promise<Buffer>;
 }
 
-export type Signer = AlgorandSigner | ethers.Signer | SolanaSigner;
+export type Signer = AlgorandSigner | ethers.Signer | SolanaSigner | TerraSigner;
 
 export type WormholeAsset = {
   chain: WormholeChain;

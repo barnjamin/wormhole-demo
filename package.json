@@ -10,6 +10,8 @@
   "dependencies": {
     "@certusone/wormhole-sdk": "0.3.0",
     "@improbable-eng/grpc-web-node-http-transport": "^0.15.0",
+    "@terra-money/core": "^2.0.9",
+    "@terra-money/terra.js": "^3.0.11",
     "algosdk": "^1.15.0",
     "b58": "^4.0.3",
     "ethers": "^5.6.4"

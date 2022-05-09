@@ -1,7 +1,13 @@
 import { Connection } from "@solana/web3.js";
 import { Algodv2 } from "algosdk";
 import { ethers } from "ethers";
-import { ALGORAND_HOST, AVAX_NETWORK_CHAIN_ID, COVALENT_AVAX, SOLANA_HOST } from "./consts";
+import { ALGORAND_HOST, AVAX_NETWORK_CHAIN_ID, COVALENT_AVAX, SOLANA_HOST, TERRA_HOST } from "./consts";
+
+import {
+  LCDClient,
+  MnemonicKey,
+  MsgExecuteContract,
+} from "@terra-money/terra.js";
 
 export function getSolConnection(): Connection {
   return new Connection(SOLANA_HOST, "confirmed");
@@ -26,4 +32,11 @@ export function getAvaxConnection(): ethers.providers.Provider {
     return new ethers.providers.JsonRpcProvider(
         `https://api.covalenthq.com/v1/${AVAX_NETWORK_CHAIN_ID}/?&key=${apiKey}`
     )
+}
+
+export function getTerraConnection(): LCDClient {
+    return new LCDClient({
+        URL: TERRA_HOST.URL,
+        chainID: TERRA_HOST.chainID,
+    });
 }
