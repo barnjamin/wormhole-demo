@@ -18,9 +18,9 @@ This repo just formalizes the API and hides specific chain details in a Wormhole
     - [x] - Redeem with VAA 
     - [x] - Find original Asset
 
-- [ ] Eth:
+- [x] Eth:
 
-    - [ ] - Attest new asset 
+    - [x] - Attest new asset 
     - [x] - Xfer out 
     - [x] - Redeem with VAA 
     - [x] - Find original asset
@@ -36,16 +36,16 @@ This repo just formalizes the API and hides specific chain details in a Wormhole
 - [ ] Terra:
 
     - [ ] - Attest new asset 
-    - [ ] - Xfer out 
-    - [ ] - Redeem with VAA 
-    - [ ] - Find original asset
+    - [x] - Xfer out 
+    - [x] - Redeem with VAA 
+    - [x] - Find original asset
 
-- [ ] Avalanche:
+- [x] Avalanche:
 
-    - [ ] - Attest new asset 
-    - [ ] - Xfer out 
-    - [ ] - Redeem with VAA 
-    - [ ] - Find original asset
+    - [x] - Attest new asset 
+    - [x] - Xfer out 
+    - [x] - Redeem with VAA 
+    - [x] - Find original asset
 
 - [ ] Tests? (lol)
 
