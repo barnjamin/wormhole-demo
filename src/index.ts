@@ -3,9 +3,6 @@ process.env["REACT_APP_CLUSTER"] = "testnet";
 import {
   Wormhole,
   WormholeAsset,
-  WormholeAttestation,
-  WormholeMessage,
-  WormholeMessageType,
   WormholeAssetTransfer,
 } from "./wormhole/wormhole";
 import { WORMHOLE_RPC_HOSTS } from "./wormhole/consts";

@@ -35,11 +35,20 @@ export type WormholeReceipt = {
 
 // WormholeMessageType describes the type of messages
 // that can be sent to Wormhole
-export enum WormholeMessageType {
+export enum WormholeAction {
   Attestation = 1,
   AssetTransfer = 2,
   ContractControlledTransfers = 3
 }
+
+// WormholeAttestation describes an intended creation of a new 
+// asset given the originating asset and destination chain
+export type WormholeAttestation = {
+  origin: WormholeAsset;
+  sender: Signer;
+  destination: WormholeChain;
+  receiver: Signer;
+};
 
 // WormholeAssetTransfer describes an intended transfer of an asset
 // From origin chain to destination chain 
@@ -51,19 +60,16 @@ export type WormholeAssetTransfer = {
   amount: bigint;
 };
 
-// WormholeAttestation describes an intended creation of a new 
-// asset given the originating asset and destination chain
-export type WormholeAttestation = {
-  origin: WormholeAsset;
-  sender: Signer;
-  destination: WormholeChain;
-  receiver: Signer;
-};
+export type WormholeContractTransfer = {
+  //TODO
+}
+
 
 export type WormholeMessage = {
-  type: WormholeMessageType;
+  action: WormholeAction;
   attestation?: WormholeAttestation;
-  tokenTransfer?: WormholeAssetTransfer;
+  assetTransfer?: WormholeAssetTransfer;
+  contractTransfer?: WormholeContractTransfer;
 };
 
 export interface WormholeChain {
@@ -146,20 +152,20 @@ export class Wormhole {
   // TODO: Send is not a great name, since we transmit AND receive,
   // maybe perform?
   async send(msg: WormholeMessage): Promise<WormholeAsset> {
-    switch (msg.type) {
-      case WormholeMessageType.Attestation:
+    switch (msg.action) {
+      case WormholeAction.Attestation:
         if (msg.attestation === undefined)
           throw new Error("Type Attestation but was undefined");
         return this.mirror(msg.attestation);
-      case WormholeMessageType.AssetTransfer:
-        if (msg.tokenTransfer === undefined)
+      case WormholeAction.AssetTransfer:
+        if (msg.assetTransfer === undefined)
           throw new Error("Type TokenTransfer but was undefined");
 
-        const receipt = await this.transfer(msg.tokenTransfer);
+        const receipt = await this.transfer(msg.assetTransfer);
         const asset = await this.claim(
-          msg.tokenTransfer.receiver,
+          msg.assetTransfer.receiver,
           receipt,
-          msg.tokenTransfer.destination
+          msg.assetTransfer.destination
         );
         return asset;
       default:
