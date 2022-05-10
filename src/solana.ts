@@ -16,21 +16,13 @@ import {
   getEmitterAddressSolana,
   tryNativeToHexString,
 } from "@certusone/wormhole-sdk";
-import {
-  SOL_BRIDGE_ADDRESS,
-  SOL_TOKEN_BRIDGE_ADDRESS,
-} from "./consts";
+import { SOL_BRIDGE_ADDRESS, SOL_TOKEN_BRIDGE_ADDRESS } from "./consts";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
-import {
-  Connection,
-  Keypair,
-  PublicKey,
-  Transaction
-} from "@solana/web3.js";
+import { Connection, Keypair, PublicKey, Transaction } from "@solana/web3.js";
 import {
   WormholeAsset,
   WormholeAttestation,
@@ -53,7 +45,7 @@ export class SolanaSigner {
     return this.keypair.publicKey.toBase58();
   }
 
- async getTokenAddress(token: string): Promise<PublicKey> {
+  async getTokenAddress(token: string): Promise<PublicKey> {
     return Token.getAssociatedTokenAddress(
       ASSOCIATED_TOKEN_PROGRAM_ID,
       TOKEN_PROGRAM_ID,
@@ -80,7 +72,7 @@ export class Solana implements WormholeChain {
   connection: Connection;
 
   constructor(connection: Connection) {
-    this.connection = connection; 
+    this.connection = connection;
   }
 
   async lookupOriginal(asset: string): Promise<WormholeWrappedInfo> {
@@ -149,7 +141,8 @@ export class Solana implements WormholeChain {
 
   async transfer(msg: WormholeTokenTransfer): Promise<string> {
     if (!isSolSigner(msg.sender)) throw new Error("Expected solana signer");
-    if (typeof msg.origin.contract !== "string") throw new Error("Expected string for contract");
+    if (typeof msg.origin.contract !== "string")
+      throw new Error("Expected string for contract");
 
     const hexStr = tryNativeToHexString(
       await msg.receiver.getAddress(),
@@ -158,7 +151,7 @@ export class Solana implements WormholeChain {
 
     if (hexStr === null) throw new Error("Couldnt parse address for receiver");
 
-    const original = await this.lookupOriginal(msg.origin.contract)
+    const original = await this.lookupOriginal(msg.origin.contract);
     let originAddress: Uint8Array | undefined = undefined;
     let originChain: ChainId | undefined = undefined;
     if (original.isWrapped) {
@@ -178,7 +171,7 @@ export class Solana implements WormholeChain {
       hexToUint8Array(hexStr),
       msg.destination.chain.id,
       originAddress,
-      originChain,
+      originChain
     );
 
     const txid = await this.connection.sendRawTransaction(
@@ -228,7 +221,7 @@ export class Solana implements WormholeChain {
     await this.connection.confirmTransaction(txid);
     const info = await this.connection.getTransaction(txid);
     if (info === null) throw new Error("Couldnt get transaction: " + txid);
-    return asset
+    return asset;
   }
 
   async createTokenAddress(signer: SolanaSigner, token: string) {
@@ -289,9 +282,17 @@ export class Solana implements WormholeChain {
   }
 
   transactionComplete(receipt: WormholeReceipt): Promise<boolean> {
-    return getIsTransferCompletedSolana(this.tokenBridgeAddress, receipt.VAA, this.connection)
+    return getIsTransferCompletedSolana(
+      this.tokenBridgeAddress,
+      receipt.VAA,
+      this.connection
+    );
   }
 
-  getAssetAsString(asset: bigint): string { throw new Error("Method not implemented."); }
-  getAssetAsInt(asset: string): bigint { throw new Error("Method not implemented."); }
+  getAssetAsString(asset: bigint): string {
+    throw new Error("Method not implemented.");
+  }
+  getAssetAsInt(asset: string): bigint {
+    throw new Error("Method not implemented.");
+  }
 }

@@ -31,7 +31,6 @@ import {
 } from "./signers";
 
 (async function () {
-
   await round_trip_terra();
   //await round_trip_ethereum();
   //await round_trip_solana()
@@ -234,7 +233,6 @@ async function round_trip_avalanche() {
     amount: BigInt(100),
   };
 
-  //const receipt_a_s = await wh.getVAA("57", algo, avax)
   console.time("Transfer Algo on Algo");
   const receipt_a_s = await wh.transfer(xferAlgoOut);
   console.timeEnd("Transfer Algo on Algo");

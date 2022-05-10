@@ -117,8 +117,6 @@ export class Algorand implements WormholeChain {
     if (!hexStr) throw new Error("Failed to convert to hexStr");
 
     const fee = 0;
-
-    console.time("Creating transactions");
     const transferTxs = await transferFromAlgorand(
       this.client,
       this.tokenBridgeId,
@@ -130,14 +128,11 @@ export class Algorand implements WormholeChain {
       msg.destination.chain.id,
       BigInt(fee)
     );
-    console.timeEnd("Creating transactions");
 
-    console.time("Signing and sending");
     const result = await this.signSendWait(
       transferTxs,
       msg.sender as AlgorandSigner
     );
-    console.timeEnd("Signing and sending");
     return parseSequenceFromLogAlgorand(result);
   }
 
@@ -146,7 +141,6 @@ export class Algorand implements WormholeChain {
     receipt: WormholeReceipt,
     asset: WormholeAsset
   ): Promise<WormholeAsset> {
-    console.time("Creating Redeem txns");
     const redeemTxs = await redeemOnAlgorand(
       this.client,
       this.tokenBridgeId,
@@ -154,10 +148,7 @@ export class Algorand implements WormholeChain {
       receipt.VAA,
       signer.getAddress()
     );
-    console.timeEnd("Creating Redeem txns");
-    console.time("Signing and sending");
     await this.signSendWait(redeemTxs, signer);
-    console.timeEnd("Signing and sending");
 
     return asset;
   }

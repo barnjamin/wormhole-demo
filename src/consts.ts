@@ -1150,7 +1150,6 @@ export const POLYGON_TERRA_WRAPPED_TOKENS = [
 
 export const JUPITER_SWAP_BASE_URL = "https://jup.ag/swap";
 
-
 export const LUNA_ADDRESS = "uluna";
 export const UST_ADDRESS = "uusd";
 

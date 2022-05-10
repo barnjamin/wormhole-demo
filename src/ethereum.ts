@@ -17,7 +17,10 @@ import {
   approveEth,
 } from "@certusone/wormhole-sdk";
 import { ethers } from "ethers";
-import { ROPSTEN_ETH_BRIDGE_ADDRESS, ROPSTEN_ETH_TOKEN_BRIDGE_ADDRESS } from "./consts";
+import {
+  ROPSTEN_ETH_BRIDGE_ADDRESS,
+  ROPSTEN_ETH_TOKEN_BRIDGE_ADDRESS,
+} from "./consts";
 import {
   WormholeAsset,
   WormholeAttestation,
@@ -26,7 +29,7 @@ import {
   WormholeTokenTransfer,
 } from "./wormhole";
 
-export type EthereumSigner = ethers.Signer
+export type EthereumSigner = ethers.Signer;
 
 export class Ethereum implements WormholeChain {
   coreId: string = ROPSTEN_ETH_BRIDGE_ADDRESS;
@@ -36,7 +39,7 @@ export class Ethereum implements WormholeChain {
   provider: any;
 
   constructor(provider: any) {
-    this.provider = provider
+    this.provider = provider;
   }
   async lookupOriginal(asset: string): Promise<WormholeWrappedInfo> {
     return await getOriginalAssetEth(
@@ -54,7 +57,7 @@ export class Ethereum implements WormholeChain {
     let assetBytes: Uint8Array;
 
     if (typeof asset === "bigint") {
-      assetBytes = hexToUint8Array(chain.getAssetAsString(asset))
+      assetBytes = hexToUint8Array(chain.getAssetAsString(asset));
     } else {
       assetBytes = hexToUint8Array(asset);
     }
@@ -66,7 +69,7 @@ export class Ethereum implements WormholeChain {
       assetBytes
     );
 
-    return { chain: this, contract: fa } as WormholeAsset
+    return { chain: this, contract: fa } as WormholeAsset;
   }
 
   async emitterAddress(): Promise<string> {
@@ -75,7 +78,7 @@ export class Ethereum implements WormholeChain {
 
   async attest(attestation: WormholeAttestation): Promise<string> {
     if (typeof attestation.origin.contract === "bigint")
-      throw new Error("Expected string contract, got bigint")
+      throw new Error("Expected string contract, got bigint");
 
     if (!(attestation.sender instanceof ethers.Signer))
       throw new Error("Expected ethers.Signer");
@@ -83,7 +86,7 @@ export class Ethereum implements WormholeChain {
     const receipt = await attestFromEth(
       this.tokenBridgeAddress,
       attestation.sender,
-      attestation.origin.contract,
+      attestation.origin.contract
     );
 
     return parseSequenceFromLogEth(receipt, this.tokenBridgeAddress);
@@ -103,7 +106,12 @@ export class Ethereum implements WormholeChain {
 
     if (hexStr === null) throw new Error("Couldnt parse address for receiver");
 
-    await approveEth(this.tokenBridgeAddress, msg.origin.contract, msg.sender, msg.amount)
+    await approveEth(
+      this.tokenBridgeAddress,
+      msg.origin.contract,
+      msg.sender,
+      msg.amount
+    );
 
     const receipt = await transferFromEth(
       this.tokenBridgeAddress,
@@ -127,7 +135,7 @@ export class Ethereum implements WormholeChain {
       signer,
       receipt.VAA
     );
-    return asset
+    return asset;
   }
 
   async createWrapped(

@@ -4,7 +4,7 @@ import { ethers } from "ethers";
 import { AlgorandSigner } from "./algorand";
 import { EthereumSigner } from "./ethereum";
 import { SolanaSigner } from "./solana";
-import {  TerraSigner } from "./terra";
+import { TerraSigner } from "./terra";
 
 // Plz dont steal all my testnet money
 export function getSolSigner(): SolanaSigner {
@@ -31,8 +31,9 @@ export function getAvaxSigner(provider: any): EthereumSigner {
   return new ethers.Wallet(ETH_PRIVATE_KEY, provider);
 }
 
-export function getTerraSigner(client: any): TerraSigner{
-    const key = "4676ae913753a7444de03fc4182d3442b2582e584dbe4e0d324dfd51945da8d7"
-    const raw = new RawKey(Buffer.from(key, "hex"))
-    return new TerraSigner(raw, client)
+export function getTerraSigner(client: any): TerraSigner {
+  const key =
+    "4676ae913753a7444de03fc4182d3442b2582e584dbe4e0d324dfd51945da8d7";
+  const raw = new RawKey(Buffer.from(key, "hex"));
+  return new TerraSigner(raw, client);
 }

@@ -143,15 +143,15 @@ export class Terra implements WormholeChain {
       receipt.VAA
     );
 
-    const info = await this.signSendWait([txns], signer)
+    const info = await this.signSendWait([txns], signer);
 
     return asset;
   }
 
   getContractAddressFromTxInfo(info: TxInfo): string {
-    if(info.logs === undefined) return "" ;
-    if(info.logs.length === 0)return "";
-    return info.logs[0].eventsByType.from_contract.contract[0]
+    if (info.logs === undefined) return "";
+    if (info.logs.length === 0) return "";
+    return info.logs[0].eventsByType.from_contract.contract[0];
   }
 
   async createWrapped(
@@ -165,7 +165,7 @@ export class Terra implements WormholeChain {
     );
 
     const info = await this.signSendWait([txns], signer);
-    
+
     //const contract_address = this.getContractAddressFromTxInfo(info)
     return { chain: this, contract: "todo" };
   }
@@ -229,7 +229,8 @@ export class Terra implements WormholeChain {
     });
 
     const result = await this.client.tx.broadcast(executeTx);
-    if(result.code !== 0) throw new Error("Failed to broadcast transaction: " + result.raw_log)
+    if (result.code !== 0)
+      throw new Error("Failed to broadcast transaction: " + result.raw_log);
 
     const info = await this.waitForTerraExecution(result.txhash);
 

@@ -1,18 +1,9 @@
 import { Connection } from "@solana/web3.js";
 import { Algodv2 } from "algosdk";
 import { ethers } from "ethers";
-import {
-  ALGORAND_HOST,
-  SOLANA_HOST,
-  TERRA_HOST,
-} from "./consts";
+import { ALGORAND_HOST, SOLANA_HOST, TERRA_HOST } from "./consts";
 
-import {
-  Coins,
-  LCDClient,
-  MnemonicKey,
-  MsgExecuteContract,
-} from "@terra-money/terra.js";
+import { Coins, LCDClient } from "@terra-money/terra.js";
 
 export function getSolConnection(): Connection {
   return new Connection(SOLANA_HOST, "confirmed");
@@ -32,7 +23,8 @@ export function getEthConnection(network?: string): ethers.providers.Provider {
 }
 
 export function getAvaxConnection(): ethers.providers.Provider {
-  const url = "https://speedy-nodes-nyc.moralis.io/236c92ab480d8cafac91f211/avalanche/testnet"
+  const url =
+    "https://speedy-nodes-nyc.moralis.io/236c92ab480d8cafac91f211/avalanche/testnet";
   return new ethers.providers.JsonRpcProvider(url);
 }
 
