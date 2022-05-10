@@ -10,7 +10,7 @@
     "demo": "npx ts-node src/index.ts"
   },
   "dependencies": {
-    "@certusone/wormhole-sdk": "0.3.0",
+    "@certusone/wormhole-sdk": "0.3.1",
     "@improbable-eng/grpc-web-node-http-transport": "^0.15.0",
     "@terra-money/core": "^2.0.9",
     "@terra-money/terra.js": "^3.0.11",
