@@ -28,7 +28,7 @@ import {
   WormholeAttestation,
   WormholeChain,
   WormholeReceipt,
-  WormholeTokenTransfer,
+  WormholeAssetTransfer,
 } from "../wormhole";
 
 import bs58 from "bs58";
@@ -139,7 +139,7 @@ export class Solana implements WormholeChain {
     return parseSequenceFromLogSolana(info);
   }
 
-  async transfer(msg: WormholeTokenTransfer): Promise<string> {
+  async transfer(msg: WormholeAssetTransfer): Promise<string> {
     if (!isSolSigner(msg.sender)) throw new Error("Expected solana signer");
     if (typeof msg.origin.contract !== "string")
       throw new Error("Expected string for contract");

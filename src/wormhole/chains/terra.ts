@@ -21,7 +21,7 @@ import {
   WormholeAttestation,
   WormholeChain,
   WormholeReceipt,
-  WormholeTokenTransfer,
+  WormholeAssetTransfer,
 } from "../wormhole";
 import {
   LCDClient,
@@ -105,7 +105,7 @@ export class Terra implements WormholeChain {
     return parseSequenceFromLogTerra(info);
   }
 
-  async transfer(msg: WormholeTokenTransfer): Promise<string> {
+  async transfer(msg: WormholeAssetTransfer): Promise<string> {
     if (!isTerraSigner(msg.sender)) throw new Error("Expected TerraSigner");
 
     if (typeof msg.origin.contract !== "string")
@@ -164,7 +164,7 @@ export class Terra implements WormholeChain {
       receipt.VAA
     );
 
-    const info = await this.signSendWait([txns], signer);
+    await this.signSendWait([txns], signer);
 
     //const contract_address = this.getContractAddressFromTxInfo(info)
     return { chain: this, contract: "todo" };

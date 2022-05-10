@@ -6,7 +6,7 @@ import {
   WormholeAttestation,
   WormholeMessage,
   WormholeMessageType,
-  WormholeTokenTransfer,
+  WormholeAssetTransfer,
 } from "./wormhole/wormhole";
 import { WORMHOLE_RPC_HOSTS } from "./wormhole/consts";
 import { Ethereum } from "./wormhole/chains/ethereum";
@@ -31,11 +31,12 @@ import {
 } from "./wormhole/signers";
 
 (async function () {
-  await round_trip_terra();
+  await round_trip_solana()
+  //await round_trip_terra();
   //await round_trip_ethereum();
-  //await round_trip_solana()
   //await round_trip_avalanche()
 })();
+
 
 async function round_trip_ethereum() {
   // Main wh interface, allows for {mirror, transfer, and attest, receive, getVaa}
@@ -57,7 +58,7 @@ async function round_trip_ethereum() {
   };
   const eth_asset = await wh.getMirrored(algo_asset, eth);
 
-  const xferAlgoOut: WormholeTokenTransfer = {
+  const xferAlgoOut: WormholeAssetTransfer = {
     origin: algo_asset,
     sender: algo_sgn,
     destination: eth_asset,
@@ -65,7 +66,7 @@ async function round_trip_ethereum() {
     amount: BigInt(100),
   };
 
-  const xferAlgoIn: WormholeTokenTransfer = {
+  const xferAlgoIn: WormholeAssetTransfer = {
     destination: algo_asset,
     receiver: algo_sgn,
     origin: eth_asset,
@@ -110,7 +111,7 @@ async function round_trip_solana() {
   };
   const sol_asset = await wh.getMirrored(algo_asset, sol);
 
-  const xferAlgoSol: WormholeTokenTransfer = {
+  const xferAlgoSol: WormholeAssetTransfer = {
     origin: algo_asset,
     sender: algo_sgn,
     destination: sol_asset,
@@ -118,7 +119,7 @@ async function round_trip_solana() {
     amount: BigInt(100),
   };
 
-  const xferSolAlgo: WormholeTokenTransfer = {
+  const xferSolAlgo: WormholeAssetTransfer = {
     destination: algo_asset,
     receiver: algo_sgn,
     origin: sol_asset,
@@ -164,7 +165,7 @@ async function round_trip_terra() {
 
   const terra_asset = await wh.getMirrored(algo_asset, terra);
 
-  const xferAlgoOut: WormholeTokenTransfer = {
+  const xferAlgoOut: WormholeAssetTransfer = {
     origin: algo_asset,
     sender: algo_sgn,
     destination: terra_asset,
@@ -172,7 +173,7 @@ async function round_trip_terra() {
     amount: BigInt(1000),
   };
 
-  const xferAlgoIn: WormholeTokenTransfer = {
+  const xferAlgoIn: WormholeAssetTransfer = {
     destination: algo_asset,
     receiver: algo_sgn,
     origin: terra_asset,
@@ -217,7 +218,7 @@ async function round_trip_avalanche() {
   };
   const avax_asset = await wh.getMirrored(algo_asset, avax);
 
-  const xferAlgoOut: WormholeTokenTransfer = {
+  const xferAlgoOut: WormholeAssetTransfer = {
     origin: algo_asset,
     sender: algo_sgn,
     destination: avax_asset,
@@ -225,7 +226,7 @@ async function round_trip_avalanche() {
     amount: BigInt(100),
   };
 
-  const xferAlgoIn: WormholeTokenTransfer = {
+  const xferAlgoIn: WormholeAssetTransfer = {
     destination: algo_asset,
     receiver: algo_sgn,
     origin: avax_asset,

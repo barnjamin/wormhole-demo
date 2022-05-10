@@ -26,7 +26,7 @@ import {
   WormholeAttestation,
   WormholeChain,
   WormholeReceipt,
-  WormholeTokenTransfer,
+  WormholeAssetTransfer,
 } from "../wormhole";
 
 export type EthereumSigner = ethers.Signer;
@@ -92,7 +92,7 @@ export class Ethereum implements WormholeChain {
     return parseSequenceFromLogEth(receipt, this.tokenBridgeAddress);
   }
 
-  async transfer(msg: WormholeTokenTransfer): Promise<string> {
+  async transfer(msg: WormholeAssetTransfer): Promise<string> {
     if (!(msg.sender instanceof ethers.Signer))
       throw new Error("Expected ethers.Signer");
 

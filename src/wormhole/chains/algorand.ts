@@ -26,7 +26,7 @@ import {
   WormholeAttestation,
   WormholeChain,
   WormholeReceipt,
-  WormholeTokenTransfer,
+  WormholeAssetTransfer,
 } from "../wormhole";
 
 export class AlgorandSigner {
@@ -99,7 +99,7 @@ export class Algorand implements WormholeChain {
     return parseSequenceFromLogAlgorand(result);
   }
 
-  async transfer(msg: WormholeTokenTransfer): Promise<string> {
+  async transfer(msg: WormholeAssetTransfer): Promise<string> {
     if (typeof msg.origin.contract !== "bigint")
       throw new Error("Expected bigint for asset, got string");
 
