@@ -38,6 +38,7 @@ export type WormholeReceipt = {
 export enum WormholeMessageType {
   Attestation = 1,
   AssetTransfer = 2,
+  ContractControlledTransfers = 3
 }
 
 // WormholeAssetTransfer describes an intended transfer of an asset

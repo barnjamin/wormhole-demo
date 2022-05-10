@@ -95,6 +95,7 @@ async function round_trip_ethereum() {
 async function round_trip_solana() {
   // Main wh interface, allows for {mirror, transfer, and attest, receive, getVaa}
   const wh = new Wormhole(WORMHOLE_RPC_HOSTS);
+  
 
   // Chain specific implementations of `WormholeChain` interface
   // they wrap specific methods and handle any weirdness
@@ -120,14 +121,6 @@ async function round_trip_solana() {
     amount: BigInt(100),
   };
 
-  const xferSolAlgo: WormholeAssetTransfer = {
-    destination: algo_asset,
-    receiver: algo_sgn,
-    origin: sol_asset,
-    sender: sol_sgn,
-    amount: BigInt(100),
-  };
-
   console.time("Transfer Algo on Algo");
   const receipt_a_s = await wh.transfer(xferAlgoSol);
   console.timeEnd("Transfer Algo on Algo");
@@ -135,6 +128,14 @@ async function round_trip_solana() {
   console.time("Claim Algo on Sol");
   await wh.claim(sol_sgn, receipt_a_s, sol_asset);
   console.timeEnd("Claim Algo on Sol");
+
+  const xferSolAlgo: WormholeAssetTransfer = {
+    destination: algo_asset,
+    receiver: algo_sgn,
+    origin: sol_asset,
+    sender: sol_sgn,
+    amount: BigInt(99),
+  };
 
   console.time("Transfer Algo on Sol");
   const receipt_s_a = await wh.transfer(xferSolAlgo);

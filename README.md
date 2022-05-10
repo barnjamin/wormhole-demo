@@ -62,15 +62,15 @@ Example:
 
 - [ ] Better examples
 
-- [ ] Tests? (lol)
+- [ ] Tests (lol)
 
-- [ ] Payload 3? 
+- [ ] Payload 3
 
 - [ ] Nontrivial demos 
 
-    - [ ] -  message service where specific token xfer w/note represents a message? 
-    - [ ] -  xfer oracle data like randomness?
-    - [ ] -  X chain DLL ("why would you do this?")
+    - [ ]  message service where specific token xfer w/note represents a message? 
+    - [ ]  xfer oracle data like randomness?
+    - [ ]  X chain DLL ("why would you do this?")
 
 
 
