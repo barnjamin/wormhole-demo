@@ -42,10 +42,10 @@ Example:
 
   // Construct an AssetTransfer to move the assets
   const xferAlgoSol: WormholeAssetTransfer = {
-    origin: algo_asset,
-    sender: algo_sgn,
-    destination: sol_asset,
-    receiver: sol_sgn,
+    origin: algoAsset,
+    sender: algoSgn,
+    destination: solAsset,
+    receiver: solSgn,
     amount: BigInt(100),
   };
 
