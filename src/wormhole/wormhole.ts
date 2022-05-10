@@ -35,7 +35,7 @@ export type WormholeReceipt = {
 
 // WormholeMessageType describes the type of messages
 // that can be sent to Wormhole
-export enum WormholeAction {
+export enum WormholeActionType {
   Attestation = 1,
   AssetTransfer = 2,
   ContractControlledTransfers = 3
@@ -65,8 +65,8 @@ export type WormholeContractTransfer = {
 }
 
 
-export type WormholeMessage = {
-  action: WormholeAction;
+export type WormholeAction = {
+  action: WormholeActionType;
   attestation?: WormholeAttestation;
   assetTransfer?: WormholeAssetTransfer;
   contractTransfer?: WormholeContractTransfer;
@@ -149,15 +149,14 @@ export class Wormhole {
     return await chain.lookupMirrored(asset.contract, asset.chain);
   }
 
-  // TODO: Send is not a great name, since we transmit AND receive,
-  // maybe perform?
-  async send(msg: WormholeMessage): Promise<WormholeAsset> {
+  // Perform takes a Wormhole Action and performs both sides of the transactions
+  async perform(msg: WormholeAction): Promise<WormholeAsset> {
     switch (msg.action) {
-      case WormholeAction.Attestation:
+      case WormholeActionType.Attestation:
         if (msg.attestation === undefined)
           throw new Error("Type Attestation but was undefined");
         return this.mirror(msg.attestation);
-      case WormholeAction.AssetTransfer:
+      case WormholeActionType.AssetTransfer:
         if (msg.assetTransfer === undefined)
           throw new Error("Type TokenTransfer but was undefined");
 
