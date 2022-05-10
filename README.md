@@ -40,8 +40,8 @@ Example:
   // created on Solana to mirror the Algo 
   const solAsset = await wh.getMirrored(algoAsset, sol);
 
-  // Construct a TokenTransfer to move the assets
-  const xferAlgoSol: WormholeTokenTransfer = {
+  // Construct an AssetTransfer to move the assets
+  const xferAlgoSol: WormholeAssetTransfer = {
     origin: algo_asset,
     sender: algo_sgn,
     destination: sol_asset,
