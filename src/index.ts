@@ -7,13 +7,13 @@ import {
   WormholeMessage,
   WormholeMessageType,
   WormholeTokenTransfer,
-} from "./wormhole";
-import { WORMHOLE_RPC_HOSTS } from "./consts";
-import { Ethereum } from "./ethereum";
-import { Algorand } from "./algorand";
-import { Solana } from "./solana";
-import { Terra } from "./terra";
-import { Avalanche } from "./avalanche";
+} from "./wormhole/wormhole";
+import { WORMHOLE_RPC_HOSTS } from "./wormhole/consts";
+import { Ethereum } from "./wormhole/ethereum";
+import { Algorand } from "./wormhole/algorand";
+import { Solana } from "./wormhole/solana";
+import { Terra } from "./wormhole/terra";
+import { Avalanche } from "./wormhole/avalanche";
 
 import {
   getAlgoConnection,
@@ -21,14 +21,14 @@ import {
   getEthConnection,
   getSolConnection,
   getTerraConnection,
-} from "./connections";
+} from "./wormhole/connections";
 import {
   getAlgoSigner,
   getAvaxSigner,
   getEthSigner,
   getSolSigner,
   getTerraSigner,
-} from "./signers";
+} from "./wormhole/signers";
 
 (async function () {
   await round_trip_terra();
