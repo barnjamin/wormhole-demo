@@ -55,10 +55,23 @@ Example:
 ```
 
 
-
-
-
 ### TODO:
+
+- [ ] Better examples
+
+- [ ] Tests? (lol)
+
+- [ ] Payload 3? 
+
+- [ ] Nontrivial demos 
+
+    - [ ] -  message service where specific token xfer w/note represents a message? 
+    - [ ] -  xfer oracle data like randomness?
+    - [ ] -  X chain DLL ("why would you do this?")
+
+
+
+#### Chains
 
 - [x] Algo: 
 
@@ -96,13 +109,4 @@ Example:
     - [x] - Redeem with VAA 
     - [x] - Find original asset
 
-- [ ] Tests? (lol)
-
-- [ ] Payload 3? 
-
-Build some demo programs for fun stuff 
-
-    - message service where specific token xfer w/note represents a message? 
-    - xfer oracle data like randomness?
-    - X chain DLL ("why would you do this?")
 
