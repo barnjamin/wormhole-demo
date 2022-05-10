@@ -15,14 +15,14 @@ import {
   updateWrappedOnTerra,
   getIsTransferCompletedTerra,
 } from "@certusone/wormhole-sdk";
-import { TERRA_BRIDGE_ADDRESS, TERRA_TOKEN_BRIDGE_ADDRESS } from "./consts";
+import { TERRA_BRIDGE_ADDRESS, TERRA_TOKEN_BRIDGE_ADDRESS } from "../consts";
 import {
   WormholeAsset,
   WormholeAttestation,
   WormholeChain,
   WormholeReceipt,
   WormholeTokenTransfer,
-} from "./wormhole";
+} from "../wormhole";
 import {
   LCDClient,
   Key,

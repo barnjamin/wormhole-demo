@@ -1,10 +1,10 @@
 import { MnemonicKey, RawKey } from "@terra-money/terra.js";
 import { mnemonicToSecretKey } from "algosdk";
 import { ethers } from "ethers";
-import { AlgorandSigner } from "./algorand";
-import { EthereumSigner } from "./ethereum";
-import { SolanaSigner } from "./solana";
-import { TerraSigner } from "./terra";
+import { AlgorandSigner } from "./chains/algorand";
+import { EthereumSigner } from "./chains/ethereum";
+import { SolanaSigner } from "./chains/solana";
+import { TerraSigner } from "./chains/terra";
 
 // Plz dont steal all my testnet money
 export function getSolSigner(): SolanaSigner {

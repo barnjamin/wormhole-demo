@@ -19,7 +19,7 @@ import algosdk, {
   generateAccount,
   waitForConfirmation,
 } from "algosdk";
-import { ALGORAND_BRIDGE_ID, ALGORAND_TOKEN_BRIDGE_ID } from "./consts";
+import { ALGORAND_BRIDGE_ID, ALGORAND_TOKEN_BRIDGE_ID } from "../consts";
 import { isSolSigner } from "./solana";
 import {
   WormholeAsset,
@@ -27,7 +27,7 @@ import {
   WormholeChain,
   WormholeReceipt,
   WormholeTokenTransfer,
-} from "./wormhole";
+} from "../wormhole";
 
 export class AlgorandSigner {
   account: algosdk.Account;

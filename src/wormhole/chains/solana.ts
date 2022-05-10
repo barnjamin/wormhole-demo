@@ -16,7 +16,7 @@ import {
   getEmitterAddressSolana,
   tryNativeToHexString,
 } from "@certusone/wormhole-sdk";
-import { SOL_BRIDGE_ADDRESS, SOL_TOKEN_BRIDGE_ADDRESS } from "./consts";
+import { SOL_BRIDGE_ADDRESS, SOL_TOKEN_BRIDGE_ADDRESS } from "../consts";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
@@ -29,7 +29,7 @@ import {
   WormholeChain,
   WormholeReceipt,
   WormholeTokenTransfer,
-} from "./wormhole";
+} from "../wormhole";
 
 import bs58 from "bs58";
 

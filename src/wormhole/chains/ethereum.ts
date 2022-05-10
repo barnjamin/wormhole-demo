@@ -20,14 +20,14 @@ import { ethers } from "ethers";
 import {
   ROPSTEN_ETH_BRIDGE_ADDRESS,
   ROPSTEN_ETH_TOKEN_BRIDGE_ADDRESS,
-} from "./consts";
+} from "../consts";
 import {
   WormholeAsset,
   WormholeAttestation,
   WormholeChain,
   WormholeReceipt,
   WormholeTokenTransfer,
-} from "./wormhole";
+} from "../wormhole";
 
 export type EthereumSigner = ethers.Signer;
 

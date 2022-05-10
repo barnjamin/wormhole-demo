@@ -5,7 +5,7 @@ import {
   WormholeWrappedInfo,
 } from "@certusone/wormhole-sdk";
 import { ethers } from "ethers";
-import { TerraSigner } from "./terra";
+import { TerraSigner } from "./chains/terra";
 
 export interface AlgorandSigner {
   getAddress(): string;

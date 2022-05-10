@@ -9,11 +9,11 @@ import {
   WormholeTokenTransfer,
 } from "./wormhole/wormhole";
 import { WORMHOLE_RPC_HOSTS } from "./wormhole/consts";
-import { Ethereum } from "./wormhole/ethereum";
-import { Algorand } from "./wormhole/algorand";
-import { Solana } from "./wormhole/solana";
-import { Terra } from "./wormhole/terra";
-import { Avalanche } from "./wormhole/avalanche";
+import { Ethereum } from "./wormhole/chains/ethereum";
+import { Algorand } from "./wormhole/chains/algorand";
+import { Solana } from "./wormhole/chains/solana";
+import { Terra } from "./wormhole/chains/terra";
+import { Avalanche } from "./wormhole/chains/avalanche";
 
 import {
   getAlgoConnection,
