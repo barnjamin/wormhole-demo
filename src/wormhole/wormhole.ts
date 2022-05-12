@@ -9,24 +9,23 @@ import { TerraSigner } from "./chains/terra";
 import { AlgorandSigner } from "./chains/algorand";
 import { SolanaSigner } from "./chains/solana";
 
-
-// Signer is a catchall for 
+// Signer is a catchall for
 export type Signer =
   | AlgorandSigner
   | ethers.Signer
   | SolanaSigner
   | TerraSigner;
 
-// WormholeAsset is just a wrapper 
+// WormholeAsset is just a wrapper
 // around some specific chain and asset
 export type WormholeAsset = {
   chain: WormholeChain;
   contract: string | bigint;
 };
 
-// WormholeReceipt should be used on 
+// WormholeReceipt should be used on
 // destination chain to claim an asset or
-// finish attesting a new asset 
+// finish attesting a new asset
 export type WormholeReceipt = {
   origin: WormholeChain; // The originating chain for an action
   destination: WormholeChain; // The destination chain for an action
@@ -38,10 +37,10 @@ export type WormholeReceipt = {
 export enum WormholeActionType {
   Attestation = 1,
   AssetTransfer = 2,
-  ContractControlledTransfers = 3
+  ContractControlledTransfer = 3,
 }
 
-// WormholeAttestation describes an intended creation of a new 
+// WormholeAttestation describes an intended creation of a new
 // asset given the originating asset and destination chain
 export type WormholeAttestation = {
   origin: WormholeAsset;
@@ -51,7 +50,7 @@ export type WormholeAttestation = {
 };
 
 // WormholeAssetTransfer describes an intended transfer of an asset
-// From origin chain to destination chain 
+// From origin chain to destination chain
 export type WormholeAssetTransfer = {
   origin: WormholeAsset;
   sender: Signer;
@@ -61,9 +60,10 @@ export type WormholeAssetTransfer = {
 };
 
 export type WormholeContractTransfer = {
-  //TODO
-}
-
+  transfer: WormholeAssetTransfer;
+  contract: string;
+  payload: Uint8Array;
+};
 
 export type WormholeAction = {
   action: WormholeActionType;
@@ -78,7 +78,8 @@ export interface WormholeChain {
   emitterAddress(): Promise<string>;
 
   attest(asset: WormholeAttestation): Promise<string>;
-  transfer(msg: WormholeAssetTransfer): Promise<string>;
+  transfer(xfer: WormholeAssetTransfer): Promise<string>;
+  contractTransfer(cxfer: WormholeContractTransfer): Promise<string>;
 
   redeem(
     signer: Signer,
@@ -155,18 +156,29 @@ export class Wormhole {
       case WormholeActionType.Attestation:
         if (msg.attestation === undefined)
           throw new Error("Type Attestation but was undefined");
+
         return this.mirror(msg.attestation);
+
       case WormholeActionType.AssetTransfer:
         if (msg.assetTransfer === undefined)
           throw new Error("Type TokenTransfer but was undefined");
 
-        const receipt = await this.transfer(msg.assetTransfer);
-        const asset = await this.claim(
+        return await this.claim(
           msg.assetTransfer.receiver,
-          receipt,
+          await this.transfer(msg.assetTransfer),
           msg.assetTransfer.destination
         );
-        return asset;
+
+      case WormholeActionType.ContractControlledTransfer:
+        if (msg.contractTransfer === undefined)
+          throw new Error("Type ContractControlledTrnasfer but was undefined");
+
+        return await this.claim(
+          msg.contractTransfer.transfer.receiver,
+          await this.contractTransfer(msg.contractTransfer),
+          msg.contractTransfer.transfer.destination
+        );
+
       default:
         throw new Error("Unknown Wormhole message type");
     }
@@ -206,6 +218,15 @@ export class Wormhole {
     }
 
     return await destination.updateWrapped(attestation.receiver, receipt);
+  }
+
+  async contractTransfer(
+    contractTransfer: WormholeContractTransfer
+  ): Promise<WormholeReceipt> {
+    const origin = contractTransfer.transfer.origin.chain;
+    const destination = contractTransfer.transfer.destination.chain;
+    const sequence = await origin.contractTransfer(contractTransfer);
+    return await this.getVAA(sequence, origin, destination);
   }
 
   // Transfers tokens into WormHole

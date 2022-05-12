@@ -27,6 +27,7 @@ import {
   WormholeChain,
   WormholeReceipt,
   WormholeAssetTransfer,
+  WormholeContractTransfer,
 } from "../wormhole";
 
 export class AlgorandSigner {
@@ -169,11 +170,42 @@ export class Algorand implements WormholeChain {
     return {} as WormholeAsset;
   }
 
-  updateWrapped(
+  async updateWrapped(
     signer: AlgorandSigner,
     receipt: WormholeReceipt
   ): Promise<WormholeAsset> {
     throw new Error("Method not implemented.");
+  }
+
+  async contractTransfer(msg: WormholeContractTransfer) {
+    const {transfer, contract, payload} = msg;
+
+    if (typeof transfer.origin.contract !== "bigint")
+      throw new Error("Expected bigint for asset, got string");
+
+    const fee = 0;
+    const transferTxs = await transferFromAlgorand(
+      this.client,
+      this.tokenBridgeId,
+      this.coreId,
+      await transfer.sender.getAddress(),
+      transfer.origin.contract,
+      transfer.amount,
+      contract,
+      transfer.destination.chain.id,
+      BigInt(fee),
+      payload
+    );
+
+    console.log(transferTxs.map((tx) => tx.tx.get_obj_for_encoding()));
+    return "0";
+
+    const result = await this.signSendWait(
+      transferTxs,
+      transfer.sender as AlgorandSigner
+    );
+
+    return parseSequenceFromLogAlgorand(result);
   }
 
   async transactionComplete(receipt: WormholeReceipt): Promise<boolean> {

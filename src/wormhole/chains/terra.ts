@@ -22,6 +22,7 @@ import {
   WormholeChain,
   WormholeReceipt,
   WormholeAssetTransfer,
+  WormholeContractTransfer,
 } from "../wormhole";
 import {
   LCDClient,
@@ -56,6 +57,9 @@ export class Terra implements WormholeChain {
 
   constructor(client: LCDClient) {
     this.client = client;
+  }
+  contractTransfer(cxfer: WormholeContractTransfer): Promise<string> {
+    throw new Error("Method not implemented.");
   }
   async lookupOriginal(asset: string): Promise<WormholeWrappedInfo> {
     return await getOriginalAssetTerra(this.client, asset);

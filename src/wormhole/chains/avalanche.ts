@@ -9,6 +9,4 @@ export class Avalanche extends Ethereum {
   coreId: string = AVAX_BRIDGE_ADDRESS;
   tokenBridgeAddress: string = AVAX_TOKEN_BRIDGE_ADDRESS;
   id: ChainId = CHAIN_ID_AVAX;
-
-  provider: any;
 }

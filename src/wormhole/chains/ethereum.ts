@@ -27,6 +27,7 @@ import {
   WormholeChain,
   WormholeReceipt,
   WormholeAssetTransfer,
+  WormholeContractTransfer,
 } from "../wormhole";
 
 export type EthereumSigner = ethers.Signer;
@@ -40,6 +41,9 @@ export class Ethereum implements WormholeChain {
 
   constructor(provider: any) {
     this.provider = provider;
+  }
+  contractTransfer(cxfer: WormholeContractTransfer): Promise<string> {
+    throw new Error("Method not implemented.");
   }
   async lookupOriginal(asset: string): Promise<WormholeWrappedInfo> {
     return await getOriginalAssetEth(
