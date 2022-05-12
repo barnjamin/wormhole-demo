@@ -1,85 +1,68 @@
 process.env["REACT_APP_CLUSTER"] = "testnet";
 
 import {
-  Signer,
   Wormhole,
-  WormholeChain,
   WormholeAsset,
-  WormholeAction,
   WormholeActionType,
+  WormholeAssetTransfer,
 } from "./wormhole/wormhole";
 import { WORMHOLE_RPC_HOSTS } from "./wormhole/consts";
-import {initChain, ChainConfigs} from "./wormhole/helpers"
+import { initChain, ChainConfigs } from "./wormhole/helpers";
 
 (async function () {
-  await roundTripAlgoSol()
+  await roundTripAsset(BigInt(0), BigInt(100), "algorand", "solana");
 })();
-
-async function roundTripAlgoSol(){
-  const [algo, algoSigner] = initChain(ChainConfigs["algorand"]);
-  const [sol, solSigner] = initChain(ChainConfigs["solana"]);
-
-  // Asset we want to transfer from the origin chain 
-  const asset = BigInt(0)
-
-  await roundTripAsset(asset, algo, sol, algoSigner, solSigner);
-}
 
 async function roundTripAsset(
   asset: string | bigint,
-  originChain: WormholeChain,
-  destChain: WormholeChain,
-  originSigner: Signer,
-  destSigner: Signer
+  amount: bigint,
+  origin: string,
+  destination: string
 ) {
-  
+  const [originChain, originSigner] = initChain(ChainConfigs[origin]);
+  const [destChain, destSigner] = initChain(ChainConfigs[destination]);
+
   // Main wh interface, allows for {mirror, transfer, and attest, receive, getVaa}
   const wh = new Wormhole(WORMHOLE_RPC_HOSTS);
 
-  // Just get the string names for logs later
-  const originName = originChain.constructor.name;
-  const destName = destChain.constructor.name;
-
   // Get the destination asset
-  const originAsset: WormholeAsset = {chain: originChain, contract: asset}
+  const originAsset: WormholeAsset = { chain: originChain, contract: asset };
   const destAsset = await wh.getMirrored(originAsset, destChain);
 
   // Prepare the transfer
-  const xfer: WormholeAction = {
-    action: WormholeActionType.AssetTransfer,
-    assetTransfer: {
-      origin: originAsset,
-      sender: originSigner,
-      destination: destAsset,
-      receiver: destSigner,
-      amount: BigInt(100),
-    },
+  const xfer: WormholeAssetTransfer = {
+    origin: originAsset,
+    sender: originSigner,
+    destination: destAsset,
+    receiver: destSigner,
+    amount: amount,
   };
 
-  console.log(`Sending transfer from ${originName} to ${destName}`);
-
   // Send it
+  console.log(`Sending transfer from ${origin} to ${destination}`);
   console.time("xfer");
-  await wh.perform(xfer);
+  await wh.perform({
+    action: WormholeActionType.AssetTransfer,
+    assetTransfer: xfer,
+  });
   console.timeEnd("xfer");
 
   // Prepare the opposite transfer
-  const xferBack: WormholeAction = {
-    action: WormholeActionType.AssetTransfer,
-    assetTransfer: {
-      origin: destAsset,
-      sender: destSigner,
-      destination: originAsset,
-      receiver: originSigner,
-      amount: BigInt(100),
-    },
+  const xferBack: WormholeAssetTransfer = {
+    origin: xfer.destination,
+    sender: xfer.receiver,
+    destination: xfer.origin,
+    receiver: xfer.sender,
+    amount: amount,
   };
 
-  console.log(`Sending transfer from ${destName} to ${originName}`);
-
   // Send it
+  console.log(`Sending transfer from ${destination} to ${origin}`);
   console.time("xferBack");
-  await wh.perform(xferBack);
+  await wh.perform({
+    action: WormholeActionType.AssetTransfer,
+    assetTransfer: xferBack,
+  });
   console.timeEnd("xferBack");
 }
 
