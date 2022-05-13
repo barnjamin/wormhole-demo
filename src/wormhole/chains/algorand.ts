@@ -150,11 +150,31 @@ export class Algorand implements WormholeChain {
       receipt.VAA,
       signer.getAddress()
     );
-    console.log(redeemTxs.map(tx=>tx.tx.get_obj_for_encoding()))
-    return asset
-    await this.signSendWait(redeemTxs, signer);
-
+    const result = await this.signSendWait(redeemTxs, signer);
     return asset;
+  }
+
+  async contractRedeem(
+    signer: AlgorandSigner,
+    receipt: WormholeReceipt,
+  ): Promise<boolean> {
+
+    const redeemTxs = await redeemOnAlgorand(
+      this.client,
+      this.tokenBridgeId,
+      this.coreId,
+      receipt.VAA,
+      signer.getAddress()
+    );
+    if(redeemTxs[redeemTxs.length -1].tx === undefined) throw new Error("asdf")
+    if(redeemTxs[redeemTxs.length -1].tx.appArgs === undefined || redeemTxs[redeemTxs.length -1].tx.appArgs?.length == 0) throw new Error("asdf")
+
+    // @ts-ignore
+    redeemTxs[redeemTxs.length -1].tx.appArgs[0] = new Uint8Array(Buffer.from("840abd1c", "hex"))
+
+    const result = await this.signSendWait(redeemTxs, signer);
+    console.log(result)
+    return true;
   }
 
   async createWrapped(

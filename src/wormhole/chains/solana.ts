@@ -30,6 +30,7 @@ import {
   WormholeReceipt,
   WormholeAssetTransfer,
   WormholeContractTransfer,
+  Signer,
 } from "../wormhole";
 
 import bs58 from "bs58";
@@ -74,6 +75,9 @@ export class Solana implements WormholeChain {
 
   constructor(connection: Connection) {
     this.connection = connection;
+  }
+  contractRedeem(destSigner: Signer, receipt: WormholeReceipt, destAsset: WormholeAsset): Promise<boolean> {
+    throw new Error("Method not implemented.");
   }
   contractTransfer(cxfer: WormholeContractTransfer): Promise<string> {
     throw new Error("Method not implemented.");

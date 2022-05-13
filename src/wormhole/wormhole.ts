@@ -80,6 +80,7 @@ export interface WormholeChain {
   transfer(xfer: WormholeAssetTransfer): Promise<string>;
   contractTransfer(cxfer: WormholeContractTransfer): Promise<string>;
 
+  contractRedeem(destSigner: Signer, receipt: WormholeReceipt, destAsset: WormholeAsset): Promise<boolean>;
   redeem(
     signer: Signer,
     receipt: WormholeReceipt,
@@ -173,11 +174,12 @@ export class Wormhole {
         if (msg.contractTransfer === undefined)
           throw new Error("Type ContractControlledTrnasfer but was undefined");
 
-        return await this.claim(
+        await this.contractClaim(
           msg.contractTransfer.transfer.receiver,
           await this.contractTransfer(msg.contractTransfer),
           msg.contractTransfer.transfer.destination
         );
+        return msg.contractTransfer.transfer.destination
 
       default:
         throw new Error("Unknown Wormhole message type");
@@ -245,5 +247,14 @@ export class Wormhole {
     asset: WormholeAsset
   ): Promise<WormholeAsset> {
     return await receipt.destination.redeem(signer, receipt, asset);
+  }
+
+  // Claims tokens or arbitrary message from wormhole given VAA
+  async contractClaim(
+    signer: Signer,
+    receipt: WormholeReceipt,
+    asset: WormholeAsset
+  ): Promise<boolean> {
+    return await receipt.destination.contractRedeem(signer, receipt, asset);
   }
 }

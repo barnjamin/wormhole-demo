@@ -1,0 +1,68 @@
+#pragma version 6
+intcblock 0 1
+txn ApplicationID
+intc_0 // 0
+==
+txn NumAppArgs
+intc_0 // 0
+==
+&&
+txn OnCompletion
+intc_0 // NoOp
+==
+&&
+bnz main_l6
+txn NumAppArgs
+intc_0 // 0
+==
+txn OnCompletion
+pushint 4 // UpdateApplication
+==
+&&
+bnz main_l5
+txna ApplicationArgs 0
+pushbytes 0x840abd1c // "thing(string)string"
+==
+txn NumAppArgs
+pushint 2 // 2
+==
+&&
+txn OnCompletion
+intc_0 // NoOp
+==
+&&
+bnz main_l4
+err
+main_l4:
+txna ApplicationArgs 1
+store 0
+load 0
+callsub thing_0
+store 1
+pushbytes 0x151f7c75 // 0x151F7C75
+load 1
+concat
+log
+intc_1 // 1
+return
+main_l5:
+intc_1 // 1
+return
+main_l6:
+intc_1 // 1
+return
+
+// thing
+thing_0:
+store 2
+load 2
+extract 2 0
+len
+itob
+extract 6 0
+load 2
+extract 2 0
+concat
+store 3
+load 3
+retsub

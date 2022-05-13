@@ -16,7 +16,7 @@ import { initChain, ChainConfigs } from "./wormhole/helpers";
   await contractTransfer(
     BigInt(0),
     BigInt(100), // 
-    BigInt(100),
+    BigInt(89170309),
     "algorand",
     "algorand"
   );
@@ -105,10 +105,9 @@ async function contractTransfer(
     payload: new Uint8Array(Buffer.from("Testing123")),
   };
 
-  const seq = await originChain.contractTransfer(cxfer);
+  //const seq = await originChain.contractTransfer(cxfer);
+  const seq = "83"
   console.log(seq)
   const receipt = await wh.getVAA(seq, originChain, destChain)
-  console.log(receipt)
-
-  const result = await destChain.redeem(destSigner, receipt, destAsset)
+  await destChain.contractRedeem(destSigner, receipt, destAsset)
 }
