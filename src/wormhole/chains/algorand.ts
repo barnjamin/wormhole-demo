@@ -16,6 +16,7 @@ import {
 import { TransactionSignerPair } from "@certusone/wormhole-sdk/lib/cjs/algorand";
 import algosdk, {
   Algodv2,
+  bigIntToBytes,
   generateAccount,
   waitForConfirmation,
 } from "algosdk";
@@ -149,6 +150,8 @@ export class Algorand implements WormholeChain {
       receipt.VAA,
       signer.getAddress()
     );
+    console.log(redeemTxs.map(tx=>tx.tx.get_obj_for_encoding()))
+    return asset
     await this.signSendWait(redeemTxs, signer);
 
     return asset;
@@ -197,9 +200,6 @@ export class Algorand implements WormholeChain {
       payload
     );
 
-    console.log(transferTxs.map((tx) => tx.tx.get_obj_for_encoding()));
-    return "0";
-
     const result = await this.signSendWait(
       transferTxs,
       transfer.sender as AlgorandSigner
@@ -215,12 +215,14 @@ export class Algorand implements WormholeChain {
       receipt.VAA
     );
   }
+
   getAssetAsString(asset: bigint | string): string {
     if (typeof asset == "string") return asset;
-    return ("0".repeat(64) + asset.toString()).slice(-64);
+    return Buffer.from(bigIntToBytes(asset, 32)).toString('hex')
   }
 
   getAssetAsInt(asset: string): bigint {
+    //TODO
     return BigInt(0);
   }
 

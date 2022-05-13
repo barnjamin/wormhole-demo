@@ -3,9 +3,9 @@ import {
   getSignedVAAWithRetry,
   ChainId,
   WormholeWrappedInfo,
+  uint8ArrayToHex,
 } from "@certusone/wormhole-sdk";
 import { ethers } from "ethers";
-import { TerraSigner } from "./chains/terra";
 import { AlgorandSigner } from "./chains/algorand";
 import { SolanaSigner } from "./chains/solana";
 
@@ -14,7 +14,6 @@ export type Signer =
   | AlgorandSigner
   | ethers.Signer
   | SolanaSigner
-  | TerraSigner;
 
 // WormholeAsset is just a wrapper
 // around some specific chain and asset
@@ -147,7 +146,8 @@ export class Wormhole {
     asset: WormholeAsset,
     chain: WormholeChain
   ): Promise<WormholeAsset> {
-    return await chain.lookupMirrored(asset.contract, asset.chain);
+    const orig = await asset.chain.lookupOriginal(asset.contract)
+    return await chain.lookupMirrored(uint8ArrayToHex(orig.assetAddress), asset.chain);
   }
 
   // Perform takes a Wormhole Action and performs both sides of the transactions

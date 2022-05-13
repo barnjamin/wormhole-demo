@@ -5,12 +5,21 @@ import {
   WormholeAsset,
   WormholeActionType,
   WormholeAssetTransfer,
+  WormholeChain,
+  WormholeContractTransfer,
 } from "./wormhole/wormhole";
 import { WORMHOLE_RPC_HOSTS } from "./wormhole/consts";
 import { initChain, ChainConfigs } from "./wormhole/helpers";
 
 (async function () {
-  await roundTripAsset(BigInt(0), BigInt(100), "algorand", "solana");
+  //await roundTripAsset(BigInt(0), BigInt(100), "algorand", "solana");
+  await contractTransfer(
+    BigInt(0),
+    BigInt(100), // 
+    BigInt(100),
+    "algorand",
+    "algorand"
+  );
 })();
 
 async function roundTripAsset(
@@ -66,33 +75,40 @@ async function roundTripAsset(
   console.timeEnd("xferBack");
 }
 
-//async function algorand_contract_transfer() {
-//  const wh = new Wormhole(WORMHOLE_RPC_HOSTS);
-//
-//  const algo = new Algorand(getAlgoConnection());
-//  const algoSgn = getAlgoSigner();
-//
-//  // Asset we want to transfer (both sides)
-//  const algoAsset: WormholeAsset = {
-//    chain: algo,
-//    contract: BigInt(0),
-//  };
-//
-//  // App that should be called
-//  const receiverApp = BigInt(123);
-//  const dest = algo.getAssetAsString(receiverApp);
-//
-//  const cxfer: WormholeContractTransfer = {
-//    transfer: {
-//      origin: algoAsset,
-//      sender: algoSgn,
-//      destination: algoAsset,
-//      receiver: algoSgn,
-//      amount: BigInt(100),
-//    },
-//    contract: dest,
-//    payload: new Uint8Array(),
-//  };
-//
-//  await algo.contractTransfer(cxfer);
-//}
+async function contractTransfer(
+  asset: bigint | string,
+  amount: bigint,
+  contract: bigint | string,
+  origin: string,
+  destination: string
+) {
+  const [originChain, originSigner] = initChain(ChainConfigs[origin]);
+  const [destChain, destSigner] = initChain(ChainConfigs[destination]);
+
+  const wh = new Wormhole(WORMHOLE_RPC_HOSTS);
+
+  // The destination contract address
+  const destinationContract = destChain.getAssetAsString(contract);
+
+  const originAsset: WormholeAsset = { chain: originChain, contract: asset };
+  const destAsset = await wh.getMirrored(originAsset, destChain)
+
+  const cxfer: WormholeContractTransfer = {
+    transfer: {
+      origin: originAsset,
+      sender: originSigner,
+      destination: destAsset,
+      receiver: destSigner,
+      amount: amount,
+    },
+    contract: destinationContract,
+    payload: new Uint8Array(Buffer.from("Testing123")),
+  };
+
+  const seq = await originChain.contractTransfer(cxfer);
+  console.log(seq)
+  const receipt = await wh.getVAA(seq, originChain, destChain)
+  console.log(receipt)
+
+  const result = await destChain.redeem(destSigner, receipt, destAsset)
+}
