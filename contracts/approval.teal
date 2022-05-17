@@ -12,7 +12,7 @@ txn OnCompletion
 intc_0 // NoOp
 ==
 &&
-bnz main_l6
+bnz main_l8
 txn NumAppArgs
 intc_0 // 0
 ==
@@ -20,7 +20,11 @@ txn OnCompletion
 intc_3 // UpdateApplication
 ==
 &&
-bnz main_l5
+bnz main_l7
+txn NumAppArgs
+intc_0 // 0
+==
+bnz main_l6
 txna ApplicationArgs 0
 pushbytes 0x903f4535 // "portal_transfer(byte[])byte[]"
 ==
@@ -32,9 +36,9 @@ txn OnCompletion
 intc_0 // NoOp
 ==
 &&
-bnz main_l4
+bnz main_l5
 err
-main_l4:
+main_l5:
 txna ApplicationArgs 1
 callsub portaltransfer_1
 store 0
@@ -44,10 +48,13 @@ concat
 log
 intc_2 // 1
 return
-main_l5:
+main_l6:
 intc_2 // 1
 return
-main_l6:
+main_l7:
+intc_2 // 1
+return
+main_l8:
 intc_2 // 1
 return
 
@@ -275,17 +282,13 @@ concat
 load 19
 concat
 load 20
-store 22
+store 21
 pushint 192 // 192
 itob
 extract 6 0
 concat
-load 22
+load 21
 concat
-store 21
-load 21
-log
-load 21
 retsub
 
 // portal_transfer

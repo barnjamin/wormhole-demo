@@ -6,6 +6,7 @@ from vaa import ContractTransferVAA, parse_contract_transfer_vaa
 router = Router()
 router.add_bare_call(Approve(), OnComplete.NoOp, creation=True)
 router.add_bare_call(Approve(), OnComplete.UpdateApplication)
+router.add_bare_call(Approve(), OnComplete.ClearState)
 
 
 @router.add_method_handler
@@ -13,8 +14,6 @@ router.add_bare_call(Approve(), OnComplete.UpdateApplication)
 def portal_transfer(
     vaa: abi.DynamicArray[abi.Byte], *, output: abi.DynamicArray[abi.Byte]
 ) -> Expr:
-
-    logstr = abi.String()
     return Seq(
         (s := abi.String()).decode(vaa.encode()),
         (ctvaa := ContractTransferVAA()).decode(parse_contract_transfer_vaa(s.get())),
