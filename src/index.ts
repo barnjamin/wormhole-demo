@@ -110,6 +110,7 @@ async function contractTransfer(
 
   console.log(`Sending contract transfer from ${origin} to ${destination}`);
   const seq = await originChain.contractTransfer(cxfer);
+  //const seq = "99"
 
   console.log(`Getting VAA for Sequence number: ${seq}`)
   const receipt = await wh.getVAA(seq, originChain, destChain)

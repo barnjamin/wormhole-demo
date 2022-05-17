@@ -2,6 +2,8 @@ import base64
 from algosdk import *
 from algosdk.v2client import algod
 from algosdk.future.transaction import *
+from pyteal import Mode, OptimizeOptions, compileTeal
+from contract import router
 
 mn = "tenant helmet motor sauce appear buddy gloom park average glory course wire buyer ostrich history time refuse room blame oxygen film diamond confirm ability spirit"
 host = "https://testnet-api.algonode.cloud"
@@ -99,11 +101,20 @@ def update_app(
 
 
 if __name__ == "__main__":
-    with open("approval.teal", "r") as f:
-        approval = f.read()
+    approval, clear, iface = router.build_program()
 
-    with open("clear.teal", "r") as f:
-        clear = f.read()
+    approval = compileTeal(
+        approval, mode=Mode.Application, version=6, assembleConstants=True, optimize=OptimizeOptions(scratch_slots=True)
+    )
+    clear = compileTeal(
+        clear, mode=Mode.Application, version=6, assembleConstants=True, optimize=OptimizeOptions(scratch_slots=True)
+    )
+
+    #with open("approval.teal", "r") as f:
+    #    approval = f.read()
+
+    #with open("clear.teal", "r") as f:
+    #    clear = f.read()
 
     client = algod.AlgodClient(token, host)
 
