@@ -97,31 +97,38 @@ def update_app(
     print("Updating sent, waiting for confirmation")
     # Wait for the result
     result = wait_for_confirmation(client, txid, 4)
-    print("Confirmed in round: {}" .format( result["confirmed-round"]))
+    print("Confirmed in round: {}".format(result["confirmed-round"]))
 
 
 if __name__ == "__main__":
     approval, clear, iface = router.build_program()
 
     approval = compileTeal(
-        approval, mode=Mode.Application, version=6, assembleConstants=True, optimize=OptimizeOptions(scratch_slots=True)
+        approval,
+        mode=Mode.Application,
+        version=6,
+        assembleConstants=True,
+        optimize=OptimizeOptions(scratch_slots=True),
     )
     clear = compileTeal(
-        clear, mode=Mode.Application, version=6, assembleConstants=True, optimize=OptimizeOptions(scratch_slots=True)
+        clear,
+        mode=Mode.Application,
+        version=6,
+        assembleConstants=True,
+        optimize=OptimizeOptions(scratch_slots=True),
     )
 
-    #with open("approval.teal", "r") as f:
+    # with open("approval.teal", "r") as f:
     #    approval = f.read()
 
-    #with open("clear.teal", "r") as f:
+    # with open("clear.teal", "r") as f:
     #    clear = f.read()
 
     client = algod.AlgodClient(token, host)
 
     addr, sk = get_account(mn)
 
-    #app_id, app_addr = create_app(client, addr, sk, approval, clear)
-    #print(f"Created {app_id} with app address {app_addr}")
+    # app_id, app_addr = create_app(client, addr, sk, approval, clear)
+    # print(f"Created {app_id} with app address {app_addr}")
 
     update_app(client, addr, sk, 89737126, approval, clear)
-

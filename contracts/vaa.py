@@ -38,15 +38,16 @@ class ContractTransferVAA(NamedTuple):
     to_address: abi.Address
     to_chain: abi.Uint16
     fee: abi.Address
-    #payload: abi.String
+    # payload: abi.String
 
 
 def move_offset(offset: ScratchVar, t: abi.BaseType) -> Expr:
     return offset.store(offset.load() + Int(t.type_spec().byte_length_static()))
 
+
 @Subroutine(TealType.bytes)
 def parse_contract_transfer_vaa(vaa) -> Expr:
-    #TODO: assert some checks here to make sure everything looks right
+    # TODO: assert some checks here to make sure everything looks right
     return Seq(
         (offset := ScratchVar()).store(Int(0)),
         (version := abi.Uint8()).decode(vaa, startIndex=offset.load()),
@@ -87,7 +88,7 @@ def parse_contract_transfer_vaa(vaa) -> Expr:
         (fee := abi.Address()).decode(vaa, startIndex=offset.load()),
         move_offset(offset, fee),
         Log(Itob(offset.load())),
-        #(payload := abi.String()).set(Suffix(vaa, offset.load())),
+        # (payload := abi.String()).set(Suffix(vaa, offset.load())),
         (ctvaa := ContractTransferVAA()).set(
             version,
             index,
@@ -105,67 +106,8 @@ def parse_contract_transfer_vaa(vaa) -> Expr:
             to_address,
             to_chain,
             fee,
-            #payload,
+            # payload,
         ),
         Log(ctvaa.encode()),
-        ctvaa.encode()
+        ctvaa.encode(),
     )
-
-
-# export function _parseVAAAlgorand(vaa: Uint8Array): Map<string, any> {
-#  let ret = new Map<string, any>();
-#  let buf = Buffer.from(vaa);
-#  ret.set("version", buf.readIntBE(0, 1));
-#  ret.set("index", buf.readIntBE(1, 4));
-#  ret.set("siglen", buf.readIntBE(5, 1));
-#  const siglen = ret.get("siglen");
-#  if (siglen) {
-#    ret.set("signatures", extract3(vaa, 6, siglen * 66));
-#  }
-#  const sigs = [];
-#  for (let i = 0; i < siglen; i++) {
-#    const start = 6 + i * 66;
-#    const len = 66;
-#    const sigBuf = extract3(vaa, start, len);
-#    sigs.push(sigBuf);
-#  }
-#  ret.set("sigs", sigs);
-#  let off = siglen * 66 + 6;
-#  ret.set("digest", vaa.slice(off)); // This is what is actually signed...
-#  ret.set("timestamp", buf.readIntBE(off, 4));
-#  off += 4;
-#  ret.set("nonce", buf.readIntBE(off, 4));
-#  off += 4;
-#  ret.set("chainRaw", Buffer.from(extract3(vaa, off, 2)).toString("hex"));
-#  ret.set("chain", buf.readIntBE(off, 2));
-#  off += 2;
-#  ret.set("emitter", Buffer.from(extract3(vaa, off, 32)).toString("hex"));
-#  off += 32;
-#  ret.set("sequence", buf.readBigUInt64BE(off));
-#  off += 8;
-#  ret.set("consistency", buf.readIntBE(off, 1));
-#  off += 1;
-#
-#  ret.set("Meta", "Unknown");
-
-#  if (buf.readIntBE(off, 1) === 3) {
-#    ret.set("Meta", "TokenBridge Transfer With Payload");
-#    ret.set("Type", buf.readIntBE(off, 1));
-#    off += 1;
-#    ret.set("Amount", extract3(vaa, off, 32));
-#    off += 32;
-#    ret.set("Contract", uint8ArrayToHex(extract3(vaa, off, 32)));
-#    off += 32;
-#    ret.set("FromChain", buf.readIntBE(off, 2));
-#    off += 2;
-#    ret.set("ToAddress", extract3(vaa, off, 32));
-#    off += 32;
-#    ret.set("ToChain", buf.readIntBE(off, 2));
-#    off += 2;
-#    ret.set("Fee", extract3(vaa, off, 32));
-#    off += 32;
-#    ret.set("Payload", vaa.slice(off));
-#  }
-#
-#  return ret;
-# }
