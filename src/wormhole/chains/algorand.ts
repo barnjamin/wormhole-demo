@@ -166,11 +166,8 @@ export class Algorand implements WormholeChain {
       receipt.VAA,
       signer.getAddress()
     );
-    if(redeemTxs[redeemTxs.length -1].tx === undefined) throw new Error("asdf")
-    if(redeemTxs[redeemTxs.length -1].tx.appArgs === undefined || redeemTxs[redeemTxs.length -1].tx.appArgs?.length == 0) throw new Error("asdf")
 
-    // @ts-ignore
-    redeemTxs[redeemTxs.length -1].tx.appArgs[0] = new Uint8Array(Buffer.from("840abd1c", "hex"))
+    console.log(redeemTxs.map(tx=>tx.tx.get_obj_for_encoding()))
 
     const result = await this.signSendWait(redeemTxs, signer);
     console.log(result)
@@ -219,6 +216,7 @@ export class Algorand implements WormholeChain {
       BigInt(fee),
       payload
     );
+    console.log(transferTxs.map(tx=>tx.tx.get_obj_for_encoding()))
 
     const result = await this.signSendWait(
       transferTxs,

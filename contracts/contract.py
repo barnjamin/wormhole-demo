@@ -1,25 +1,31 @@
+from base64 import encode
 from pyteal import *
+from vaa import ContractTransferVAA, parse_contract_transfer_vaa
 
-
-@ABIReturnSubroutine
-def payload3(vaa: abi.String, *, output: abi.String)->Expr:
-    #TODO: something interesting    
-    return output.set(vaa.get())
-
-@Subroutine(TealType.uint64)
-def doit(arg: Expr):
-    pass
 
 router = Router()
-router.on_bare_app_call(Approve(), OnComplete.NoOp, creation=True)
-router.on_bare_app_call(doit(), OnComplete.NoOp)
-router.on_bare_app_call(Approve(), OnComplete.UpdateApplication)
-router.on_method_call(payload3)
-approval, clear, iface = router.build_program()
+router.add_bare_call(Approve(), OnComplete.NoOp, creation=True)
+router.add_bare_call(Approve(), OnComplete.UpdateApplication)
+
+
+@router.add_method_handler
+@ABIReturnSubroutine
+def portal_transfer(
+    vaa: abi.DynamicArray[abi.Byte], *, output: abi.DynamicArray[abi.Byte]
+) -> Expr:
+    return Seq(
+        (ctvaa := ContractTransferVAA()).decode(parse_contract_transfer_vaa(vaa.encode())),
+        (ts := abi.Uint32()).set(ctvaa.timestamp()),
+        (logstr := abi.String()).set(ts.encode()),
+        output.decode(logstr.encode()),
+    )
+
 
 if __name__ == "__main__":
     import os
     import json
+
+    approval, clear, iface = router.build_program()
 
     path = os.path.dirname(os.path.abspath(__file__))
 
