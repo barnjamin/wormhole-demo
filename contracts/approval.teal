@@ -1,5 +1,5 @@
 #pragma version 6
-intcblock 0 32 1 4
+intcblock 0 32 1 2
 bytecblock 0x00
 txn ApplicationID
 intc_0 // 0
@@ -12,33 +12,57 @@ txn OnCompletion
 intc_0 // NoOp
 ==
 &&
-bnz main_l8
+bnz main_l14
 txn NumAppArgs
 intc_0 // 0
 ==
 txn OnCompletion
-intc_3 // UpdateApplication
+pushint 4 // UpdateApplication
 ==
 &&
-bnz main_l7
+bnz main_l13
 txn NumAppArgs
 intc_0 // 0
 ==
-bnz main_l6
+txn OnCompletion
+pushint 5 // DeleteApplication
+==
+&&
+bnz main_l12
+txn NumAppArgs
+intc_0 // 0
+==
+txn OnCompletion
+intc_2 // OptIn
+==
+&&
+bnz main_l11
+txn NumAppArgs
+intc_0 // 0
+==
+txn OnCompletion
+intc_3 // CloseOut
+==
+&&
+bnz main_l10
+txn NumAppArgs
+intc_0 // 0
+==
+bnz main_l9
 txna ApplicationArgs 0
 pushbytes 0x903f4535 // "portal_transfer(byte[])byte[]"
 ==
 txn NumAppArgs
-pushint 2 // 2
+intc_3 // 2
 ==
 &&
 txn OnCompletion
 intc_0 // NoOp
 ==
 &&
-bnz main_l5
+bnz main_l8
 err
-main_l5:
+main_l8:
 txna ApplicationArgs 1
 callsub portaltransfer_1
 store 0
@@ -48,13 +72,26 @@ concat
 log
 intc_2 // 1
 return
-main_l6:
-intc_2 // 1
+main_l9:
+intc_0 // 0
 return
-main_l7:
-intc_2 // 1
+main_l10:
+intc_0 // 0
 return
-main_l8:
+main_l11:
+intc_0 // 0
+return
+main_l12:
+txn Sender
+global CreatorAddress
+==
+return
+main_l13:
+txn Sender
+global CreatorAddress
+==
+return
+main_l14:
 intc_2 // 1
 return
 
@@ -76,7 +113,7 @@ load 3
 extract_uint32
 store 5
 load 3
-intc_3 // 4
+pushint 4 // 4
 +
 store 3
 load 2
@@ -96,7 +133,7 @@ load 3
 extract_uint32
 store 7
 load 3
-intc_3 // 4
+pushint 4 // 4
 +
 store 3
 load 2
@@ -104,7 +141,7 @@ load 3
 extract_uint32
 store 8
 load 3
-intc_3 // 4
+pushint 4 // 4
 +
 store 3
 load 2
@@ -112,15 +149,13 @@ load 3
 extract_uint16
 store 9
 load 3
-pushint 2 // 2
+intc_3 // 2
 +
 store 3
 load 2
 load 3
-load 3
 intc_1 // 32
-+
-substring3
+extract3
 store 10
 load 3
 intc_1 // 32
@@ -152,10 +187,8 @@ intc_2 // 1
 store 3
 load 2
 load 3
-load 3
 intc_1 // 32
-+
-substring3
+extract3
 store 14
 load 3
 intc_1 // 32
@@ -163,10 +196,8 @@ intc_1 // 32
 store 3
 load 2
 load 3
-load 3
 intc_1 // 32
-+
-substring3
+extract3
 store 15
 load 3
 intc_1 // 32
@@ -177,15 +208,13 @@ load 3
 extract_uint16
 store 16
 load 3
-pushint 2 // 2
+intc_3 // 2
 +
 store 3
 load 2
 load 3
-load 3
 intc_1 // 32
-+
-substring3
+extract3
 store 17
 load 3
 intc_1 // 32
@@ -196,15 +225,13 @@ load 3
 extract_uint16
 store 18
 load 3
-pushint 2 // 2
+intc_3 // 2
 +
 store 3
 load 2
 load 3
-load 3
 intc_1 // 32
-+
-substring3
+extract3
 store 19
 load 3
 intc_1 // 32

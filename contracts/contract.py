@@ -5,8 +5,15 @@ from vaa import ContractTransferVAA, parse_contract_transfer_vaa
 
 router = Router()
 router.add_bare_call(Approve(), OnComplete.NoOp, creation=True)
-router.add_bare_call(Approve(), OnComplete.UpdateApplication)
-router.add_bare_call(Approve(), OnComplete.ClearState)
+router.add_bare_call(
+    Return(Txn.sender() == Global.creator_address()), OnComplete.UpdateApplication
+)
+router.add_bare_call(
+    Return(Txn.sender() == Global.creator_address()), OnComplete.DeleteApplication
+)
+router.add_bare_call(Reject(), OnComplete.OptIn)
+router.add_bare_call(Reject(), OnComplete.CloseOut)
+router.add_bare_call(Reject(), OnComplete.ClearState)
 
 
 @router.add_method_handler
