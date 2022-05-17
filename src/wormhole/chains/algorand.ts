@@ -167,8 +167,6 @@ export class Algorand implements WormholeChain {
       signer.getAddress()
     );
 
-    console.log(redeemTxs.map(tx=>tx.tx.get_obj_for_encoding()))
-
     const result = await this.signSendWait(redeemTxs, signer);
     console.log(result)
     return true;
@@ -216,7 +214,6 @@ export class Algorand implements WormholeChain {
       BigInt(fee),
       payload
     );
-    console.log(transferTxs.map(tx=>tx.tx.get_obj_for_encoding()))
 
     const result = await this.signSendWait(
       transferTxs,
@@ -272,6 +269,7 @@ export class Algorand implements WormholeChain {
 
     await this.client.sendRawTransaction(signedTxns).do();
 
+    console.log(txid)
     return await waitForConfirmation(this.client, txid, 2);
   }
 }

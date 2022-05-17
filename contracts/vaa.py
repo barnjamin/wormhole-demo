@@ -38,7 +38,7 @@ class ContractTransferVAA(NamedTuple):
     to_address: abi.Address
     to_chain: abi.Uint16
     fee: abi.Address
-    # payload: abi.String
+    payload: abi.String
 
 
 def move_offset(offset: ScratchVar, t: abi.BaseType) -> Expr:
@@ -67,7 +67,9 @@ def parse_contract_transfer_vaa(vaa) -> Expr:
         move_offset(offset, nonce),
         (chain := abi.Uint16()).decode(vaa, startIndex=offset.load()),
         move_offset(offset, chain),
-        (emitter := abi.Address()).decode(vaa, startIndex=offset.load()),
+        (emitter := abi.Address()).decode(
+            vaa, startIndex=offset.load(), endIndex=(offset.load() + Int(32))
+        ),
         move_offset(offset, emitter),
         (sequence := abi.Uint64()).decode(vaa, startIndex=offset.load()),
         move_offset(offset, sequence),
@@ -75,20 +77,27 @@ def parse_contract_transfer_vaa(vaa) -> Expr:
         move_offset(offset, consistency),
         (type := abi.Uint8()).decode(vaa, startIndex=offset.load()),
         move_offset(offset, type),
-        (amount := abi.Address()).decode(vaa, startIndex=offset.load()),
+        (amount := abi.Address()).decode(
+            vaa, startIndex=offset.load(), endIndex=(offset.load() + Int(32))
+        ),
         move_offset(offset, amount),
-        (contract := abi.Address()).decode(vaa, startIndex=offset.load()),
+        (contract := abi.Address()).decode(
+            vaa, startIndex=offset.load(), endIndex=(offset.load() + Int(32))
+        ),
         move_offset(offset, contract),
         (from_chain := abi.Uint16()).decode(vaa, startIndex=offset.load()),
         move_offset(offset, from_chain),
-        (to_address := abi.Address()).decode(vaa, startIndex=offset.load()),
+        (to_address := abi.Address()).decode(
+            vaa, startIndex=offset.load(), endIndex=(offset.load() + Int(32))
+        ),
         move_offset(offset, to_address),
         (to_chain := abi.Uint16()).decode(vaa, startIndex=offset.load()),
         move_offset(offset, to_chain),
-        (fee := abi.Address()).decode(vaa, startIndex=offset.load()),
+        (fee := abi.Address()).decode(
+            vaa, startIndex=offset.load(), endIndex=(offset.load() + Int(32))
+        ),
         move_offset(offset, fee),
-        Log(Itob(offset.load())),
-        # (payload := abi.String()).set(Suffix(vaa, offset.load())),
+        (payload := abi.String()).set(Suffix(vaa, offset.load())),
         (ctvaa := ContractTransferVAA()).set(
             version,
             index,
@@ -106,8 +115,7 @@ def parse_contract_transfer_vaa(vaa) -> Expr:
             to_address,
             to_chain,
             fee,
-            # payload,
+            payload,
         ),
-        Log(ctvaa.encode()),
         ctvaa.encode(),
     )

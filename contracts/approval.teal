@@ -1,5 +1,5 @@
 #pragma version 6
-intcblock 0 1 32 4
+intcblock 0 32 1 4
 bytecblock 0x00
 txn ApplicationID
 intc_0 // 0
@@ -42,177 +42,198 @@ pushbytes 0x151f7c75 // 0x151F7C75
 load 0
 concat
 log
-intc_1 // 1
+intc_2 // 1
 return
 main_l5:
-intc_1 // 1
+intc_2 // 1
 return
 main_l6:
-intc_1 // 1
+intc_2 // 1
 return
 
 // parse_contract_transfer_vaa
 parsecontracttransfervaa_0:
-store 3
+store 2
 intc_0 // 0
-store 4
+store 3
+load 2
 load 3
-load 4
 getbyte
-store 5
-load 4
-intc_1 // 1
-+
 store 4
 load 3
-load 4
+intc_2 // 1
++
+store 3
+load 2
+load 3
 extract_uint32
-store 6
-load 4
+store 5
+load 3
 intc_3 // 4
 +
-store 4
+store 3
+load 2
 load 3
-load 4
 getbyte
-store 7
-load 4
-intc_1 // 1
+store 6
+load 3
+intc_2 // 1
 +
-load 7
+load 6
 pushint 66 // 66
 *
 +
-store 4
+store 3
+load 2
 load 3
-load 4
+extract_uint32
+store 7
+load 3
+intc_3 // 4
++
+store 3
+load 2
+load 3
 extract_uint32
 store 8
-load 4
+load 3
 intc_3 // 4
 +
-store 4
+store 3
+load 2
 load 3
-load 4
-extract_uint32
-store 9
-load 4
-intc_3 // 4
-+
-store 4
-load 3
-load 4
 extract_uint16
-store 10
-load 4
+store 9
+load 3
 pushint 2 // 2
 +
-store 4
+store 3
+load 2
 load 3
-load 4
-dig 1
-len
-substring3
-store 11
-load 4
-intc_2 // 32
+load 3
+intc_1 // 32
 +
-store 4
+substring3
+store 10
 load 3
-load 4
+intc_1 // 32
++
+store 3
+load 2
+load 3
 extract_uint64
-store 12
-load 4
+store 11
+load 3
 pushint 8 // 8
 +
-store 4
+store 3
+load 2
 load 3
-load 4
+getbyte
+store 12
+load 3
+intc_2 // 1
++
+store 3
+load 2
+load 3
 getbyte
 store 13
-load 4
-intc_1 // 1
-+
-store 4
 load 3
-load 4
-getbyte
+intc_2 // 1
++
+store 3
+load 2
+load 3
+load 3
+intc_1 // 32
++
+substring3
 store 14
-load 4
-intc_1 // 1
-+
-store 4
 load 3
-load 4
-dig 1
-len
+intc_1 // 32
++
+store 3
+load 2
+load 3
+load 3
+intc_1 // 32
++
 substring3
 store 15
-load 4
-intc_2 // 32
-+
-store 4
 load 3
-load 4
-dig 1
-len
-substring3
+intc_1 // 32
++
+store 3
+load 2
+load 3
+extract_uint16
 store 16
-load 4
-intc_2 // 32
-+
-store 4
 load 3
-load 4
-extract_uint16
+pushint 2 // 2
++
+store 3
+load 2
+load 3
+load 3
+intc_1 // 32
++
+substring3
 store 17
-load 4
-pushint 2 // 2
-+
-store 4
 load 3
-load 4
-dig 1
-len
-substring3
-store 18
-load 4
-intc_2 // 32
+intc_1 // 32
 +
-store 4
+store 3
+load 2
 load 3
-load 4
 extract_uint16
-store 19
-load 4
+store 18
+load 3
 pushint 2 // 2
 +
-store 4
+store 3
+load 2
 load 3
-load 4
+load 3
+intc_1 // 32
++
+substring3
+store 19
+load 3
+intc_1 // 32
++
+store 3
+load 2
+load 3
 dig 1
 len
 substring3
-store 20
-load 4
-intc_2 // 32
-+
-store 4
-load 4
+len
 itob
-log
+extract 6 0
+load 2
+load 3
+dig 1
+len
+substring3
+concat
+store 20
 bytec_0 // 0x00
 intc_0 // 0
-load 5
+load 4
 setbyte
-load 6
+load 5
 itob
 extract 4 0
 concat
 bytec_0 // 0x00
 intc_0 // 0
-load 7
+load 6
 setbyte
+concat
+load 7
+itob
+extract 4 0
 concat
 load 8
 itob
@@ -220,42 +241,46 @@ extract 4 0
 concat
 load 9
 itob
-extract 4 0
-concat
-load 10
-itob
 extract 6 0
 concat
-load 11
+load 10
 concat
-load 12
+load 11
 itob
+concat
+bytec_0 // 0x00
+intc_0 // 0
+load 12
+setbyte
 concat
 bytec_0 // 0x00
 intc_0 // 0
 load 13
 setbyte
 concat
-bytec_0 // 0x00
-intc_0 // 0
 load 14
-setbyte
 concat
 load 15
 concat
 load 16
+itob
+extract 6 0
 concat
 load 17
-itob
-extract 6 0
 concat
 load 18
-concat
-load 19
 itob
 extract 6 0
 concat
+load 19
+concat
 load 20
+store 22
+pushint 192 // 192
+itob
+extract 6 0
+concat
+load 22
 concat
 store 21
 load 21
@@ -265,10 +290,14 @@ retsub
 
 // portal_transfer
 portaltransfer_1:
-store 1
-load 1
 extract 2 0
 callsub parsecontracttransfervaa_0
-store 2
+store 1
 load 1
+load 1
+pushint 190 // 190
+extract_uint16
+dig 1
+len
+substring3
 retsub
