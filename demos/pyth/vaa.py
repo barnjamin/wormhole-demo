@@ -69,7 +69,7 @@ def parse_pyth_vaa(vaa)->Expr:
         move_offset(offset, consistency),
         (payload := abi.String()).set(Suffix(vaa, offset.load())),
         (payload_bytes := abi.make(abi.DynamicArray[abi.Byte])).decode(payload.encode()),
-        (ctvaa := ContractTransferVAA()).set(
+        (ptvaa := PythTransferVAA()).set(
             version,
             index,
             siglen,
@@ -81,5 +81,5 @@ def parse_pyth_vaa(vaa)->Expr:
             consistency,
             payload_bytes,
         ),
-        ctvaa.encode(),
+        ptvaa.encode(),
     )
