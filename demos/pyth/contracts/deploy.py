@@ -4,7 +4,7 @@ from algosdk.v2client import algod
 from algosdk.future.transaction import *
 from pyteal import Mode, OptimizeOptions, compileTeal
 #from pyth_contract import router
-from demos.portal_transfer.portal_transfer_contract import router
+from contract import router
 
 mn = "tenant helmet motor sauce appear buddy gloom park average glory course wire buyer ostrich history time refuse room blame oxygen film diamond confirm ability spirit"
 host = "https://testnet-api.algonode.cloud"
@@ -129,7 +129,6 @@ if __name__ == "__main__":
 
     addr, sk = get_account(mn)
 
-    # app_id, app_addr = create_app(client, addr, sk, approval, clear)
-    # print(f"Created {app_id} with app address {app_addr}")
-
-    update_app(client, addr, sk, 89737126, approval, clear)
+    app_id, app_addr = create_app(client, addr, sk, approval, clear)
+    print(f"Created {app_id} with app address {app_addr}")
+    #update_app(client, addr, sk, 89737126, approval, clear)

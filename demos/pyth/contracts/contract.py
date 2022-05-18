@@ -49,9 +49,13 @@ def pyth_publish(
         DebugAssert(Gtxn[tidx.load()].sender() == Txn.sender()),
         DebugAssert(Gtxn[tidx.load()].application_args[1] == Txn.application_args[1]),
 
+        #TODO dupe suppression
+
+
         (s := abi.String()).decode(vaa.encode()),
         (ptvaa := PythTransferVAA()).decode(parse_pyth_vaa(s.get())),
         # TODO: parse out stuff? write to state values?
+
 
         output.set(ptvaa.payload())
     )
