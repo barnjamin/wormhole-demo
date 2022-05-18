@@ -24,9 +24,7 @@ def portal_transfer(
     return Seq(
         (s := abi.String()).decode(vaa.encode()),
         (ctvaa := ContractTransferVAA()).decode(parse_contract_transfer_vaa(s.get())),
-        cast(abi.TupleElement, ctvaa.payload()).use(
-            lambda s: output.decode(s.encode())
-        ),
+        output.set(ctvaa.payload())
     )
 
 

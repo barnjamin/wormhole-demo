@@ -4,7 +4,7 @@ from pyteal import *
 
 class NamedTuple(abi.Tuple):
     def __init__(self):
-        self.type_specs = {k: v().type_spec() for k, v in self.__annotations__.items()}
+        self.type_specs = {k: abi.make(v).type_spec() for k, v in self.__annotations__.items()}
         self.field_names = list(self.type_specs.keys())
 
         for idx in range(len(self.field_names)):
@@ -38,7 +38,7 @@ class ContractTransferVAA(NamedTuple):
     to_address: abi.Address
     to_chain: abi.Uint16
     fee: abi.Address
-    payload: abi.String
+    payload: abi.DynamicArray[abi.Byte]
 
 
 def move_offset(offset: ScratchVar, t: abi.BaseType) -> Expr:
@@ -94,6 +94,7 @@ def parse_contract_transfer_vaa(vaa) -> Expr:
         (fee := abi.Address()).decode(vaa, startIndex=offset.load(), length=Int(32)),
         move_offset(offset, fee),
         (payload := abi.String()).set(Suffix(vaa, offset.load())),
+        (payload_bytes := abi.make(abi.DynamicArray[abi.Byte])).decode(payload.encode()),
         (ctvaa := ContractTransferVAA()).set(
             version,
             index,
@@ -111,7 +112,7 @@ def parse_contract_transfer_vaa(vaa) -> Expr:
             to_address,
             to_chain,
             fee,
-            payload,
+            payload_bytes,
         ),
         ctvaa.encode(),
     )
