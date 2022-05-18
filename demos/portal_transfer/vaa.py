@@ -21,24 +21,24 @@ class NamedTuple(abi.Tuple):
 
 
 class ContractTransferVAA(NamedTuple):
-    version: abi.Uint8
-    index: abi.Uint32
-    siglen: abi.Uint8
-    timestamp: abi.Uint32
-    nonce: abi.Uint32
-    chain: abi.Uint16
-    emitter: abi.Address
-    sequence: abi.Uint64
-    consistency: abi.Uint8
+    version: abi.Uint8 # Version of VAA
+    index: abi.Uint32 #  Which guardian set to be validated against
+    siglen: abi.Uint8 # How many signatures
+    timestamp: abi.Uint32 # TS of message
+    nonce: abi.Uint32 # Uniquifying  
+    chain: abi.Uint16 # The Id of the chain where the message originated
+    emitter: abi.Address  # The address of the contract that emitted this message on the origin chain
+    sequence: abi.Uint64 # Unique integer representing the index, used for dedupe/ordering 
+    consistency: abi.Uint8 # 
 
-    type: abi.Uint8
-    amount: abi.Address
-    contract: abi.Address
-    from_chain: abi.Uint16
-    to_address: abi.Address
-    to_chain: abi.Uint16
-    fee: abi.Address
-    payload: abi.DynamicArray[abi.Byte]
+    type: abi.Uint8 # Type of message
+    amount: abi.Address # amount of transfer
+    contract: abi.Address # asset transferred
+    from_chain: abi.Uint16 # Id of the chain the token originated
+    to_address: abi.Address # Receiver of the token transfer
+    to_chain: abi.Uint16 # Id of the chain where the token transfer should be redeemed
+    fee: abi.Address # Amount to pay relayer
+    payload: abi.DynamicArray[abi.Byte] # Arbitrary byte payload
 
 
 def move_offset(offset: ScratchVar, t: abi.BaseType) -> Expr:

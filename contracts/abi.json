@@ -1,1 +1,0 @@
-{"name": "Contract", "methods": [{"name": "portal_transfer", "args": [{"type": "byte[]"}], "returns": {"type": "byte[]"}}], "desc": null, "networks": {}}

@@ -3,7 +3,8 @@ from algosdk import *
 from algosdk.v2client import algod
 from algosdk.future.transaction import *
 from pyteal import Mode, OptimizeOptions, compileTeal
-from contract import router
+#from pyth_contract import router
+from demos.portal_transfer.portal_transfer_contract import router
 
 mn = "tenant helmet motor sauce appear buddy gloom park average glory course wire buyer ostrich history time refuse room blame oxygen film diamond confirm ability spirit"
 host = "https://testnet-api.algonode.cloud"
