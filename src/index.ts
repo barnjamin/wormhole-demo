@@ -17,11 +17,12 @@ import { initChain, ChainConfigs } from "./wormhole/helpers";
   //await roundTripAsset(BigInt(0), BigInt(100), "algorand", "ethereum");
 
   await contractTransfer(
-    BigInt(0),
-    BigInt(100), 
-    BigInt(89737126),
-    "algorand",
-    "algorand"
+    BigInt(0), // Asset Id / Contract
+    BigInt(100),  // Amount
+    BigInt(89737126), // App Id / Contract to call
+    "algorand", // From chain
+    "algorand", // To chain
+    new Uint8Array(Buffer.from("Testing123")) // Payload to pass to the receiving contract 
   );
 })();
 
@@ -83,7 +84,8 @@ async function contractTransfer(
   amount: bigint,
   contract: bigint | string,
   origin: string,
-  destination: string
+  destination: string,
+  payload: Uint8Array
 ) {
   const [originChain, originSigner] = initChain(ChainConfigs[origin]);
   const [destChain, destSigner] = initChain(ChainConfigs[destination]);
@@ -105,7 +107,7 @@ async function contractTransfer(
       amount: amount,
     },
     contract: destinationContract,
-    payload: new Uint8Array(Buffer.from("Testing123")),
+    payload: payload,
   };
 
   console.log(`Sending contract transfer from ${origin} to ${destination}`);
