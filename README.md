@@ -60,56 +60,24 @@ Example:
 
 ### TODO:
 
-- [ ] Better examples
-
-- [ ] Tests (lol)
-
-- [ ] Payload 3
-
-- [ ] Nontrivial demos 
+Nontrivial demos:
 
     - [ ]  message service where specific token xfer w/note represents a message? 
+
     - [ ]  xfer oracle data like randomness?
+
     - [ ]  X chain DLL ("why would you do this?")
 
 
+Testing?
+
+ContractTransfer/Redeem w/ !Algorand chains
 
 #### Chains
 
-- [x] Algo: 
-
-    - [x] - Attest new asset 
-    - [x] - Xfer out 
-    - [x] - Redeem with VAA 
-    - [x] - Find original Asset
-
-- [x] Eth:
-
-    - [x] - Attest new asset 
-    - [x] - Xfer out 
-    - [x] - Redeem with VAA 
-    - [x] - Find original asset
-
-- [ ] Sol:
-
-    - [ ] - Attest new asset 
-    - [x] - Xfer out 
-    - [x] - Redeem with VAA 
-    - [x] - Find original asset
- 
-
-- [ ] Terra:
-
-    - [ ] - Attest new asset 
-    - [x] - Xfer out 
-    - [x] - Redeem with VAA 
-    - [x] - Find original asset
-
-- [x] Avalanche:
-
-    - [x] - Attest new asset 
-    - [x] - Xfer out 
-    - [x] - Redeem with VAA 
-    - [x] - Find original asset
+- [x] Algorand
+- [x] Ethereum
+- [x] Solana
+- [x] Avalanche
 
 
