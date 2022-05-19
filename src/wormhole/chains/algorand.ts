@@ -13,7 +13,7 @@ import {
   createWrappedOnAlgorand,
   tryNativeToHexString,
 } from "@certusone/wormhole-sdk";
-import { TransactionSignerPair } from "@certusone/wormhole-sdk/lib/cjs/algorand";
+import { submitVAAHeader, TransactionSignerPair } from "@certusone/wormhole-sdk/lib/cjs/algorand";
 import algosdk, {
   Algodv2,
   bigIntToBytes,
@@ -223,6 +223,14 @@ export class Algorand implements WormholeChain {
     return parseSequenceFromLogAlgorand(result);
   }
 
+  async submitHeader(vaa: Uint8Array, sender: AlgorandSigner, appId: bigint){
+    const {vaaMap, accounts, txs, guardianAddr} = await submitVAAHeader(this.client, this.coreId, vaa, sender.getAddress(), appId)
+    console.log(vaaMap, accounts, txs, guardianAddr)
+    const result = await this.signSendWait( txs, sender)
+    console.log(result)
+  }
+
+
   async transactionComplete(receipt: WormholeReceipt): Promise<boolean> {
     return await getIsTransferCompletedAlgorand(
       this.client,
@@ -230,6 +238,7 @@ export class Algorand implements WormholeChain {
       receipt.VAA
     );
   }
+
 
   getAssetAsString(asset: bigint | string): string {
     if (typeof asset == "string") return asset;
