@@ -22,17 +22,11 @@ def portal_transfer(
     vaa: abi.DynamicArray[abi.Byte], *, output: abi.DynamicArray[abi.Byte]
 ) -> Expr:
     return Seq(
-<<<<<<< Updated upstream:demos/portal_transfer/contract.py
-        (s := abi.String()).decode(vaa.encode()),
-        (ctvaa := ContractTransferVAA()).decode(parse_contract_transfer_vaa(s.get())),
-        output.set(ctvaa.payload())
-=======
         (scratch := abi.String()).decode(vaa.encode()),
         (ctvaa := ContractTransferVAA()).decode(parse_contract_transfer_vaa(scratch.get())),
         cast(abi.TupleElement, ctvaa.payload()).use(
             lambda s: output.decode(s.encode())
         ),
->>>>>>> Stashed changes:contracts/contract.py
     )
 
 
