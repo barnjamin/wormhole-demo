@@ -12,49 +12,17 @@ Demo prep for wormhole hackathon (https://www.activate.build/miami)
 Wormhole is a multisig bridge with 19 "guardian" validators that watch blocks on the chains they're connected to. When they see a relevant transaction on some originating chain, they sign a VAA. Once a sufficient number of the guardians sign the VAA it can be passed to the target chain to create an asset or claim tokens for an asset.
 
 
-Example:
+Run with
+```sh
+git clone https://github.com/algorand-devrel/wormhole-demo 
+cd wormhole-demo
+npm install
+```
 
-```ts
-  // Main wormhole class, takes `WormholeChain` interfaces and 
-  // dispatches calls 
-  const wh = new Wormhole(WORMHOLE_RPC_HOSTS);
-
-  // Chain specific implementations of `WormholeChain` interface
-  // they wrap specific methods and handle any weirdness
-  // Pass each an instance of the client that can do lookups/send transactions 
-  const algo = new Algorand(getAlgoConnection());
-  const sol = new Solana(getSolConnection());
-
-  // Get chain specific signers
-  // Simple interface to get Address and sign transactions
-  const algoSigner = getAlgoSigner();
-  const solSigner = getSolSigner();
-
-  // Asset we want to transfer
-  const algoAsset: WormholeAsset = {
-    chain: algo,
-    contract: BigInt(0), // 0 is Algo, the native asset
-  };
-
-  // Get the details for the token that has been 
-  // created on Solana to mirror the Algo 
-  const solAsset = await wh.getMirrored(algoAsset, sol);
-
-  // Construct an AssetTransfer to move the assets
-  const xferAlgoSol: WormholeAssetTransfer = {
-    origin: algoAsset,
-    sender: algoSgn,
-    destination: solAsset,
-    receiver: solSgn,
-    amount: BigInt(100),
-  };
-
-  // A `transfer` will return a `WormholeReceipt` containing
-  // the Signed VAA and origin/destination chain references
-  const receipt = await wh.transfer(xferAlgoSol);
-
-  // Use the receipt to claim the asset on Solana side
-  await wh.claim(solSigner, receipt, solAsset);
+Tweak the keys and clients in `src/wormhole/helpers.ts`
+Tweak the method calls in index.ts
+```sh
+npm run demo
 ```
 
 
