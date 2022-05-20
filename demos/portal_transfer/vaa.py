@@ -93,8 +93,7 @@ def parse_contract_transfer_vaa(vaa) -> Expr:
         move_offset(offset, to_chain),
         (fee := abi.Address()).decode(vaa, startIndex=offset.load(), length=Int(32)),
         move_offset(offset, fee),
-        (payload := abi.String()).set(Suffix(vaa, offset.load())),
-        (payload_bytes := abi.make(abi.DynamicArray[abi.Byte])).decode(payload.encode()),
+        (payload := abi.String).set(Suffix(vaa, offset.load())),
         (ctvaa := ContractTransferVAA()).set(
             version,
             index,
