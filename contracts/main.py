@@ -1,4 +1,4 @@
-from copy import copy
+import base64
 from algosdk.future import transaction
 from algosdk.encoding import decode_address
 from algosdk.atomic_transaction_composer import (
@@ -10,8 +10,10 @@ from algosdk.atomic_transaction_composer import (
 from algosdk.mnemonic import to_private_key, to_public_key
 from algosdk.v2client import algod
 from algosdk.logic import get_application_address
+
 from beaker import *
-from contract import PingPong, _ping, _pong
+
+from contract import PingPong
 from tmpl_sig import TmplSig
 
 # RPC connection parameters
@@ -100,17 +102,20 @@ def demo(app_id: int = 0):
     lsa = get_storage_account(app_addr)
 
     if app_id == 0:
+        initialize_storage(algod_client, lsa, ACCOUNT_ADDRESS, ACCOUNT_SIGNER)
+        print("Initialized storage for core contract sequence tracking")
+
         app_client.call(
             PingPong.configure, app_id=WORMHOLE_CORE_ID, storage_acct=lsa.address()
         )
         print("Configured settings")
 
-        initialize_storage(algod_client, lsa, ACCOUNT_ADDRESS, ACCOUNT_SIGNER)
-        print("Initialized storage for core contract sequence tracking")
-
     # Kickstart the ping pong
+    print("Calling kickstart")
     result = app_client.call(PingPong.kickstart)
-    print(result.tx_info)
+    raw_seq = result.tx_info["inner-txns"][0]["logs"][0]
+    seq = int.from_bytes(base64.b64decode(raw_seq), "big")
+    print(f"Message assigned sequence number: {seq}")
 
     # TODO:
     # while True:
