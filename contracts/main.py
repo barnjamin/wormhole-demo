@@ -1,11 +1,5 @@
-import json
-from algosdk.abi import ABIType
 from beaker import *
-
-if __name__ == "__main__":
-    from contract import OracleDataCache
-else:
-    from .contract import OracleDataCache
+from contract import PingPong, _ping, _pong
 
 
 base_vaa = bytes.fromhex(
@@ -19,40 +13,28 @@ base_vaa = bytes.fromhex(
     + "fcf3f8d9efc458695dc7bd7e534080ac7b48f2b881fd3063b1308f0648"
 )
 
-# Get the codec to decode the stored value
-oracle_data_codec = ABIType.from_string(str(OracleDataCache.OracleData().type_spec()))
-
 
 def demo():
+    # Grab an account from the sandbox KMD
+    account = sandbox.get_accounts().pop()
+
+    # Create  an app client for our app
     app_client = client.ApplicationClient(
         sandbox.get_algod_client(),
-        OracleDataCache(),
-        signer=sandbox.get_accounts().pop().signer,
+        PingPong(),
+        signer=account.signer,
     )
 
     # Deploy the app on chain
     app_client.create()
 
-    # Make up some fake oracle data and send it to the contract
-    base_ts = 1661802300
-    base_price = 10000
-    for x in range(10):
-        fauxracle_data = {
-            "ts": base_ts + x * 60,
-            "price": base_price + x,
-            "confidence": 9999,
-        }
-
-        app_client.call(
-            OracleDataCache.portal_transfer,
-            vaa=base_vaa + json.dumps(fauxracle_data).encode(),
-        )
-
-    # Get the current app state
-    app_state = app_client.get_application_state(raw=True)
-    for v in app_state.values():
-        ts, price, confidence = oracle_data_codec.decode(v)
-        print(f"ts: {ts}, price: {price}, confidence: {confidence}")
+    # Send a ping, expect pong 
+    result = app_client.call(
+        PingPong.portal_transfer,
+        vaa=base_vaa + _ping,
+    )
+    res = bytes(result.return_value)
+    assert res == _pong
 
 
 if __name__ == "__main__":
