@@ -131,11 +131,21 @@ class WormholeTransfer(Application, ABC):
     will cause this contract to have it's `portal_transfer` method called.
     """
 
+    core_app_id: Final[ApplicationStateValue] = ApplicationStateValue(
+        TealType.uint64, static=True
+    )
+    storage_account: Final[ApplicationStateValue] = ApplicationStateValue(
+        TealType.bytes, static=True
+    )
+
     publish_selector: Final[Bytes] = Bytes("publishMessage")
 
-    def __init__(self, core_app_id: int):
-        self.core_app_id = Int(core_app_id)
-        super().__init__()
+    @external(authorize=Authorize.only(Global.creator_address()))
+    def configure(self, app_id: abi.Uint64, storage_acct: abi.Address):
+        return Seq(
+            self.core_app_id.set(app_id.get()),
+            self.storage_account.set(storage_acct.get()),
+        )
 
     @external
     def portal_transfer(
@@ -157,7 +167,7 @@ class WormholeTransfer(Application, ABC):
         )
 
     @internal(TealType.none)
-    def publish_message(self, account: abi.Account, message: Expr):
+    def publish_message(self, message: Expr):
         return Seq(
             InnerTxnBuilder.Begin(),
             # Payment
@@ -168,7 +178,7 @@ class WormholeTransfer(Application, ABC):
                     TxnField.type_enum: TxnType.ApplicationCall,
                     TxnField.application_id: self.core_app_id,
                     TxnField.application_args: [self.publish_selector, message],
-                    TxnField.accounts: [account.address()],
+                    TxnField.accounts: [self.storage_account],
                 }
             ),
             InnerTxnBuilder.Submit(),

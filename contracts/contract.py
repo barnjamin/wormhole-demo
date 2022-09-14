@@ -13,8 +13,16 @@ Pong = Bytes(_pong)
 
 class PingPong(WormholeTransfer):
     @external
-    def kickstart(self, storage_account: abi.Account, core_app_id: abi.Application):
+    def kickstart(
+        self,
+        storage_account: abi.Account = WormholeTransfer.storage_account,
+        core_app_id: abi.Application = WormholeTransfer.core_app_id,
+    ):
         return self.publish_message(Ping)
+
+    @delete(authorize=Authorize.only(Global.creator_address()))
+    def delete(self):
+        return Approve()
 
     def handle_transfer(
         self, ctvaa: ContractTransferVAA, *, output: abi.DynamicBytes
