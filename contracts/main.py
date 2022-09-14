@@ -14,18 +14,19 @@ from beaker import *
 from contract import PingPong, _ping, _pong
 from tmpl_sig import TmplSig
 
+# RPC connection parameters
+ALGOD_HOST = "https://testnet-api.algonode.cloud"
+ALGOD_TOKEN = ""
 
 # Testnet app id for core bridge
 WORMHOLE_CORE_ID = 86525623
 WORMHOLE_CORE_ADDR = get_application_address(WORMHOLE_CORE_ID)
 
+# Generated account with algos on Testnet
 ACCOUNT_MNEMONIC = "tenant helmet motor sauce appear buddy gloom park average glory course wire buyer ostrich history time refuse room blame oxygen film diamond confirm ability spirit"
 ACCOUNT_ADDRESS = to_public_key(ACCOUNT_MNEMONIC)
 ACCOUNT_SECRET = to_private_key(ACCOUNT_MNEMONIC)
-
-
-ALGOD_HOST = "https://testnet-api.algonode.cloud"
-ALGOD_TOKEN = "a" * 64
+ACCOUNT_SIGNER = AccountTransactionSigner(ACCOUNT_SECRET)
 
 
 def get_storage_account(emitter_addr: str) -> transaction.LogicSigAccount:
@@ -75,42 +76,47 @@ def initialize_storage(
     print(f"Opted in at round: {result.confirmed_round}")
 
 
-def demo(app_id: int = 0, app_addr: str = ""):
-
-    signer = AccountTransactionSigner(ACCOUNT_SECRET)
+def demo(app_id: int = 0):
 
     algod_client = algod.AlgodClient(ALGOD_TOKEN, ALGOD_HOST)
 
     # Create  an app client for our app
     app_client = client.ApplicationClient(
-        algod_client, PingPong(version=6), signer=signer, app_id=app_id
+        algod_client, PingPong(version=6), signer=ACCOUNT_SIGNER, app_id=app_id
     )
 
-    # Deploy the app on chain
-    app_id, app_addr, _ = app_client.create()
-    print(f"Deployed app: {app_id}")
-    app_client.fund(2 * consts.algo)
+    if app_id == 0:
+        # Deploy the app on chain
+        app_id, app_addr, _ = app_client.create()
+        print(f"Deployed app: {app_id}")
 
-    print(f"App addr: {app_addr}")
+        # TODO add this to another group or dont wait
+        app_client.fund(2 * consts.algo)
+        print(f"Funded app")
+
+    else:
+        app_addr = get_application_address(app_id)
 
     lsa = get_storage_account(app_addr)
 
-    app_client.call(
-        PingPong.configure, app_id=WORMHOLE_CORE_ID, storage_acct=lsa.address()
-    )
-    print("Configured settings")
+    if app_id == 0:
+        app_client.call(
+            PingPong.configure, app_id=WORMHOLE_CORE_ID, storage_acct=lsa.address()
+        )
+        print("Configured settings")
 
-    initialize_storage(algod_client, lsa, ACCOUNT_ADDRESS, signer)
-    print("Initialized storage")
+        initialize_storage(algod_client, lsa, ACCOUNT_ADDRESS, ACCOUNT_SIGNER)
+        print("Initialized storage for core contract sequence tracking")
 
-    result = app_client.call(
-        PingPong.kickstart, storage_account=lsa.address(), core_app_id=WORMHOLE_CORE_ID
-    )
+    # Kickstart the ping pong
+    result = app_client.call(PingPong.kickstart)
     print(result.tx_info)
+
+    # TODO:
+    # while True:
+    #     # relay VAAs
 
 
 if __name__ == "__main__":
-    # app_id = 109938718
-    app_id = 0
-    app_addr = get_application_address(app_id) if app_id != 0 else ""
-    demo(app_id=app_id, app_addr=app_addr)
+    app_id = 109939165
+    demo(app_id=app_id)
