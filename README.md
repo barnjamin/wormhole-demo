@@ -4,7 +4,7 @@ Demo prep for xHack (https://xhack.splashthat.com/)
 
 [NPM](https://www.npmjs.com/package/@certusone/wormhole-sdk)
 
-[Testnet Bridge](https://wormhole-foundation.github.io/wormhole/#/transfer)
+[Testnet Bridge](https://wormhole-foundation.github.io/example-token-bridge-ui/#/transfer)
 
 [Production Bridge](https://www.portalbridge.com/#/transfer)
 
