@@ -1,16 +1,23 @@
+from typing import Final
 from abc import ABC, abstractmethod
 from typing import Literal
 
-from beaker import Application, external
-from pyteal import (
-    Reject,
-    abi,
-    Expr,
-    Seq,
-    ScratchVar,
-    Int,
-    Suffix,
-)
+from beaker import *
+
+# Application, external, internal
+from pyteal import *
+
+# (
+#    Txn
+#    Reject,
+#    abi,
+#    Expr,
+#    Seq,
+#    ScratchVar,
+#    Int,
+#    Suffix,
+#    InnerTxnBuilder
+# )
 
 
 def read_next(vaa: Expr, offset: int, t: abi.BaseType) -> tuple[int, Expr]:
@@ -124,6 +131,12 @@ class WormholeTransfer(Application, ABC):
     will cause this contract to have it's `portal_transfer` method called.
     """
 
+    publish_selector: Final[Bytes] = Bytes("publishMessage")
+
+    def __init__(self, core_app_id: int):
+        self.core_app_id = Int(core_app_id)
+        super().__init__()
+
     @external
     def portal_transfer(
         self, vaa: abi.DynamicBytes, *, output: abi.DynamicBytes
@@ -141,6 +154,24 @@ class WormholeTransfer(Application, ABC):
         return Seq(
             (ctvaa := ContractTransferVAA()).decode(vaa.get()),
             self.handle_transfer(ctvaa, output=output),
+        )
+
+    @internal(TealType.none)
+    def publish_message(self, account: abi.Account, message: Expr):
+        return Seq(
+            InnerTxnBuilder.Begin(),
+            # Payment
+            # InnerTxnBuilder.SetFields({}),
+            # InnerTxnBuilder.Next(),
+            InnerTxnBuilder.SetFields(
+                {
+                    TxnField.type_enum: TxnType.ApplicationCall,
+                    TxnField.application_id: self.core_app_id,
+                    TxnField.application_args: [self.publish_selector, message],
+                    TxnField.accounts: [account.address()],
+                }
+            ),
+            InnerTxnBuilder.Submit(),
         )
 
     @abstractmethod

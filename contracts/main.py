@@ -28,11 +28,12 @@ def demo():
     # Deploy the app on chain
     app_client.create()
 
-    # Send a ping, expect pong 
+    # Send a ping, expect pong
     result = app_client.call(
-        PingPong.portal_transfer,
-        vaa=base_vaa + _ping,
+        PingPong.kickstart,
+        wormhole_account="",
     )
+
     res = bytes(result.return_value)
     assert res == _pong
 
