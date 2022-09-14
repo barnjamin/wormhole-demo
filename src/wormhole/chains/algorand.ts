@@ -131,6 +131,8 @@ export class Algorand implements WormholeChain {
       BigInt(fee)
     );
 
+    console.log(transferTxs.map(tx=>tx.tx.get_obj_for_encoding()))
+
     const result = await this.signSendWait(
       transferTxs,
       msg.sender as AlgorandSigner
@@ -150,6 +152,7 @@ export class Algorand implements WormholeChain {
       receipt.VAA,
       signer.getAddress()
     );
+    console.log(redeemTxs.map(tx=>tx.tx.get_obj_for_encoding()))
     const result = await this.signSendWait(redeemTxs, signer);
     return asset;
   }

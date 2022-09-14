@@ -34,9 +34,9 @@ export type WormholeReceipt = {
 // WormholeMessageType describes the type of messages
 // that can be sent to Wormhole
 export enum WormholeActionType {
-  Attestation = 1,
-  AssetTransfer = 2,
-  ContractControlledTransfer = 3,
+  Attestation = 1, // Create a new asset, based on source asset
+  AssetTransfer = 2, // Transfer asset from one chain to another
+  ContractControlledTransfer = 3, // Transfer asset + call smart contract with VAA passed containing custom payload
 }
 
 // WormholeAttestation describes an intended creation of a new
@@ -122,6 +122,7 @@ export class Wormhole {
     origin: WormholeChain,
     destination: WormholeChain
   ): Promise<WormholeReceipt> {
+    console.time("getvaa")
     const { vaaBytes } = await getSignedVAAWithRetry(
       this.rpcHosts,
       origin.id,
@@ -130,6 +131,7 @@ export class Wormhole {
       { transport: NodeHttpTransport() }
     );
 
+    console.timeEnd("getvaa")
     return {
       VAA: vaaBytes,
       origin: origin,

@@ -12,18 +12,17 @@ import { WORMHOLE_RPC_HOSTS } from "./wormhole/consts";
 import { initChain, ChainConfigs } from "./wormhole/helpers";
 
 (async function () {
-  //await roundTripAsset(BigInt(0), BigInt(100), "algorand", "solana");
+  await roundTripAsset(BigInt(0), BigInt(100), "algorand", "solana");
   //await roundTripAsset(BigInt(0), BigInt(100), "algorand", "avalanche");
   //await roundTripAsset(BigInt(0), BigInt(100), "algorand", "ethereum");
-
-  await contractTransfer(
-    BigInt(0), // Asset Id / Contract
-    BigInt(100),  // Amount
-    BigInt(89737126), // App Id / Contract to call
-    "algorand", // From chain
-    "algorand", // To chain
-    new Uint8Array(Buffer.from("Testing123")) // Payload to pass to the receiving contract 
-  );
+  //await contractTransfer(
+  //  BigInt(0), // Asset Id / Contract
+  //  BigInt(100),  // Amount
+  //  BigInt(89737126), // App Id / Contract to call
+  //  "algorand", // From chain
+  //  "algorand", // To chain
+  //  new Uint8Array(Buffer.from("Testing123")) // Payload to pass to the receiving contract 
+  //);
 })();
 
 async function roundTripAsset(
