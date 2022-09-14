@@ -120,13 +120,16 @@ export class Wormhole {
   async getVAA(
     sequence: string,
     origin: WormholeChain,
-    destination: WormholeChain
+    destination: WormholeChain,
+    emitter?: string
   ): Promise<WormholeReceipt> {
     console.time("getvaa")
+    if (emitter === undefined)
+      emitter = await origin.emitterAddress()
     const { vaaBytes } = await getSignedVAAWithRetry(
       this.rpcHosts,
       origin.id,
-      await origin.emitterAddress(),
+      emitter,
       sequence,
       { transport: NodeHttpTransport() }
     );

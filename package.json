@@ -8,7 +8,8 @@
   },
   "scripts": {
     "roundtrip": "npx ts-node src/roundtrip.ts",
-    "message": "npx ts-node src/message.ts"
+    "message": "npx ts-node src/message.ts",
+    "pingpong": "npx ts-node src/pingpong.ts"
   },
   "dependencies": {
     "@certusone/wormhole-sdk": "^0.6.2",

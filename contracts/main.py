@@ -1,3 +1,4 @@
+from copy import copy
 from algosdk.future import transaction
 from algosdk.encoding import decode_address
 from algosdk.atomic_transaction_composer import (
@@ -46,6 +47,8 @@ def initialize_storage(
     signer: AccountTransactionSigner,
 ):
     sp = client.suggested_params()
+    sp.flat_fee = True
+    sp.fee = 2000
 
     atc = AtomicTransactionComposer()
     atc.add_transaction(
@@ -54,6 +57,8 @@ def initialize_storage(
             signer=signer,
         )
     )
+
+    sp.fee = 0
     atc.add_transaction(
         TransactionWithSigner(
             txn=transaction.ApplicationCallTxn(
@@ -82,18 +87,21 @@ def demo(app_id: int = 0, app_addr: str = ""):
     )
 
     # Deploy the app on chain
-    # app_id, app_addr, _ = app_client.create()
-    # print(f"Deployed app: {app_id}")
-    # app_client.fund(2*consts.algo)
+    app_id, app_addr, _ = app_client.create()
+    print(f"Deployed app: {app_id}")
+    app_client.fund(2 * consts.algo)
+
+    print(f"App addr: {app_addr}")
 
     lsa = get_storage_account(app_addr)
-    initialize_storage(algod_client, lsa, ACCOUNT_ADDRESS, signer)
-    print("Initialized storage")
 
     app_client.call(
         PingPong.configure, app_id=WORMHOLE_CORE_ID, storage_acct=lsa.address()
     )
     print("Configured settings")
+
+    initialize_storage(algod_client, lsa, ACCOUNT_ADDRESS, signer)
+    print("Initialized storage")
 
     result = app_client.call(
         PingPong.kickstart, storage_account=lsa.address(), core_app_id=WORMHOLE_CORE_ID
@@ -102,6 +110,6 @@ def demo(app_id: int = 0, app_addr: str = ""):
 
 
 if __name__ == "__main__":
-    app_id = 109928441
-    app_addr = get_application_address(app_id)
+    app_id = 109938718
+    app_addr = get_application_address(app_id) if app_id != 0 else ""
     demo(app_id=app_id, app_addr=app_addr)

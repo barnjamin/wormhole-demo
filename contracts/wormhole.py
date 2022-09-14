@@ -169,6 +169,27 @@ class WormholeTransfer(Application, ABC):
     @internal(TealType.none)
     def publish_message(self, message: Expr):
         return Seq(
+            (payload := ScratchVar()).store(
+                Concat(
+                    # Type: its a payload3
+                    Bytes("base16", "03"),
+                    # Amount: 0 amount
+                    BytesZero(Int(32)),
+                    # AssetId: 0 for algos, even tho we're not sending anything
+                    BytesZero(Int(32)),
+                    # FromChain: (0008 is us)
+                    Bytes("base16", "0008"),
+                    # ToAddress (here we use the app id prefixed with 24 leading 0s)
+                    BytesZero(Int(32)),
+                    Itob(Global.current_application_id()),
+                    # ToChain (force to algorand for now)
+                    Bytes("base16", "0008"),
+                    # FromAddress (from us)
+                    self.address,
+                    # Payload
+                    message,
+                )
+            ),
             InnerTxnBuilder.Begin(),
             # Payment
             # InnerTxnBuilder.SetFields({}),
@@ -177,7 +198,11 @@ class WormholeTransfer(Application, ABC):
                 {
                     TxnField.type_enum: TxnType.ApplicationCall,
                     TxnField.application_id: self.core_app_id,
-                    TxnField.application_args: [self.publish_selector, message],
+                    TxnField.application_args: [
+                        self.publish_selector,
+                        payload.load(),
+                        Itob(Int(0)),
+                    ],
                     TxnField.accounts: [self.storage_account],
                 }
             ),
