@@ -110,6 +110,7 @@ def demo(app_id: int = 0, app_addr: str = ""):
 
 
 if __name__ == "__main__":
-    app_id = 109938718
+    # app_id = 109938718
+    app_id = 0
     app_addr = get_application_address(app_id) if app_id != 0 else ""
     demo(app_id=app_id, app_addr=app_addr)

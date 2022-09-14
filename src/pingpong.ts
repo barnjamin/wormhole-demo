@@ -21,7 +21,7 @@ import { _parseVAAAlgorand } from "@certusone/wormhole-sdk/lib/cjs/algorand";
   
     const wh = new Wormhole(WORMHOLE_RPC_HOSTS);
 
-    const appId = 109938718 
+    const appId = 109939165 
     const appAddr = algosdk.getApplicationAddress(appId)
     const emitter = Buffer.from(algosdk.decodeAddress(appAddr).publicKey).toString('hex')
     console.log(`Emitter address: ${emitter}`)

@@ -180,7 +180,7 @@ class WormholeTransfer(Application, ABC):
                     # FromChain: (0008 is us)
                     Bytes("base16", "0008"),
                     # ToAddress (here we use the app id prefixed with 24 leading 0s)
-                    BytesZero(Int(32)),
+                    BytesZero(Int(24)),
                     Itob(Global.current_application_id()),
                     # ToChain (force to algorand for now)
                     Bytes("base16", "0008"),
