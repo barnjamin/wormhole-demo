@@ -30,10 +30,12 @@ ACCOUNT_ADDRESS = to_public_key(ACCOUNT_MNEMONIC)
 ACCOUNT_SECRET = to_private_key(ACCOUNT_MNEMONIC)
 ACCOUNT_SIGNER = AccountTransactionSigner(ACCOUNT_SECRET)
 
+# our PingPong app id
+APP_ID = 109939165
+
 
 def get_storage_account(emitter_addr: str) -> transaction.LogicSigAccount:
-    ts = TmplSig()
-    return ts.populate(
+    return TmplSig().populate(
         {
             "TMPL_ADDR_IDX": 0,
             "TMPL_EMITTER_ID": decode_address(emitter_addr).hex(),
@@ -121,5 +123,4 @@ def demo(app_id: int = 0):
 
 
 if __name__ == "__main__":
-    app_id = 109939165
-    demo(app_id=app_id)
+    demo(app_id=APP_ID)
