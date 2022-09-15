@@ -6,8 +6,7 @@ from spy.v1 import spy_pb2 as spy_dot_v1_dot_spy__pb2
 
 
 class SpyRPCServiceStub(object):
-    """SpyRPCService exposes a gossip introspection service, allowing sniffing of gossip messages.
-    """
+    """SpyRPCService exposes a gossip introspection service, allowing sniffing of gossip messages."""
 
     def __init__(self, channel):
         """Constructor.
@@ -16,55 +15,65 @@ class SpyRPCServiceStub(object):
             channel: A grpc.Channel.
         """
         self.SubscribeSignedVAA = channel.unary_stream(
-                '/spy.v1.SpyRPCService/SubscribeSignedVAA',
-                request_serializer=spy_dot_v1_dot_spy__pb2.SubscribeSignedVAARequest.SerializeToString,
-                response_deserializer=spy_dot_v1_dot_spy__pb2.SubscribeSignedVAAResponse.FromString,
-                )
+            "/spy.v1.SpyRPCService/SubscribeSignedVAA",
+            request_serializer=spy_dot_v1_dot_spy__pb2.SubscribeSignedVAARequest.SerializeToString,
+            response_deserializer=spy_dot_v1_dot_spy__pb2.SubscribeSignedVAAResponse.FromString,
+        )
 
 
 class SpyRPCServiceServicer(object):
-    """SpyRPCService exposes a gossip introspection service, allowing sniffing of gossip messages.
-    """
+    """SpyRPCService exposes a gossip introspection service, allowing sniffing of gossip messages."""
 
     def SubscribeSignedVAA(self, request, context):
-        """SubscribeSignedVAA returns a stream of signed VAA messages received on the network.
-        """
+        """SubscribeSignedVAA returns a stream of signed VAA messages received on the network."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
 
 def add_SpyRPCServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'SubscribeSignedVAA': grpc.unary_stream_rpc_method_handler(
-                    servicer.SubscribeSignedVAA,
-                    request_deserializer=spy_dot_v1_dot_spy__pb2.SubscribeSignedVAARequest.FromString,
-                    response_serializer=spy_dot_v1_dot_spy__pb2.SubscribeSignedVAAResponse.SerializeToString,
-            ),
+        "SubscribeSignedVAA": grpc.unary_stream_rpc_method_handler(
+            servicer.SubscribeSignedVAA,
+            request_deserializer=spy_dot_v1_dot_spy__pb2.SubscribeSignedVAARequest.FromString,
+            response_serializer=spy_dot_v1_dot_spy__pb2.SubscribeSignedVAAResponse.SerializeToString,
+        ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'spy.v1.SpyRPCService', rpc_method_handlers)
+        "spy.v1.SpyRPCService", rpc_method_handlers
+    )
     server.add_generic_rpc_handlers((generic_handler,))
 
 
- # This class is part of an EXPERIMENTAL API.
+# This class is part of an EXPERIMENTAL API.
 class SpyRPCService(object):
-    """SpyRPCService exposes a gossip introspection service, allowing sniffing of gossip messages.
-    """
+    """SpyRPCService exposes a gossip introspection service, allowing sniffing of gossip messages."""
 
     @staticmethod
-    def SubscribeSignedVAA(request,
+    def SubscribeSignedVAA(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_stream(
+            request,
             target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/spy.v1.SpyRPCService/SubscribeSignedVAA',
+            "/spy.v1.SpyRPCService/SubscribeSignedVAA",
             spy_dot_v1_dot_spy__pb2.SubscribeSignedVAARequest.SerializeToString,
             spy_dot_v1_dot_spy__pb2.SubscribeSignedVAAResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+        )

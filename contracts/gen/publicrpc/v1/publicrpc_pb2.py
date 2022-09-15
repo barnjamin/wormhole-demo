@@ -8,6 +8,7 @@ from google.protobuf import descriptor_pool as _descriptor_pool
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
+
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
@@ -17,9 +18,11 @@ from ...gossip.v1 import gossip_pb2 as gossip_dot_v1_dot_gossip__pb2
 from google.api import annotations_pb2 as google_dot_api_dot_annotations__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1cpublicrpc/v1/publicrpc.proto\x12\x0cpublicrpc.v1\x1a\x16gossip/v1/gossip.proto\x1a\x1cgoogle/api/annotations.proto\"\x8c\x01\n\tMessageID\x12:\n\remitter_chain\x18\x01 \x01(\x0e\x32\x15.publicrpc.v1.ChainIDR\x0c\x65mitterChain\x12\'\n\x0f\x65mitter_address\x18\x02 \x01(\tR\x0e\x65mitterAddress\x12\x1a\n\x08sequence\x18\x03 \x01(\x04R\x08sequence\"Z\n\x07\x42\x61tchID\x12:\n\remitter_chain\x18\x01 \x01(\x0e\x32\x15.publicrpc.v1.ChainIDR\x0c\x65mitterChain\x12\x13\n\x05tx_id\x18\x02 \x01(\tR\x04txId\"M\n\x13GetSignedVAARequest\x12\x36\n\nmessage_id\x18\x01 \x01(\x0b\x32\x17.publicrpc.v1.MessageIDR\tmessageId\"3\n\x14GetSignedVAAResponse\x12\x1b\n\tvaa_bytes\x18\x01 \x01(\x0cR\x08vaaBytes\"L\n\x18GetSignedBatchVAARequest\x12\x30\n\x08\x62\x61tch_id\x18\x01 \x01(\x0b\x32\x15.publicrpc.v1.BatchIDR\x07\x62\x61tchId\"C\n\x19GetSignedBatchVAAResponse\x12&\n\x0f\x62\x61tch_vaa_bytes\x18\x01 \x01(\x0cR\rbatchVaaBytes\"\x1a\n\x18GetLastHeartbeatsRequest\"\x83\x02\n\x19GetLastHeartbeatsResponse\x12G\n\x07\x65ntries\x18\x01 \x03(\x0b\x32-.publicrpc.v1.GetLastHeartbeatsResponse.EntryR\x07\x65ntries\x1a\x9c\x01\n\x05\x45ntry\x12\x34\n\x16verified_guardian_addr\x18\x01 \x01(\tR\x14verifiedGuardianAddr\x12\"\n\rp2p_node_addr\x18\x02 \x01(\tR\x0bp2pNodeAddr\x12\x39\n\rraw_heartbeat\x18\x03 \x01(\x0b\x32\x14.gossip.v1.HeartbeatR\x0crawHeartbeat\"\x1e\n\x1cGetCurrentGuardianSetRequest\"]\n\x1dGetCurrentGuardianSetResponse\x12<\n\x0cguardian_set\x18\x01 \x01(\x0b\x32\x19.publicrpc.v1.GuardianSetR\x0bguardianSet\"A\n\x0bGuardianSet\x12\x14\n\x05index\x18\x01 \x01(\rR\x05index\x12\x1c\n\taddresses\x18\x02 \x03(\tR\taddresses\",\n*GovernorGetAvailableNotionalByChainRequest\"\xc8\x02\n+GovernorGetAvailableNotionalByChainResponse\x12Y\n\x07\x65ntries\x18\x01 \x03(\x0b\x32?.publicrpc.v1.GovernorGetAvailableNotionalByChainResponse.EntryR\x07\x65ntries\x1a\xbd\x01\n\x05\x45ntry\x12\x19\n\x08\x63hain_id\x18\x01 \x01(\rR\x07\x63hainId\x12@\n\x1cremaining_available_notional\x18\x02 \x01(\x04R\x1aremainingAvailableNotional\x12%\n\x0enotional_limit\x18\x03 \x01(\x04R\rnotionalLimit\x12\x30\n\x14\x62ig_transaction_size\x18\x04 \x01(\x04R\x12\x62igTransactionSize\" \n\x1eGovernorGetEnqueuedVAAsRequest\"\xc7\x02\n\x1fGovernorGetEnqueuedVAAsResponse\x12M\n\x07\x65ntries\x18\x01 \x03(\x0b\x32\x33.publicrpc.v1.GovernorGetEnqueuedVAAsResponse.EntryR\x07\x65ntries\x1a\xd4\x01\n\x05\x45ntry\x12#\n\remitter_chain\x18\x01 \x01(\rR\x0c\x65mitterChain\x12\'\n\x0f\x65mitter_address\x18\x02 \x01(\tR\x0e\x65mitterAddress\x12\x1a\n\x08sequence\x18\x03 \x01(\x04R\x08sequence\x12!\n\x0crelease_time\x18\x04 \x01(\rR\x0breleaseTime\x12%\n\x0enotional_value\x18\x05 \x01(\x04R\rnotionalValue\x12\x17\n\x07tx_hash\x18\x06 \x01(\tR\x06txHash\"V\n\x1cGovernorIsVAAEnqueuedRequest\x12\x36\n\nmessage_id\x18\x01 \x01(\x0b\x32\x17.publicrpc.v1.MessageIDR\tmessageId\"@\n\x1dGovernorIsVAAEnqueuedResponse\x12\x1f\n\x0bis_enqueued\x18\x01 \x01(\x08R\nisEnqueued\"\x1d\n\x1bGovernorGetTokenListRequest\"\xd8\x01\n\x1cGovernorGetTokenListResponse\x12J\n\x07\x65ntries\x18\x01 \x03(\x0b\x32\x30.publicrpc.v1.GovernorGetTokenListResponse.EntryR\x07\x65ntries\x1al\n\x05\x45ntry\x12&\n\x0forigin_chain_id\x18\x01 \x01(\rR\roriginChainId\x12%\n\x0eorigin_address\x18\x02 \x01(\tR\roriginAddress\x12\x14\n\x05price\x18\x03 \x01(\x02R\x05price*\xe8\x04\n\x07\x43hainID\x12\x18\n\x14\x43HAIN_ID_UNSPECIFIED\x10\x00\x12\x13\n\x0f\x43HAIN_ID_SOLANA\x10\x01\x12\x15\n\x11\x43HAIN_ID_ETHEREUM\x10\x02\x12\x12\n\x0e\x43HAIN_ID_TERRA\x10\x03\x12\x10\n\x0c\x43HAIN_ID_BSC\x10\x04\x12\x14\n\x10\x43HAIN_ID_POLYGON\x10\x05\x12\x16\n\x12\x43HAIN_ID_AVALANCHE\x10\x06\x12\x12\n\x0e\x43HAIN_ID_OASIS\x10\x07\x12\x15\n\x11\x43HAIN_ID_ALGORAND\x10\x08\x12\x13\n\x0f\x43HAIN_ID_AURORA\x10\t\x12\x13\n\x0f\x43HAIN_ID_FANTOM\x10\n\x12\x13\n\x0f\x43HAIN_ID_KARURA\x10\x0b\x12\x12\n\x0e\x43HAIN_ID_ACALA\x10\x0c\x12\x13\n\x0f\x43HAIN_ID_KLAYTN\x10\r\x12\x11\n\rCHAIN_ID_CELO\x10\x0e\x12\x11\n\rCHAIN_ID_NEAR\x10\x0f\x12\x15\n\x11\x43HAIN_ID_MOONBEAM\x10\x10\x12\x11\n\rCHAIN_ID_NEON\x10\x11\x12\x13\n\x0f\x43HAIN_ID_TERRA2\x10\x12\x12\x16\n\x12\x43HAIN_ID_INJECTIVE\x10\x13\x12\x14\n\x10\x43HAIN_ID_OSMOSIS\x10\x14\x12\x10\n\x0c\x43HAIN_ID_SUI\x10\x15\x12\x12\n\x0e\x43HAIN_ID_APTOS\x10\x16\x12\x15\n\x11\x43HAIN_ID_ARBITRUM\x10\x17\x12\x15\n\x11\x43HAIN_ID_OPTIMISM\x10\x18\x12\x13\n\x0f\x43HAIN_ID_GNOSIS\x10\x19\x12\x14\n\x10\x43HAIN_ID_PYTHNET\x10\x1a\x12\x1e\n\x19\x43HAIN_ID_ETHEREUM_ROPSTEN\x10\x91N2\xf5\n\n\x10PublicRPCService\x12|\n\x11GetLastHeartbeats\x12&.publicrpc.v1.GetLastHeartbeatsRequest\x1a\'.publicrpc.v1.GetLastHeartbeatsResponse\"\x16\x82\xd3\xe4\x93\x02\x10\x12\x0e/v1/heartbeats\x12\xbb\x01\n\x0cGetSignedVAA\x12!.publicrpc.v1.GetSignedVAARequest\x1a\".publicrpc.v1.GetSignedVAAResponse\"d\x82\xd3\xe4\x93\x02^\x12\\/v1/signed_vaa/{message_id.emitter_chain}/{message_id.emitter_address}/{message_id.sequence}\x12\xac\x01\n\x11GetSignedBatchVAA\x12&.publicrpc.v1.GetSignedBatchVAARequest\x1a\'.publicrpc.v1.GetSignedBatchVAAResponse\"F\x82\xd3\xe4\x93\x02@\x12>/v1/signed_batch_vaa/{batch_id.emitter_chain}/{batch_id.tx_id}\x12\x91\x01\n\x15GetCurrentGuardianSet\x12*.publicrpc.v1.GetCurrentGuardianSetRequest\x1a+.publicrpc.v1.GetCurrentGuardianSetResponse\"\x1f\x82\xd3\xe4\x93\x02\x19\x12\x17/v1/guardianset/current\x12\xcc\x01\n#GovernorGetAvailableNotionalByChain\x12\x38.publicrpc.v1.GovernorGetAvailableNotionalByChainRequest\x1a\x39.publicrpc.v1.GovernorGetAvailableNotionalByChainResponse\"0\x82\xd3\xe4\x93\x02*\x12(/v1/governor/available_notional_by_chain\x12\x9a\x01\n\x17GovernorGetEnqueuedVAAs\x12,.publicrpc.v1.GovernorGetEnqueuedVAAsRequest\x1a-.publicrpc.v1.GovernorGetEnqueuedVAAsResponse\"\"\x82\xd3\xe4\x93\x02\x1c\x12\x1a/v1/governor/enqueued_vaas\x12\xe4\x01\n\x15GovernorIsVAAEnqueued\x12*.publicrpc.v1.GovernorIsVAAEnqueuedRequest\x1a+.publicrpc.v1.GovernorIsVAAEnqueuedResponse\"r\x82\xd3\xe4\x93\x02l\x12j/v1/governor/is_vaa_enqueued/{message_id.emitter_chain}/{message_id.emitter_address}/{message_id.sequence}\x12\x8e\x01\n\x14GovernorGetTokenList\x12).publicrpc.v1.GovernorGetTokenListRequest\x1a*.publicrpc.v1.GovernorGetTokenListResponse\"\x1f\x82\xd3\xe4\x93\x02\x19\x12\x17/v1/governor/token_listB\xba\x01\n\x10\x63om.publicrpc.v1B\x0ePublicrpcProtoP\x01ZEgithub.com/certusone/wormhole/node/pkg/proto/publicrpc/v1;publicrpcv1\xa2\x02\x03PXX\xaa\x02\x0cPublicrpc.V1\xca\x02\x0cPublicrpc\\V1\xe2\x02\x18Publicrpc\\V1\\GPBMetadata\xea\x02\rPublicrpc::V1b\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(
+    b'\n\x1cpublicrpc/v1/publicrpc.proto\x12\x0cpublicrpc.v1\x1a\x16gossip/v1/gossip.proto\x1a\x1cgoogle/api/annotations.proto"\x8c\x01\n\tMessageID\x12:\n\remitter_chain\x18\x01 \x01(\x0e\x32\x15.publicrpc.v1.ChainIDR\x0c\x65mitterChain\x12\'\n\x0f\x65mitter_address\x18\x02 \x01(\tR\x0e\x65mitterAddress\x12\x1a\n\x08sequence\x18\x03 \x01(\x04R\x08sequence"Z\n\x07\x42\x61tchID\x12:\n\remitter_chain\x18\x01 \x01(\x0e\x32\x15.publicrpc.v1.ChainIDR\x0c\x65mitterChain\x12\x13\n\x05tx_id\x18\x02 \x01(\tR\x04txId"M\n\x13GetSignedVAARequest\x12\x36\n\nmessage_id\x18\x01 \x01(\x0b\x32\x17.publicrpc.v1.MessageIDR\tmessageId"3\n\x14GetSignedVAAResponse\x12\x1b\n\tvaa_bytes\x18\x01 \x01(\x0cR\x08vaaBytes"L\n\x18GetSignedBatchVAARequest\x12\x30\n\x08\x62\x61tch_id\x18\x01 \x01(\x0b\x32\x15.publicrpc.v1.BatchIDR\x07\x62\x61tchId"C\n\x19GetSignedBatchVAAResponse\x12&\n\x0f\x62\x61tch_vaa_bytes\x18\x01 \x01(\x0cR\rbatchVaaBytes"\x1a\n\x18GetLastHeartbeatsRequest"\x83\x02\n\x19GetLastHeartbeatsResponse\x12G\n\x07\x65ntries\x18\x01 \x03(\x0b\x32-.publicrpc.v1.GetLastHeartbeatsResponse.EntryR\x07\x65ntries\x1a\x9c\x01\n\x05\x45ntry\x12\x34\n\x16verified_guardian_addr\x18\x01 \x01(\tR\x14verifiedGuardianAddr\x12"\n\rp2p_node_addr\x18\x02 \x01(\tR\x0bp2pNodeAddr\x12\x39\n\rraw_heartbeat\x18\x03 \x01(\x0b\x32\x14.gossip.v1.HeartbeatR\x0crawHeartbeat"\x1e\n\x1cGetCurrentGuardianSetRequest"]\n\x1dGetCurrentGuardianSetResponse\x12<\n\x0cguardian_set\x18\x01 \x01(\x0b\x32\x19.publicrpc.v1.GuardianSetR\x0bguardianSet"A\n\x0bGuardianSet\x12\x14\n\x05index\x18\x01 \x01(\rR\x05index\x12\x1c\n\taddresses\x18\x02 \x03(\tR\taddresses",\n*GovernorGetAvailableNotionalByChainRequest"\xc8\x02\n+GovernorGetAvailableNotionalByChainResponse\x12Y\n\x07\x65ntries\x18\x01 \x03(\x0b\x32?.publicrpc.v1.GovernorGetAvailableNotionalByChainResponse.EntryR\x07\x65ntries\x1a\xbd\x01\n\x05\x45ntry\x12\x19\n\x08\x63hain_id\x18\x01 \x01(\rR\x07\x63hainId\x12@\n\x1cremaining_available_notional\x18\x02 \x01(\x04R\x1aremainingAvailableNotional\x12%\n\x0enotional_limit\x18\x03 \x01(\x04R\rnotionalLimit\x12\x30\n\x14\x62ig_transaction_size\x18\x04 \x01(\x04R\x12\x62igTransactionSize" \n\x1eGovernorGetEnqueuedVAAsRequest"\xc7\x02\n\x1fGovernorGetEnqueuedVAAsResponse\x12M\n\x07\x65ntries\x18\x01 \x03(\x0b\x32\x33.publicrpc.v1.GovernorGetEnqueuedVAAsResponse.EntryR\x07\x65ntries\x1a\xd4\x01\n\x05\x45ntry\x12#\n\remitter_chain\x18\x01 \x01(\rR\x0c\x65mitterChain\x12\'\n\x0f\x65mitter_address\x18\x02 \x01(\tR\x0e\x65mitterAddress\x12\x1a\n\x08sequence\x18\x03 \x01(\x04R\x08sequence\x12!\n\x0crelease_time\x18\x04 \x01(\rR\x0breleaseTime\x12%\n\x0enotional_value\x18\x05 \x01(\x04R\rnotionalValue\x12\x17\n\x07tx_hash\x18\x06 \x01(\tR\x06txHash"V\n\x1cGovernorIsVAAEnqueuedRequest\x12\x36\n\nmessage_id\x18\x01 \x01(\x0b\x32\x17.publicrpc.v1.MessageIDR\tmessageId"@\n\x1dGovernorIsVAAEnqueuedResponse\x12\x1f\n\x0bis_enqueued\x18\x01 \x01(\x08R\nisEnqueued"\x1d\n\x1bGovernorGetTokenListRequest"\xd8\x01\n\x1cGovernorGetTokenListResponse\x12J\n\x07\x65ntries\x18\x01 \x03(\x0b\x32\x30.publicrpc.v1.GovernorGetTokenListResponse.EntryR\x07\x65ntries\x1al\n\x05\x45ntry\x12&\n\x0forigin_chain_id\x18\x01 \x01(\rR\roriginChainId\x12%\n\x0eorigin_address\x18\x02 \x01(\tR\roriginAddress\x12\x14\n\x05price\x18\x03 \x01(\x02R\x05price*\xe8\x04\n\x07\x43hainID\x12\x18\n\x14\x43HAIN_ID_UNSPECIFIED\x10\x00\x12\x13\n\x0f\x43HAIN_ID_SOLANA\x10\x01\x12\x15\n\x11\x43HAIN_ID_ETHEREUM\x10\x02\x12\x12\n\x0e\x43HAIN_ID_TERRA\x10\x03\x12\x10\n\x0c\x43HAIN_ID_BSC\x10\x04\x12\x14\n\x10\x43HAIN_ID_POLYGON\x10\x05\x12\x16\n\x12\x43HAIN_ID_AVALANCHE\x10\x06\x12\x12\n\x0e\x43HAIN_ID_OASIS\x10\x07\x12\x15\n\x11\x43HAIN_ID_ALGORAND\x10\x08\x12\x13\n\x0f\x43HAIN_ID_AURORA\x10\t\x12\x13\n\x0f\x43HAIN_ID_FANTOM\x10\n\x12\x13\n\x0f\x43HAIN_ID_KARURA\x10\x0b\x12\x12\n\x0e\x43HAIN_ID_ACALA\x10\x0c\x12\x13\n\x0f\x43HAIN_ID_KLAYTN\x10\r\x12\x11\n\rCHAIN_ID_CELO\x10\x0e\x12\x11\n\rCHAIN_ID_NEAR\x10\x0f\x12\x15\n\x11\x43HAIN_ID_MOONBEAM\x10\x10\x12\x11\n\rCHAIN_ID_NEON\x10\x11\x12\x13\n\x0f\x43HAIN_ID_TERRA2\x10\x12\x12\x16\n\x12\x43HAIN_ID_INJECTIVE\x10\x13\x12\x14\n\x10\x43HAIN_ID_OSMOSIS\x10\x14\x12\x10\n\x0c\x43HAIN_ID_SUI\x10\x15\x12\x12\n\x0e\x43HAIN_ID_APTOS\x10\x16\x12\x15\n\x11\x43HAIN_ID_ARBITRUM\x10\x17\x12\x15\n\x11\x43HAIN_ID_OPTIMISM\x10\x18\x12\x13\n\x0f\x43HAIN_ID_GNOSIS\x10\x19\x12\x14\n\x10\x43HAIN_ID_PYTHNET\x10\x1a\x12\x1e\n\x19\x43HAIN_ID_ETHEREUM_ROPSTEN\x10\x91N2\xf5\n\n\x10PublicRPCService\x12|\n\x11GetLastHeartbeats\x12&.publicrpc.v1.GetLastHeartbeatsRequest\x1a\'.publicrpc.v1.GetLastHeartbeatsResponse"\x16\x82\xd3\xe4\x93\x02\x10\x12\x0e/v1/heartbeats\x12\xbb\x01\n\x0cGetSignedVAA\x12!.publicrpc.v1.GetSignedVAARequest\x1a".publicrpc.v1.GetSignedVAAResponse"d\x82\xd3\xe4\x93\x02^\x12\\/v1/signed_vaa/{message_id.emitter_chain}/{message_id.emitter_address}/{message_id.sequence}\x12\xac\x01\n\x11GetSignedBatchVAA\x12&.publicrpc.v1.GetSignedBatchVAARequest\x1a\'.publicrpc.v1.GetSignedBatchVAAResponse"F\x82\xd3\xe4\x93\x02@\x12>/v1/signed_batch_vaa/{batch_id.emitter_chain}/{batch_id.tx_id}\x12\x91\x01\n\x15GetCurrentGuardianSet\x12*.publicrpc.v1.GetCurrentGuardianSetRequest\x1a+.publicrpc.v1.GetCurrentGuardianSetResponse"\x1f\x82\xd3\xe4\x93\x02\x19\x12\x17/v1/guardianset/current\x12\xcc\x01\n#GovernorGetAvailableNotionalByChain\x12\x38.publicrpc.v1.GovernorGetAvailableNotionalByChainRequest\x1a\x39.publicrpc.v1.GovernorGetAvailableNotionalByChainResponse"0\x82\xd3\xe4\x93\x02*\x12(/v1/governor/available_notional_by_chain\x12\x9a\x01\n\x17GovernorGetEnqueuedVAAs\x12,.publicrpc.v1.GovernorGetEnqueuedVAAsRequest\x1a-.publicrpc.v1.GovernorGetEnqueuedVAAsResponse""\x82\xd3\xe4\x93\x02\x1c\x12\x1a/v1/governor/enqueued_vaas\x12\xe4\x01\n\x15GovernorIsVAAEnqueued\x12*.publicrpc.v1.GovernorIsVAAEnqueuedRequest\x1a+.publicrpc.v1.GovernorIsVAAEnqueuedResponse"r\x82\xd3\xe4\x93\x02l\x12j/v1/governor/is_vaa_enqueued/{message_id.emitter_chain}/{message_id.emitter_address}/{message_id.sequence}\x12\x8e\x01\n\x14GovernorGetTokenList\x12).publicrpc.v1.GovernorGetTokenListRequest\x1a*.publicrpc.v1.GovernorGetTokenListResponse"\x1f\x82\xd3\xe4\x93\x02\x19\x12\x17/v1/governor/token_listB\xba\x01\n\x10\x63om.publicrpc.v1B\x0ePublicrpcProtoP\x01ZEgithub.com/certusone/wormhole/node/pkg/proto/publicrpc/v1;publicrpcv1\xa2\x02\x03PXX\xaa\x02\x0cPublicrpc.V1\xca\x02\x0cPublicrpc\\V1\xe2\x02\x18Publicrpc\\V1\\GPBMetadata\xea\x02\rPublicrpc::V1b\x06proto3'
+)
 
-_CHAINID = DESCRIPTOR.enum_types_by_name['ChainID']
+_CHAINID = DESCRIPTOR.enum_types_by_name["ChainID"]
 ChainID = enum_type_wrapper.EnumTypeWrapper(_CHAINID)
 CHAIN_ID_UNSPECIFIED = 0
 CHAIN_ID_SOLANA = 1
@@ -51,263 +54,401 @@ CHAIN_ID_PYTHNET = 26
 CHAIN_ID_ETHEREUM_ROPSTEN = 10001
 
 
-_MESSAGEID = DESCRIPTOR.message_types_by_name['MessageID']
-_BATCHID = DESCRIPTOR.message_types_by_name['BatchID']
-_GETSIGNEDVAAREQUEST = DESCRIPTOR.message_types_by_name['GetSignedVAARequest']
-_GETSIGNEDVAARESPONSE = DESCRIPTOR.message_types_by_name['GetSignedVAAResponse']
-_GETSIGNEDBATCHVAAREQUEST = DESCRIPTOR.message_types_by_name['GetSignedBatchVAARequest']
-_GETSIGNEDBATCHVAARESPONSE = DESCRIPTOR.message_types_by_name['GetSignedBatchVAAResponse']
-_GETLASTHEARTBEATSREQUEST = DESCRIPTOR.message_types_by_name['GetLastHeartbeatsRequest']
-_GETLASTHEARTBEATSRESPONSE = DESCRIPTOR.message_types_by_name['GetLastHeartbeatsResponse']
-_GETLASTHEARTBEATSRESPONSE_ENTRY = _GETLASTHEARTBEATSRESPONSE.nested_types_by_name['Entry']
-_GETCURRENTGUARDIANSETREQUEST = DESCRIPTOR.message_types_by_name['GetCurrentGuardianSetRequest']
-_GETCURRENTGUARDIANSETRESPONSE = DESCRIPTOR.message_types_by_name['GetCurrentGuardianSetResponse']
-_GUARDIANSET = DESCRIPTOR.message_types_by_name['GuardianSet']
-_GOVERNORGETAVAILABLENOTIONALBYCHAINREQUEST = DESCRIPTOR.message_types_by_name['GovernorGetAvailableNotionalByChainRequest']
-_GOVERNORGETAVAILABLENOTIONALBYCHAINRESPONSE = DESCRIPTOR.message_types_by_name['GovernorGetAvailableNotionalByChainResponse']
-_GOVERNORGETAVAILABLENOTIONALBYCHAINRESPONSE_ENTRY = _GOVERNORGETAVAILABLENOTIONALBYCHAINRESPONSE.nested_types_by_name['Entry']
-_GOVERNORGETENQUEUEDVAASREQUEST = DESCRIPTOR.message_types_by_name['GovernorGetEnqueuedVAAsRequest']
-_GOVERNORGETENQUEUEDVAASRESPONSE = DESCRIPTOR.message_types_by_name['GovernorGetEnqueuedVAAsResponse']
-_GOVERNORGETENQUEUEDVAASRESPONSE_ENTRY = _GOVERNORGETENQUEUEDVAASRESPONSE.nested_types_by_name['Entry']
-_GOVERNORISVAAENQUEUEDREQUEST = DESCRIPTOR.message_types_by_name['GovernorIsVAAEnqueuedRequest']
-_GOVERNORISVAAENQUEUEDRESPONSE = DESCRIPTOR.message_types_by_name['GovernorIsVAAEnqueuedResponse']
-_GOVERNORGETTOKENLISTREQUEST = DESCRIPTOR.message_types_by_name['GovernorGetTokenListRequest']
-_GOVERNORGETTOKENLISTRESPONSE = DESCRIPTOR.message_types_by_name['GovernorGetTokenListResponse']
-_GOVERNORGETTOKENLISTRESPONSE_ENTRY = _GOVERNORGETTOKENLISTRESPONSE.nested_types_by_name['Entry']
-MessageID = _reflection.GeneratedProtocolMessageType('MessageID', (_message.Message,), {
-  'DESCRIPTOR' : _MESSAGEID,
-  '__module__' : 'publicrpc.v1.publicrpc_pb2'
-  # @@protoc_insertion_point(class_scope:publicrpc.v1.MessageID)
-  })
+_MESSAGEID = DESCRIPTOR.message_types_by_name["MessageID"]
+_BATCHID = DESCRIPTOR.message_types_by_name["BatchID"]
+_GETSIGNEDVAAREQUEST = DESCRIPTOR.message_types_by_name["GetSignedVAARequest"]
+_GETSIGNEDVAARESPONSE = DESCRIPTOR.message_types_by_name["GetSignedVAAResponse"]
+_GETSIGNEDBATCHVAAREQUEST = DESCRIPTOR.message_types_by_name["GetSignedBatchVAARequest"]
+_GETSIGNEDBATCHVAARESPONSE = DESCRIPTOR.message_types_by_name[
+    "GetSignedBatchVAAResponse"
+]
+_GETLASTHEARTBEATSREQUEST = DESCRIPTOR.message_types_by_name["GetLastHeartbeatsRequest"]
+_GETLASTHEARTBEATSRESPONSE = DESCRIPTOR.message_types_by_name[
+    "GetLastHeartbeatsResponse"
+]
+_GETLASTHEARTBEATSRESPONSE_ENTRY = _GETLASTHEARTBEATSRESPONSE.nested_types_by_name[
+    "Entry"
+]
+_GETCURRENTGUARDIANSETREQUEST = DESCRIPTOR.message_types_by_name[
+    "GetCurrentGuardianSetRequest"
+]
+_GETCURRENTGUARDIANSETRESPONSE = DESCRIPTOR.message_types_by_name[
+    "GetCurrentGuardianSetResponse"
+]
+_GUARDIANSET = DESCRIPTOR.message_types_by_name["GuardianSet"]
+_GOVERNORGETAVAILABLENOTIONALBYCHAINREQUEST = DESCRIPTOR.message_types_by_name[
+    "GovernorGetAvailableNotionalByChainRequest"
+]
+_GOVERNORGETAVAILABLENOTIONALBYCHAINRESPONSE = DESCRIPTOR.message_types_by_name[
+    "GovernorGetAvailableNotionalByChainResponse"
+]
+_GOVERNORGETAVAILABLENOTIONALBYCHAINRESPONSE_ENTRY = (
+    _GOVERNORGETAVAILABLENOTIONALBYCHAINRESPONSE.nested_types_by_name["Entry"]
+)
+_GOVERNORGETENQUEUEDVAASREQUEST = DESCRIPTOR.message_types_by_name[
+    "GovernorGetEnqueuedVAAsRequest"
+]
+_GOVERNORGETENQUEUEDVAASRESPONSE = DESCRIPTOR.message_types_by_name[
+    "GovernorGetEnqueuedVAAsResponse"
+]
+_GOVERNORGETENQUEUEDVAASRESPONSE_ENTRY = (
+    _GOVERNORGETENQUEUEDVAASRESPONSE.nested_types_by_name["Entry"]
+)
+_GOVERNORISVAAENQUEUEDREQUEST = DESCRIPTOR.message_types_by_name[
+    "GovernorIsVAAEnqueuedRequest"
+]
+_GOVERNORISVAAENQUEUEDRESPONSE = DESCRIPTOR.message_types_by_name[
+    "GovernorIsVAAEnqueuedResponse"
+]
+_GOVERNORGETTOKENLISTREQUEST = DESCRIPTOR.message_types_by_name[
+    "GovernorGetTokenListRequest"
+]
+_GOVERNORGETTOKENLISTRESPONSE = DESCRIPTOR.message_types_by_name[
+    "GovernorGetTokenListResponse"
+]
+_GOVERNORGETTOKENLISTRESPONSE_ENTRY = (
+    _GOVERNORGETTOKENLISTRESPONSE.nested_types_by_name["Entry"]
+)
+MessageID = _reflection.GeneratedProtocolMessageType(
+    "MessageID",
+    (_message.Message,),
+    {
+        "DESCRIPTOR": _MESSAGEID,
+        "__module__": "publicrpc.v1.publicrpc_pb2"
+        # @@protoc_insertion_point(class_scope:publicrpc.v1.MessageID)
+    },
+)
 _sym_db.RegisterMessage(MessageID)
 
-BatchID = _reflection.GeneratedProtocolMessageType('BatchID', (_message.Message,), {
-  'DESCRIPTOR' : _BATCHID,
-  '__module__' : 'publicrpc.v1.publicrpc_pb2'
-  # @@protoc_insertion_point(class_scope:publicrpc.v1.BatchID)
-  })
+BatchID = _reflection.GeneratedProtocolMessageType(
+    "BatchID",
+    (_message.Message,),
+    {
+        "DESCRIPTOR": _BATCHID,
+        "__module__": "publicrpc.v1.publicrpc_pb2"
+        # @@protoc_insertion_point(class_scope:publicrpc.v1.BatchID)
+    },
+)
 _sym_db.RegisterMessage(BatchID)
 
-GetSignedVAARequest = _reflection.GeneratedProtocolMessageType('GetSignedVAARequest', (_message.Message,), {
-  'DESCRIPTOR' : _GETSIGNEDVAAREQUEST,
-  '__module__' : 'publicrpc.v1.publicrpc_pb2'
-  # @@protoc_insertion_point(class_scope:publicrpc.v1.GetSignedVAARequest)
-  })
+GetSignedVAARequest = _reflection.GeneratedProtocolMessageType(
+    "GetSignedVAARequest",
+    (_message.Message,),
+    {
+        "DESCRIPTOR": _GETSIGNEDVAAREQUEST,
+        "__module__": "publicrpc.v1.publicrpc_pb2"
+        # @@protoc_insertion_point(class_scope:publicrpc.v1.GetSignedVAARequest)
+    },
+)
 _sym_db.RegisterMessage(GetSignedVAARequest)
 
-GetSignedVAAResponse = _reflection.GeneratedProtocolMessageType('GetSignedVAAResponse', (_message.Message,), {
-  'DESCRIPTOR' : _GETSIGNEDVAARESPONSE,
-  '__module__' : 'publicrpc.v1.publicrpc_pb2'
-  # @@protoc_insertion_point(class_scope:publicrpc.v1.GetSignedVAAResponse)
-  })
+GetSignedVAAResponse = _reflection.GeneratedProtocolMessageType(
+    "GetSignedVAAResponse",
+    (_message.Message,),
+    {
+        "DESCRIPTOR": _GETSIGNEDVAARESPONSE,
+        "__module__": "publicrpc.v1.publicrpc_pb2"
+        # @@protoc_insertion_point(class_scope:publicrpc.v1.GetSignedVAAResponse)
+    },
+)
 _sym_db.RegisterMessage(GetSignedVAAResponse)
 
-GetSignedBatchVAARequest = _reflection.GeneratedProtocolMessageType('GetSignedBatchVAARequest', (_message.Message,), {
-  'DESCRIPTOR' : _GETSIGNEDBATCHVAAREQUEST,
-  '__module__' : 'publicrpc.v1.publicrpc_pb2'
-  # @@protoc_insertion_point(class_scope:publicrpc.v1.GetSignedBatchVAARequest)
-  })
+GetSignedBatchVAARequest = _reflection.GeneratedProtocolMessageType(
+    "GetSignedBatchVAARequest",
+    (_message.Message,),
+    {
+        "DESCRIPTOR": _GETSIGNEDBATCHVAAREQUEST,
+        "__module__": "publicrpc.v1.publicrpc_pb2"
+        # @@protoc_insertion_point(class_scope:publicrpc.v1.GetSignedBatchVAARequest)
+    },
+)
 _sym_db.RegisterMessage(GetSignedBatchVAARequest)
 
-GetSignedBatchVAAResponse = _reflection.GeneratedProtocolMessageType('GetSignedBatchVAAResponse', (_message.Message,), {
-  'DESCRIPTOR' : _GETSIGNEDBATCHVAARESPONSE,
-  '__module__' : 'publicrpc.v1.publicrpc_pb2'
-  # @@protoc_insertion_point(class_scope:publicrpc.v1.GetSignedBatchVAAResponse)
-  })
+GetSignedBatchVAAResponse = _reflection.GeneratedProtocolMessageType(
+    "GetSignedBatchVAAResponse",
+    (_message.Message,),
+    {
+        "DESCRIPTOR": _GETSIGNEDBATCHVAARESPONSE,
+        "__module__": "publicrpc.v1.publicrpc_pb2"
+        # @@protoc_insertion_point(class_scope:publicrpc.v1.GetSignedBatchVAAResponse)
+    },
+)
 _sym_db.RegisterMessage(GetSignedBatchVAAResponse)
 
-GetLastHeartbeatsRequest = _reflection.GeneratedProtocolMessageType('GetLastHeartbeatsRequest', (_message.Message,), {
-  'DESCRIPTOR' : _GETLASTHEARTBEATSREQUEST,
-  '__module__' : 'publicrpc.v1.publicrpc_pb2'
-  # @@protoc_insertion_point(class_scope:publicrpc.v1.GetLastHeartbeatsRequest)
-  })
+GetLastHeartbeatsRequest = _reflection.GeneratedProtocolMessageType(
+    "GetLastHeartbeatsRequest",
+    (_message.Message,),
+    {
+        "DESCRIPTOR": _GETLASTHEARTBEATSREQUEST,
+        "__module__": "publicrpc.v1.publicrpc_pb2"
+        # @@protoc_insertion_point(class_scope:publicrpc.v1.GetLastHeartbeatsRequest)
+    },
+)
 _sym_db.RegisterMessage(GetLastHeartbeatsRequest)
 
-GetLastHeartbeatsResponse = _reflection.GeneratedProtocolMessageType('GetLastHeartbeatsResponse', (_message.Message,), {
-
-  'Entry' : _reflection.GeneratedProtocolMessageType('Entry', (_message.Message,), {
-    'DESCRIPTOR' : _GETLASTHEARTBEATSRESPONSE_ENTRY,
-    '__module__' : 'publicrpc.v1.publicrpc_pb2'
-    # @@protoc_insertion_point(class_scope:publicrpc.v1.GetLastHeartbeatsResponse.Entry)
-    })
-  ,
-  'DESCRIPTOR' : _GETLASTHEARTBEATSRESPONSE,
-  '__module__' : 'publicrpc.v1.publicrpc_pb2'
-  # @@protoc_insertion_point(class_scope:publicrpc.v1.GetLastHeartbeatsResponse)
-  })
+GetLastHeartbeatsResponse = _reflection.GeneratedProtocolMessageType(
+    "GetLastHeartbeatsResponse",
+    (_message.Message,),
+    {
+        "Entry": _reflection.GeneratedProtocolMessageType(
+            "Entry",
+            (_message.Message,),
+            {
+                "DESCRIPTOR": _GETLASTHEARTBEATSRESPONSE_ENTRY,
+                "__module__": "publicrpc.v1.publicrpc_pb2"
+                # @@protoc_insertion_point(class_scope:publicrpc.v1.GetLastHeartbeatsResponse.Entry)
+            },
+        ),
+        "DESCRIPTOR": _GETLASTHEARTBEATSRESPONSE,
+        "__module__": "publicrpc.v1.publicrpc_pb2"
+        # @@protoc_insertion_point(class_scope:publicrpc.v1.GetLastHeartbeatsResponse)
+    },
+)
 _sym_db.RegisterMessage(GetLastHeartbeatsResponse)
 _sym_db.RegisterMessage(GetLastHeartbeatsResponse.Entry)
 
-GetCurrentGuardianSetRequest = _reflection.GeneratedProtocolMessageType('GetCurrentGuardianSetRequest', (_message.Message,), {
-  'DESCRIPTOR' : _GETCURRENTGUARDIANSETREQUEST,
-  '__module__' : 'publicrpc.v1.publicrpc_pb2'
-  # @@protoc_insertion_point(class_scope:publicrpc.v1.GetCurrentGuardianSetRequest)
-  })
+GetCurrentGuardianSetRequest = _reflection.GeneratedProtocolMessageType(
+    "GetCurrentGuardianSetRequest",
+    (_message.Message,),
+    {
+        "DESCRIPTOR": _GETCURRENTGUARDIANSETREQUEST,
+        "__module__": "publicrpc.v1.publicrpc_pb2"
+        # @@protoc_insertion_point(class_scope:publicrpc.v1.GetCurrentGuardianSetRequest)
+    },
+)
 _sym_db.RegisterMessage(GetCurrentGuardianSetRequest)
 
-GetCurrentGuardianSetResponse = _reflection.GeneratedProtocolMessageType('GetCurrentGuardianSetResponse', (_message.Message,), {
-  'DESCRIPTOR' : _GETCURRENTGUARDIANSETRESPONSE,
-  '__module__' : 'publicrpc.v1.publicrpc_pb2'
-  # @@protoc_insertion_point(class_scope:publicrpc.v1.GetCurrentGuardianSetResponse)
-  })
+GetCurrentGuardianSetResponse = _reflection.GeneratedProtocolMessageType(
+    "GetCurrentGuardianSetResponse",
+    (_message.Message,),
+    {
+        "DESCRIPTOR": _GETCURRENTGUARDIANSETRESPONSE,
+        "__module__": "publicrpc.v1.publicrpc_pb2"
+        # @@protoc_insertion_point(class_scope:publicrpc.v1.GetCurrentGuardianSetResponse)
+    },
+)
 _sym_db.RegisterMessage(GetCurrentGuardianSetResponse)
 
-GuardianSet = _reflection.GeneratedProtocolMessageType('GuardianSet', (_message.Message,), {
-  'DESCRIPTOR' : _GUARDIANSET,
-  '__module__' : 'publicrpc.v1.publicrpc_pb2'
-  # @@protoc_insertion_point(class_scope:publicrpc.v1.GuardianSet)
-  })
+GuardianSet = _reflection.GeneratedProtocolMessageType(
+    "GuardianSet",
+    (_message.Message,),
+    {
+        "DESCRIPTOR": _GUARDIANSET,
+        "__module__": "publicrpc.v1.publicrpc_pb2"
+        # @@protoc_insertion_point(class_scope:publicrpc.v1.GuardianSet)
+    },
+)
 _sym_db.RegisterMessage(GuardianSet)
 
-GovernorGetAvailableNotionalByChainRequest = _reflection.GeneratedProtocolMessageType('GovernorGetAvailableNotionalByChainRequest', (_message.Message,), {
-  'DESCRIPTOR' : _GOVERNORGETAVAILABLENOTIONALBYCHAINREQUEST,
-  '__module__' : 'publicrpc.v1.publicrpc_pb2'
-  # @@protoc_insertion_point(class_scope:publicrpc.v1.GovernorGetAvailableNotionalByChainRequest)
-  })
+GovernorGetAvailableNotionalByChainRequest = _reflection.GeneratedProtocolMessageType(
+    "GovernorGetAvailableNotionalByChainRequest",
+    (_message.Message,),
+    {
+        "DESCRIPTOR": _GOVERNORGETAVAILABLENOTIONALBYCHAINREQUEST,
+        "__module__": "publicrpc.v1.publicrpc_pb2"
+        # @@protoc_insertion_point(class_scope:publicrpc.v1.GovernorGetAvailableNotionalByChainRequest)
+    },
+)
 _sym_db.RegisterMessage(GovernorGetAvailableNotionalByChainRequest)
 
-GovernorGetAvailableNotionalByChainResponse = _reflection.GeneratedProtocolMessageType('GovernorGetAvailableNotionalByChainResponse', (_message.Message,), {
-
-  'Entry' : _reflection.GeneratedProtocolMessageType('Entry', (_message.Message,), {
-    'DESCRIPTOR' : _GOVERNORGETAVAILABLENOTIONALBYCHAINRESPONSE_ENTRY,
-    '__module__' : 'publicrpc.v1.publicrpc_pb2'
-    # @@protoc_insertion_point(class_scope:publicrpc.v1.GovernorGetAvailableNotionalByChainResponse.Entry)
-    })
-  ,
-  'DESCRIPTOR' : _GOVERNORGETAVAILABLENOTIONALBYCHAINRESPONSE,
-  '__module__' : 'publicrpc.v1.publicrpc_pb2'
-  # @@protoc_insertion_point(class_scope:publicrpc.v1.GovernorGetAvailableNotionalByChainResponse)
-  })
+GovernorGetAvailableNotionalByChainResponse = _reflection.GeneratedProtocolMessageType(
+    "GovernorGetAvailableNotionalByChainResponse",
+    (_message.Message,),
+    {
+        "Entry": _reflection.GeneratedProtocolMessageType(
+            "Entry",
+            (_message.Message,),
+            {
+                "DESCRIPTOR": _GOVERNORGETAVAILABLENOTIONALBYCHAINRESPONSE_ENTRY,
+                "__module__": "publicrpc.v1.publicrpc_pb2"
+                # @@protoc_insertion_point(class_scope:publicrpc.v1.GovernorGetAvailableNotionalByChainResponse.Entry)
+            },
+        ),
+        "DESCRIPTOR": _GOVERNORGETAVAILABLENOTIONALBYCHAINRESPONSE,
+        "__module__": "publicrpc.v1.publicrpc_pb2"
+        # @@protoc_insertion_point(class_scope:publicrpc.v1.GovernorGetAvailableNotionalByChainResponse)
+    },
+)
 _sym_db.RegisterMessage(GovernorGetAvailableNotionalByChainResponse)
 _sym_db.RegisterMessage(GovernorGetAvailableNotionalByChainResponse.Entry)
 
-GovernorGetEnqueuedVAAsRequest = _reflection.GeneratedProtocolMessageType('GovernorGetEnqueuedVAAsRequest', (_message.Message,), {
-  'DESCRIPTOR' : _GOVERNORGETENQUEUEDVAASREQUEST,
-  '__module__' : 'publicrpc.v1.publicrpc_pb2'
-  # @@protoc_insertion_point(class_scope:publicrpc.v1.GovernorGetEnqueuedVAAsRequest)
-  })
+GovernorGetEnqueuedVAAsRequest = _reflection.GeneratedProtocolMessageType(
+    "GovernorGetEnqueuedVAAsRequest",
+    (_message.Message,),
+    {
+        "DESCRIPTOR": _GOVERNORGETENQUEUEDVAASREQUEST,
+        "__module__": "publicrpc.v1.publicrpc_pb2"
+        # @@protoc_insertion_point(class_scope:publicrpc.v1.GovernorGetEnqueuedVAAsRequest)
+    },
+)
 _sym_db.RegisterMessage(GovernorGetEnqueuedVAAsRequest)
 
-GovernorGetEnqueuedVAAsResponse = _reflection.GeneratedProtocolMessageType('GovernorGetEnqueuedVAAsResponse', (_message.Message,), {
-
-  'Entry' : _reflection.GeneratedProtocolMessageType('Entry', (_message.Message,), {
-    'DESCRIPTOR' : _GOVERNORGETENQUEUEDVAASRESPONSE_ENTRY,
-    '__module__' : 'publicrpc.v1.publicrpc_pb2'
-    # @@protoc_insertion_point(class_scope:publicrpc.v1.GovernorGetEnqueuedVAAsResponse.Entry)
-    })
-  ,
-  'DESCRIPTOR' : _GOVERNORGETENQUEUEDVAASRESPONSE,
-  '__module__' : 'publicrpc.v1.publicrpc_pb2'
-  # @@protoc_insertion_point(class_scope:publicrpc.v1.GovernorGetEnqueuedVAAsResponse)
-  })
+GovernorGetEnqueuedVAAsResponse = _reflection.GeneratedProtocolMessageType(
+    "GovernorGetEnqueuedVAAsResponse",
+    (_message.Message,),
+    {
+        "Entry": _reflection.GeneratedProtocolMessageType(
+            "Entry",
+            (_message.Message,),
+            {
+                "DESCRIPTOR": _GOVERNORGETENQUEUEDVAASRESPONSE_ENTRY,
+                "__module__": "publicrpc.v1.publicrpc_pb2"
+                # @@protoc_insertion_point(class_scope:publicrpc.v1.GovernorGetEnqueuedVAAsResponse.Entry)
+            },
+        ),
+        "DESCRIPTOR": _GOVERNORGETENQUEUEDVAASRESPONSE,
+        "__module__": "publicrpc.v1.publicrpc_pb2"
+        # @@protoc_insertion_point(class_scope:publicrpc.v1.GovernorGetEnqueuedVAAsResponse)
+    },
+)
 _sym_db.RegisterMessage(GovernorGetEnqueuedVAAsResponse)
 _sym_db.RegisterMessage(GovernorGetEnqueuedVAAsResponse.Entry)
 
-GovernorIsVAAEnqueuedRequest = _reflection.GeneratedProtocolMessageType('GovernorIsVAAEnqueuedRequest', (_message.Message,), {
-  'DESCRIPTOR' : _GOVERNORISVAAENQUEUEDREQUEST,
-  '__module__' : 'publicrpc.v1.publicrpc_pb2'
-  # @@protoc_insertion_point(class_scope:publicrpc.v1.GovernorIsVAAEnqueuedRequest)
-  })
+GovernorIsVAAEnqueuedRequest = _reflection.GeneratedProtocolMessageType(
+    "GovernorIsVAAEnqueuedRequest",
+    (_message.Message,),
+    {
+        "DESCRIPTOR": _GOVERNORISVAAENQUEUEDREQUEST,
+        "__module__": "publicrpc.v1.publicrpc_pb2"
+        # @@protoc_insertion_point(class_scope:publicrpc.v1.GovernorIsVAAEnqueuedRequest)
+    },
+)
 _sym_db.RegisterMessage(GovernorIsVAAEnqueuedRequest)
 
-GovernorIsVAAEnqueuedResponse = _reflection.GeneratedProtocolMessageType('GovernorIsVAAEnqueuedResponse', (_message.Message,), {
-  'DESCRIPTOR' : _GOVERNORISVAAENQUEUEDRESPONSE,
-  '__module__' : 'publicrpc.v1.publicrpc_pb2'
-  # @@protoc_insertion_point(class_scope:publicrpc.v1.GovernorIsVAAEnqueuedResponse)
-  })
+GovernorIsVAAEnqueuedResponse = _reflection.GeneratedProtocolMessageType(
+    "GovernorIsVAAEnqueuedResponse",
+    (_message.Message,),
+    {
+        "DESCRIPTOR": _GOVERNORISVAAENQUEUEDRESPONSE,
+        "__module__": "publicrpc.v1.publicrpc_pb2"
+        # @@protoc_insertion_point(class_scope:publicrpc.v1.GovernorIsVAAEnqueuedResponse)
+    },
+)
 _sym_db.RegisterMessage(GovernorIsVAAEnqueuedResponse)
 
-GovernorGetTokenListRequest = _reflection.GeneratedProtocolMessageType('GovernorGetTokenListRequest', (_message.Message,), {
-  'DESCRIPTOR' : _GOVERNORGETTOKENLISTREQUEST,
-  '__module__' : 'publicrpc.v1.publicrpc_pb2'
-  # @@protoc_insertion_point(class_scope:publicrpc.v1.GovernorGetTokenListRequest)
-  })
+GovernorGetTokenListRequest = _reflection.GeneratedProtocolMessageType(
+    "GovernorGetTokenListRequest",
+    (_message.Message,),
+    {
+        "DESCRIPTOR": _GOVERNORGETTOKENLISTREQUEST,
+        "__module__": "publicrpc.v1.publicrpc_pb2"
+        # @@protoc_insertion_point(class_scope:publicrpc.v1.GovernorGetTokenListRequest)
+    },
+)
 _sym_db.RegisterMessage(GovernorGetTokenListRequest)
 
-GovernorGetTokenListResponse = _reflection.GeneratedProtocolMessageType('GovernorGetTokenListResponse', (_message.Message,), {
-
-  'Entry' : _reflection.GeneratedProtocolMessageType('Entry', (_message.Message,), {
-    'DESCRIPTOR' : _GOVERNORGETTOKENLISTRESPONSE_ENTRY,
-    '__module__' : 'publicrpc.v1.publicrpc_pb2'
-    # @@protoc_insertion_point(class_scope:publicrpc.v1.GovernorGetTokenListResponse.Entry)
-    })
-  ,
-  'DESCRIPTOR' : _GOVERNORGETTOKENLISTRESPONSE,
-  '__module__' : 'publicrpc.v1.publicrpc_pb2'
-  # @@protoc_insertion_point(class_scope:publicrpc.v1.GovernorGetTokenListResponse)
-  })
+GovernorGetTokenListResponse = _reflection.GeneratedProtocolMessageType(
+    "GovernorGetTokenListResponse",
+    (_message.Message,),
+    {
+        "Entry": _reflection.GeneratedProtocolMessageType(
+            "Entry",
+            (_message.Message,),
+            {
+                "DESCRIPTOR": _GOVERNORGETTOKENLISTRESPONSE_ENTRY,
+                "__module__": "publicrpc.v1.publicrpc_pb2"
+                # @@protoc_insertion_point(class_scope:publicrpc.v1.GovernorGetTokenListResponse.Entry)
+            },
+        ),
+        "DESCRIPTOR": _GOVERNORGETTOKENLISTRESPONSE,
+        "__module__": "publicrpc.v1.publicrpc_pb2"
+        # @@protoc_insertion_point(class_scope:publicrpc.v1.GovernorGetTokenListResponse)
+    },
+)
 _sym_db.RegisterMessage(GovernorGetTokenListResponse)
 _sym_db.RegisterMessage(GovernorGetTokenListResponse.Entry)
 
-_PUBLICRPCSERVICE = DESCRIPTOR.services_by_name['PublicRPCService']
+_PUBLICRPCSERVICE = DESCRIPTOR.services_by_name["PublicRPCService"]
 if _descriptor._USE_C_DESCRIPTORS == False:
 
-  DESCRIPTOR._options = None
-  DESCRIPTOR._serialized_options = b'\n\020com.publicrpc.v1B\016PublicrpcProtoP\001ZEgithub.com/certusone/wormhole/node/pkg/proto/publicrpc/v1;publicrpcv1\242\002\003PXX\252\002\014Publicrpc.V1\312\002\014Publicrpc\\V1\342\002\030Publicrpc\\V1\\GPBMetadata\352\002\rPublicrpc::V1'
-  _PUBLICRPCSERVICE.methods_by_name['GetLastHeartbeats']._options = None
-  _PUBLICRPCSERVICE.methods_by_name['GetLastHeartbeats']._serialized_options = b'\202\323\344\223\002\020\022\016/v1/heartbeats'
-  _PUBLICRPCSERVICE.methods_by_name['GetSignedVAA']._options = None
-  _PUBLICRPCSERVICE.methods_by_name['GetSignedVAA']._serialized_options = b'\202\323\344\223\002^\022\\/v1/signed_vaa/{message_id.emitter_chain}/{message_id.emitter_address}/{message_id.sequence}'
-  _PUBLICRPCSERVICE.methods_by_name['GetSignedBatchVAA']._options = None
-  _PUBLICRPCSERVICE.methods_by_name['GetSignedBatchVAA']._serialized_options = b'\202\323\344\223\002@\022>/v1/signed_batch_vaa/{batch_id.emitter_chain}/{batch_id.tx_id}'
-  _PUBLICRPCSERVICE.methods_by_name['GetCurrentGuardianSet']._options = None
-  _PUBLICRPCSERVICE.methods_by_name['GetCurrentGuardianSet']._serialized_options = b'\202\323\344\223\002\031\022\027/v1/guardianset/current'
-  _PUBLICRPCSERVICE.methods_by_name['GovernorGetAvailableNotionalByChain']._options = None
-  _PUBLICRPCSERVICE.methods_by_name['GovernorGetAvailableNotionalByChain']._serialized_options = b'\202\323\344\223\002*\022(/v1/governor/available_notional_by_chain'
-  _PUBLICRPCSERVICE.methods_by_name['GovernorGetEnqueuedVAAs']._options = None
-  _PUBLICRPCSERVICE.methods_by_name['GovernorGetEnqueuedVAAs']._serialized_options = b'\202\323\344\223\002\034\022\032/v1/governor/enqueued_vaas'
-  _PUBLICRPCSERVICE.methods_by_name['GovernorIsVAAEnqueued']._options = None
-  _PUBLICRPCSERVICE.methods_by_name['GovernorIsVAAEnqueued']._serialized_options = b'\202\323\344\223\002l\022j/v1/governor/is_vaa_enqueued/{message_id.emitter_chain}/{message_id.emitter_address}/{message_id.sequence}'
-  _PUBLICRPCSERVICE.methods_by_name['GovernorGetTokenList']._options = None
-  _PUBLICRPCSERVICE.methods_by_name['GovernorGetTokenList']._serialized_options = b'\202\323\344\223\002\031\022\027/v1/governor/token_list'
-  _CHAINID._serialized_start=2244
-  _CHAINID._serialized_end=2860
-  _MESSAGEID._serialized_start=101
-  _MESSAGEID._serialized_end=241
-  _BATCHID._serialized_start=243
-  _BATCHID._serialized_end=333
-  _GETSIGNEDVAAREQUEST._serialized_start=335
-  _GETSIGNEDVAAREQUEST._serialized_end=412
-  _GETSIGNEDVAARESPONSE._serialized_start=414
-  _GETSIGNEDVAARESPONSE._serialized_end=465
-  _GETSIGNEDBATCHVAAREQUEST._serialized_start=467
-  _GETSIGNEDBATCHVAAREQUEST._serialized_end=543
-  _GETSIGNEDBATCHVAARESPONSE._serialized_start=545
-  _GETSIGNEDBATCHVAARESPONSE._serialized_end=612
-  _GETLASTHEARTBEATSREQUEST._serialized_start=614
-  _GETLASTHEARTBEATSREQUEST._serialized_end=640
-  _GETLASTHEARTBEATSRESPONSE._serialized_start=643
-  _GETLASTHEARTBEATSRESPONSE._serialized_end=902
-  _GETLASTHEARTBEATSRESPONSE_ENTRY._serialized_start=746
-  _GETLASTHEARTBEATSRESPONSE_ENTRY._serialized_end=902
-  _GETCURRENTGUARDIANSETREQUEST._serialized_start=904
-  _GETCURRENTGUARDIANSETREQUEST._serialized_end=934
-  _GETCURRENTGUARDIANSETRESPONSE._serialized_start=936
-  _GETCURRENTGUARDIANSETRESPONSE._serialized_end=1029
-  _GUARDIANSET._serialized_start=1031
-  _GUARDIANSET._serialized_end=1096
-  _GOVERNORGETAVAILABLENOTIONALBYCHAINREQUEST._serialized_start=1098
-  _GOVERNORGETAVAILABLENOTIONALBYCHAINREQUEST._serialized_end=1142
-  _GOVERNORGETAVAILABLENOTIONALBYCHAINRESPONSE._serialized_start=1145
-  _GOVERNORGETAVAILABLENOTIONALBYCHAINRESPONSE._serialized_end=1473
-  _GOVERNORGETAVAILABLENOTIONALBYCHAINRESPONSE_ENTRY._serialized_start=1284
-  _GOVERNORGETAVAILABLENOTIONALBYCHAINRESPONSE_ENTRY._serialized_end=1473
-  _GOVERNORGETENQUEUEDVAASREQUEST._serialized_start=1475
-  _GOVERNORGETENQUEUEDVAASREQUEST._serialized_end=1507
-  _GOVERNORGETENQUEUEDVAASRESPONSE._serialized_start=1510
-  _GOVERNORGETENQUEUEDVAASRESPONSE._serialized_end=1837
-  _GOVERNORGETENQUEUEDVAASRESPONSE_ENTRY._serialized_start=1625
-  _GOVERNORGETENQUEUEDVAASRESPONSE_ENTRY._serialized_end=1837
-  _GOVERNORISVAAENQUEUEDREQUEST._serialized_start=1839
-  _GOVERNORISVAAENQUEUEDREQUEST._serialized_end=1925
-  _GOVERNORISVAAENQUEUEDRESPONSE._serialized_start=1927
-  _GOVERNORISVAAENQUEUEDRESPONSE._serialized_end=1991
-  _GOVERNORGETTOKENLISTREQUEST._serialized_start=1993
-  _GOVERNORGETTOKENLISTREQUEST._serialized_end=2022
-  _GOVERNORGETTOKENLISTRESPONSE._serialized_start=2025
-  _GOVERNORGETTOKENLISTRESPONSE._serialized_end=2241
-  _GOVERNORGETTOKENLISTRESPONSE_ENTRY._serialized_start=2133
-  _GOVERNORGETTOKENLISTRESPONSE_ENTRY._serialized_end=2241
-  _PUBLICRPCSERVICE._serialized_start=2863
-  _PUBLICRPCSERVICE._serialized_end=4260
+    DESCRIPTOR._options = None
+    DESCRIPTOR._serialized_options = b"\n\020com.publicrpc.v1B\016PublicrpcProtoP\001ZEgithub.com/certusone/wormhole/node/pkg/proto/publicrpc/v1;publicrpcv1\242\002\003PXX\252\002\014Publicrpc.V1\312\002\014Publicrpc\\V1\342\002\030Publicrpc\\V1\\GPBMetadata\352\002\rPublicrpc::V1"
+    _PUBLICRPCSERVICE.methods_by_name["GetLastHeartbeats"]._options = None
+    _PUBLICRPCSERVICE.methods_by_name[
+        "GetLastHeartbeats"
+    ]._serialized_options = b"\202\323\344\223\002\020\022\016/v1/heartbeats"
+    _PUBLICRPCSERVICE.methods_by_name["GetSignedVAA"]._options = None
+    _PUBLICRPCSERVICE.methods_by_name[
+        "GetSignedVAA"
+    ]._serialized_options = b"\202\323\344\223\002^\022\\/v1/signed_vaa/{message_id.emitter_chain}/{message_id.emitter_address}/{message_id.sequence}"
+    _PUBLICRPCSERVICE.methods_by_name["GetSignedBatchVAA"]._options = None
+    _PUBLICRPCSERVICE.methods_by_name[
+        "GetSignedBatchVAA"
+    ]._serialized_options = b"\202\323\344\223\002@\022>/v1/signed_batch_vaa/{batch_id.emitter_chain}/{batch_id.tx_id}"
+    _PUBLICRPCSERVICE.methods_by_name["GetCurrentGuardianSet"]._options = None
+    _PUBLICRPCSERVICE.methods_by_name[
+        "GetCurrentGuardianSet"
+    ]._serialized_options = b"\202\323\344\223\002\031\022\027/v1/guardianset/current"
+    _PUBLICRPCSERVICE.methods_by_name[
+        "GovernorGetAvailableNotionalByChain"
+    ]._options = None
+    _PUBLICRPCSERVICE.methods_by_name[
+        "GovernorGetAvailableNotionalByChain"
+    ]._serialized_options = (
+        b"\202\323\344\223\002*\022(/v1/governor/available_notional_by_chain"
+    )
+    _PUBLICRPCSERVICE.methods_by_name["GovernorGetEnqueuedVAAs"]._options = None
+    _PUBLICRPCSERVICE.methods_by_name[
+        "GovernorGetEnqueuedVAAs"
+    ]._serialized_options = (
+        b"\202\323\344\223\002\034\022\032/v1/governor/enqueued_vaas"
+    )
+    _PUBLICRPCSERVICE.methods_by_name["GovernorIsVAAEnqueued"]._options = None
+    _PUBLICRPCSERVICE.methods_by_name[
+        "GovernorIsVAAEnqueued"
+    ]._serialized_options = b"\202\323\344\223\002l\022j/v1/governor/is_vaa_enqueued/{message_id.emitter_chain}/{message_id.emitter_address}/{message_id.sequence}"
+    _PUBLICRPCSERVICE.methods_by_name["GovernorGetTokenList"]._options = None
+    _PUBLICRPCSERVICE.methods_by_name[
+        "GovernorGetTokenList"
+    ]._serialized_options = b"\202\323\344\223\002\031\022\027/v1/governor/token_list"
+    _CHAINID._serialized_start = 2244
+    _CHAINID._serialized_end = 2860
+    _MESSAGEID._serialized_start = 101
+    _MESSAGEID._serialized_end = 241
+    _BATCHID._serialized_start = 243
+    _BATCHID._serialized_end = 333
+    _GETSIGNEDVAAREQUEST._serialized_start = 335
+    _GETSIGNEDVAAREQUEST._serialized_end = 412
+    _GETSIGNEDVAARESPONSE._serialized_start = 414
+    _GETSIGNEDVAARESPONSE._serialized_end = 465
+    _GETSIGNEDBATCHVAAREQUEST._serialized_start = 467
+    _GETSIGNEDBATCHVAAREQUEST._serialized_end = 543
+    _GETSIGNEDBATCHVAARESPONSE._serialized_start = 545
+    _GETSIGNEDBATCHVAARESPONSE._serialized_end = 612
+    _GETLASTHEARTBEATSREQUEST._serialized_start = 614
+    _GETLASTHEARTBEATSREQUEST._serialized_end = 640
+    _GETLASTHEARTBEATSRESPONSE._serialized_start = 643
+    _GETLASTHEARTBEATSRESPONSE._serialized_end = 902
+    _GETLASTHEARTBEATSRESPONSE_ENTRY._serialized_start = 746
+    _GETLASTHEARTBEATSRESPONSE_ENTRY._serialized_end = 902
+    _GETCURRENTGUARDIANSETREQUEST._serialized_start = 904
+    _GETCURRENTGUARDIANSETREQUEST._serialized_end = 934
+    _GETCURRENTGUARDIANSETRESPONSE._serialized_start = 936
+    _GETCURRENTGUARDIANSETRESPONSE._serialized_end = 1029
+    _GUARDIANSET._serialized_start = 1031
+    _GUARDIANSET._serialized_end = 1096
+    _GOVERNORGETAVAILABLENOTIONALBYCHAINREQUEST._serialized_start = 1098
+    _GOVERNORGETAVAILABLENOTIONALBYCHAINREQUEST._serialized_end = 1142
+    _GOVERNORGETAVAILABLENOTIONALBYCHAINRESPONSE._serialized_start = 1145
+    _GOVERNORGETAVAILABLENOTIONALBYCHAINRESPONSE._serialized_end = 1473
+    _GOVERNORGETAVAILABLENOTIONALBYCHAINRESPONSE_ENTRY._serialized_start = 1284
+    _GOVERNORGETAVAILABLENOTIONALBYCHAINRESPONSE_ENTRY._serialized_end = 1473
+    _GOVERNORGETENQUEUEDVAASREQUEST._serialized_start = 1475
+    _GOVERNORGETENQUEUEDVAASREQUEST._serialized_end = 1507
+    _GOVERNORGETENQUEUEDVAASRESPONSE._serialized_start = 1510
+    _GOVERNORGETENQUEUEDVAASRESPONSE._serialized_end = 1837
+    _GOVERNORGETENQUEUEDVAASRESPONSE_ENTRY._serialized_start = 1625
+    _GOVERNORGETENQUEUEDVAASRESPONSE_ENTRY._serialized_end = 1837
+    _GOVERNORISVAAENQUEUEDREQUEST._serialized_start = 1839
+    _GOVERNORISVAAENQUEUEDREQUEST._serialized_end = 1925
+    _GOVERNORISVAAENQUEUEDRESPONSE._serialized_start = 1927
+    _GOVERNORISVAAENQUEUEDRESPONSE._serialized_end = 1991
+    _GOVERNORGETTOKENLISTREQUEST._serialized_start = 1993
+    _GOVERNORGETTOKENLISTREQUEST._serialized_end = 2022
+    _GOVERNORGETTOKENLISTRESPONSE._serialized_start = 2025
+    _GOVERNORGETTOKENLISTRESPONSE._serialized_end = 2241
+    _GOVERNORGETTOKENLISTRESPONSE_ENTRY._serialized_start = 2133
+    _GOVERNORGETTOKENLISTRESPONSE_ENTRY._serialized_end = 2241
+    _PUBLICRPCSERVICE._serialized_start = 2863
+    _PUBLICRPCSERVICE._serialized_end = 4260
 # @@protoc_insertion_point(module_scope)

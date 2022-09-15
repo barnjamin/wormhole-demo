@@ -31,7 +31,7 @@ ACCOUNT_SECRET = to_private_key(ACCOUNT_MNEMONIC)
 ACCOUNT_SIGNER = AccountTransactionSigner(ACCOUNT_SECRET)
 
 # our PingPong app id
-APP_ID =  110207597 
+APP_ID = 110207597
 
 
 def get_storage_account(emitter_addr: str) -> transaction.LogicSigAccount:
