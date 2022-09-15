@@ -89,22 +89,20 @@ def demo(app_id: int = 0):
 
     if app_id == 0:
         # Deploy the app on chain
-        app_id, app_addr, _ = app_client.create()
+        app_id, _, _ = app_client.create()
         print(f"Deployed app: {app_id}")
 
         # TODO add this to another group or dont wait
         app_client.fund(2 * consts.algo)
         print(f"Funded app")
 
-    else:
-        app_addr = get_application_address(app_id)
+        # Set up our storage for the core contract
+        lsa = get_storage_account(get_application_address(app_id))
 
-    lsa = get_storage_account(app_addr)
-
-    if app_id == 0:
         initialize_storage(algod_client, lsa, ACCOUNT_ADDRESS, ACCOUNT_SIGNER)
         print("Initialized storage for core contract sequence tracking")
 
+        # Set app state vals for params
         app_client.call(
             PingPong.configure, app_id=WORMHOLE_CORE_ID, storage_acct=lsa.address()
         )
