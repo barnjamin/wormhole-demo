@@ -14,6 +14,7 @@ from algosdk.logic import get_application_address
 from beaker import *
 
 from contract import PingPong
+from parse_vaa import parseVAA
 from tmpl_sig import TmplSig
 
 # RPC connection parameters

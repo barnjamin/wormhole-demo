@@ -27,7 +27,7 @@ const emitter = Buffer.from(algosdk.decodeAddress(appAddr).publicKey).toString(
   const chainConfig = ChainConfigs[origin];
   const [algoChain, algoSigner] = initChain(chainConfig);
 
-  let seq = (1).toString()
+  let seq = (6).toString()
 
   // const signer =  algoSigner as AlgorandSigner;
   // const appClient = new PingPong({
@@ -50,6 +50,11 @@ const emitter = Buffer.from(algosdk.decodeAddress(appAddr).publicKey).toString(
   for (let x = 0; x<10; x++){
     console.log(`Getting VAA for Sequence number: ${seq}`);
     const receipt = await wh.getVAA(seq, algoChain, algoChain, emitter);
+
+    const vaa = _parseVAAAlgorand(receipt.VAA)
+    if(vaa.Payload !== undefined)
+      console.log(`VAA found with payload '${Buffer.from(vaa.Payload).toString('ascii')}'`)
+
 
     console.log(`Redeeming contract transfer on ${destination}`);
     seq = await algoChain.contractRedeem(algoSigner, receipt);

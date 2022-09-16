@@ -170,17 +170,21 @@ export class Algorand implements WormholeChain {
       signer.getAddress()
     );
 
-    const vaa = _parseVAAAlgorand(receipt.VAA)
-    const addr = algosdk.encodeAddress(new Uint8Array(Buffer.from(vaa.emitter, 'hex')))
+    const filteredTxs = []
+    for(let stxn of redeemTxs){
+      if(stxn.tx.appIndex !== Number(this.tokenBridgeId))
+        filteredTxs.push(stxn)
+    }
 
-    if(redeemTxs[redeemTxs.length - 1].tx.appAccounts === undefined) 
-      redeemTxs[redeemTxs.length - 1].tx.appAccounts = []
-    redeemTxs[redeemTxs.length - 1].tx.appAccounts?.push(algosdk.decodeAddress(addr))
+    const lastIdx = filteredTxs.length - 1
 
+    filteredTxs[lastIdx].tx.appAccounts ||= []
+    filteredTxs[lastIdx].tx.appAccounts?.push(algosdk.decodeAddress("BEYVDQCCKZN7XGEDFLOTWDJUIL4FJNZSO4LGQFKCPL3HPRBFT6AJZUSQFU"))
 
-    //console.log(redeemTxs)
-    const result = await this.signSendWait(redeemTxs, signer);
+    filteredTxs[lastIdx].tx.appForeignApps ||= [] 
+    filteredTxs[lastIdx].tx.appForeignApps?.push(Number(this.coreId))
 
+    const result = await this.signSendWait(filteredTxs, signer);
 
     return parseSequenceFromLogAlgorand(result);
   }
@@ -277,11 +281,6 @@ export class Algorand implements WormholeChain {
 
     // Take the last txns id
     const txid: string = txs[txs.length - 1].txID();
-
-
-    for(let tx of txs){
-      console.log(`${tx.txID()} => ${tx.appIndex}`)
-    }
 
     // If it came with a signer, use it
     const signedTxns: Uint8Array[] = await Promise.all(
