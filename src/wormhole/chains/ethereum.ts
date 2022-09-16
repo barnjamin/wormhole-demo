@@ -43,7 +43,7 @@ export class Ethereum implements WormholeChain {
   constructor(provider: any) {
     this.provider = provider;
   }
-  contractRedeem(destSigner: Signer, receipt: WormholeReceipt, destAsset: WormholeAsset): Promise<boolean> {
+  contractRedeem(destSigner: Signer, receipt: WormholeReceipt): Promise<string> {
     throw new Error("Method not implemented.");
   }
   contractTransfer(cxfer: WormholeContractTransfer): Promise<string> {

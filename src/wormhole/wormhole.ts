@@ -9,7 +9,7 @@ import { ethers } from "ethers";
 import { AlgorandSigner } from "./chains/algorand";
 import { SolanaSigner } from "./chains/solana";
 
-// Signer is a catchall for
+// Signer is a catchall for different chain signers
 export type Signer =
   | AlgorandSigner
   | ethers.Signer
@@ -34,9 +34,12 @@ export type WormholeReceipt = {
 // WormholeMessageType describes the type of messages
 // that can be sent to Wormhole
 export enum WormholeActionType {
-  Attestation = 1, // Create a new asset, based on source asset
-  AssetTransfer = 2, // Transfer asset from one chain to another
-  ContractControlledTransfer = 3, // Transfer asset + call smart contract with VAA passed containing custom payload
+  // Create a new asset, based on source asset
+  Attestation = 1, 
+  // Transfer asset from one chain to another
+  AssetTransfer = 2,
+  // Transfer asset + call smart contract with VAA passed containing custom payload
+  ContractControlledTransfer = 3, 
 }
 
 // WormholeAttestation describes an intended creation of a new
@@ -77,15 +80,20 @@ export interface WormholeChain {
   emitterAddress(): Promise<string>;
 
   attest(asset: WormholeAttestation): Promise<string>;
+
   transfer(xfer: WormholeAssetTransfer): Promise<string>;
   contractTransfer(cxfer: WormholeContractTransfer): Promise<string>;
 
-  contractRedeem(destSigner: Signer, receipt: WormholeReceipt, destAsset: WormholeAsset): Promise<boolean>;
   redeem(
     signer: Signer,
     receipt: WormholeReceipt,
     asset?: WormholeAsset
   ): Promise<WormholeAsset>;
+  contractRedeem(
+    signer: Signer, 
+    receipt: WormholeReceipt
+  ): Promise<string>;
+
   createWrapped(
     signer: Signer,
     receipt: WormholeReceipt
@@ -182,7 +190,6 @@ export class Wormhole {
         await this.contractClaim(
           msg.contractTransfer.transfer.receiver,
           await this.contractTransfer(msg.contractTransfer),
-          msg.contractTransfer.transfer.destination
         );
         return msg.contractTransfer.transfer.destination
 
@@ -257,9 +264,8 @@ export class Wormhole {
   // Claims tokens or arbitrary message from wormhole given VAA
   async contractClaim(
     signer: Signer,
-    receipt: WormholeReceipt,
-    asset: WormholeAsset
-  ): Promise<boolean> {
-    return await receipt.destination.contractRedeem(signer, receipt, asset);
+    receipt: WormholeReceipt
+  ): Promise<string> {
+    return await receipt.destination.contractRedeem(signer, receipt);
   }
 }

@@ -13,7 +13,7 @@ import {
   createWrappedOnAlgorand,
   tryNativeToHexString,
 } from "@certusone/wormhole-sdk";
-import { submitVAAHeader, TransactionSignerPair } from "@certusone/wormhole-sdk/lib/cjs/algorand";
+import { submitVAAHeader, TransactionSignerPair, _parseVAAAlgorand } from "@certusone/wormhole-sdk/lib/cjs/algorand";
 import algosdk, {
   Algodv2,
   bigIntToBytes,
@@ -160,7 +160,7 @@ export class Algorand implements WormholeChain {
   async contractRedeem(
     signer: AlgorandSigner,
     receipt: WormholeReceipt,
-  ): Promise<boolean> {
+  ): Promise<string> {
 
     const redeemTxs = await redeemOnAlgorand(
       this.client,
@@ -170,9 +170,19 @@ export class Algorand implements WormholeChain {
       signer.getAddress()
     );
 
+    const vaa = _parseVAAAlgorand(receipt.VAA)
+    const addr = algosdk.encodeAddress(new Uint8Array(Buffer.from(vaa.emitter, 'hex')))
+
+    if(redeemTxs[redeemTxs.length - 1].tx.appAccounts === undefined) 
+      redeemTxs[redeemTxs.length - 1].tx.appAccounts = []
+    redeemTxs[redeemTxs.length - 1].tx.appAccounts?.push(algosdk.decodeAddress(addr))
+
+
+    //console.log(redeemTxs)
     const result = await this.signSendWait(redeemTxs, signer);
-    console.log(result)
-    return true;
+
+
+    return parseSequenceFromLogAlgorand(result);
   }
 
   async createWrapped(
@@ -256,7 +266,7 @@ export class Algorand implements WormholeChain {
   async signSendWait(
     txns: TransactionSignerPair[],
     acct: AlgorandSigner
-  ): Promise<any> {
+  ): Promise<Record<string,any>> {
     // Signer empty, take just tx
     const txs = txns.map((tx) => {
       return tx.tx;
@@ -267,6 +277,11 @@ export class Algorand implements WormholeChain {
 
     // Take the last txns id
     const txid: string = txs[txs.length - 1].txID();
+
+
+    for(let tx of txs){
+      console.log(`${tx.txID()} => ${tx.appIndex}`)
+    }
 
     // If it came with a signer, use it
     const signedTxns: Uint8Array[] = await Promise.all(
@@ -281,7 +296,6 @@ export class Algorand implements WormholeChain {
 
     await this.client.sendRawTransaction(signedTxns).do();
 
-    console.log(txid)
     return await waitForConfirmation(this.client, txid, 2);
   }
 }

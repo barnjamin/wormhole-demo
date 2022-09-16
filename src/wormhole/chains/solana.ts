@@ -76,7 +76,7 @@ export class Solana implements WormholeChain {
   constructor(connection: Connection) {
     this.connection = connection;
   }
-  contractRedeem(destSigner: Signer, receipt: WormholeReceipt, destAsset: WormholeAsset): Promise<boolean> {
+  contractRedeem(destSigner: Signer, receipt: WormholeReceipt): Promise<string> {
     throw new Error("Method not implemented.");
   }
   contractTransfer(cxfer: WormholeContractTransfer): Promise<string> {

@@ -24,6 +24,10 @@ class PingPong(WormholeTransfer):
     def delete(self):
         return Approve()
 
+    @update(authorize=Authorize.only(Global.creator_address()))
+    def update(self):
+        return Approve()
+
     def handle_transfer(
         self, ctvaa: ContractTransferVAA, *, output: abi.DynamicBytes
     ) -> Expr:
@@ -31,7 +35,10 @@ class PingPong(WormholeTransfer):
         invoked from parent class `portal_transfer` after parsing the VAA into
         abi vars
         """
-        return output.set(If(ctvaa.payload.get() == Ping, Pong, Ping))
+        return Seq(
+            output.set(If(ctvaa.payload.get() == Ping, Pong, Ping)),
+            self.publish_message(output.get())
+        )
 
 
 if __name__ == "__main__":
