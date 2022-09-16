@@ -4,9 +4,9 @@ import {
   Wormhole,
   WormholeAsset,
   WormholeContractTransfer,
-} from "./wormhole/wormhole";
-import { WORMHOLE_RPC_HOSTS } from "./wormhole/consts";
-import { initChain, ChainConfigs } from "./wormhole/helpers";
+} from "../src/wormhole/wormhole";
+import { WORMHOLE_RPC_HOSTS } from "../src/wormhole/consts";
+import { initChain, ChainConfigs } from "../src/wormhole/helpers";
 import algosdk from "algosdk";
 import { _parseVAAAlgorand } from "@certusone/wormhole-sdk/lib/cjs/algorand";
 
@@ -21,18 +21,18 @@ import { _parseVAAAlgorand } from "@certusone/wormhole-sdk/lib/cjs/algorand";
   
     const wh = new Wormhole(WORMHOLE_RPC_HOSTS);
 
-    const appId = 109939165 
+    const appId = 110207597 
     const appAddr = algosdk.getApplicationAddress(appId)
     const emitter = Buffer.from(algosdk.decodeAddress(appAddr).publicKey).toString('hex')
     console.log(`Emitter address: ${emitter}`)
 
-    const vaa = await wh.getVAA("1", originChain, destChain, emitter)
+    const vaa = await wh.getVAA("4", originChain, destChain, emitter)
 
     const rawVaa = Buffer.from(vaa.VAA).toString('hex')
     console.log(`Raw VAA: ${rawVaa}`)
 
     const parsed = _parseVAAAlgorand(vaa.VAA)
-    console.log(`Parsed VAA: ${parsed}`)
+    console.log(parsed)
 
 })();
 

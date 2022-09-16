@@ -35,4 +35,4 @@ class PingPong(WormholeTransfer):
 
 
 if __name__ == "__main__":
-    PingPong(123).dump("./artifacts")
+    PingPong().dump("./artifacts")
