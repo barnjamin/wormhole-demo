@@ -147,5 +147,5 @@ class TmplSig:
 if __name__ == "__main__":
     core = TmplSig()
 
-    with open("sig.tmpl.teal", "w") as f:
+    with open("./artifacts/sig.tmpl.teal", "w") as f:
         f.write(core.get_sig_tmpl())
