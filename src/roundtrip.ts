@@ -39,19 +39,16 @@ async function roundTripAsset(
     destAsset = await wh.getMirrored(originAsset, destChain);
   } catch (e) {
     console.log("No dest asset, creating wrapped version");
-    console.time("attesting");
 
+    console.time("attesting");
     destAsset = await wh.mirror({
       origin: originAsset,
       sender: originSigner,
       destination: destChain,
       receiver: destSigner,
     });
-
     console.timeEnd("attesting");
   }
-
-  console.log(destAsset);
 
   // Prepare the transfer
   const xfer: WormholeAssetTransfer = {
@@ -64,9 +61,6 @@ async function roundTripAsset(
 
   // Send it
   console.log(`Sending transfer from ${origin} to ${destination}`);
-
-  // const vaa = await wh.getVAA("955", originChain, destChain);
-  // await wh.claim(destSigner, vaa, destAsset);
 
   console.time("xfer");
   await wh.perform({

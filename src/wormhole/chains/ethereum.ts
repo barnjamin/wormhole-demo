@@ -38,8 +38,6 @@ export class Ethereum implements WormholeChain {
   tokenBridgeAddress: string = ETH_TOKEN_BRIDGE_ADDRESS;
   id: ChainId = CHAIN_ID_ETH;
 
-  overrides: ethers.Overrides = {};
-
   provider: any;
 
   constructor(provider: any) {
@@ -86,6 +84,10 @@ export class Ethereum implements WormholeChain {
     return getEmitterAddressEth(this.tokenBridgeAddress);
   }
 
+  async updateOverrides(signer: ethers.Signer): Promise<ethers.Overrides> {
+    return {}
+  }
+
   async attest(attestation: WormholeAttestation): Promise<string> {
     if (typeof attestation.origin.contract === "bigint")
       throw new Error("Expected string contract, got bigint");
@@ -97,7 +99,7 @@ export class Ethereum implements WormholeChain {
       this.tokenBridgeAddress,
       attestation.sender,
       attestation.origin.contract,
-      this.overrides,
+      await this.updateOverrides(attestation.sender),
     );
 
     return parseSequenceFromLogEth(receipt, this.tokenBridgeAddress);
@@ -122,7 +124,7 @@ export class Ethereum implements WormholeChain {
       msg.origin.contract,
       msg.sender,
       msg.amount,
-      this.overrides
+      await this.updateOverrides(msg.sender)
     );
 
     const receipt = await transferFromEth(
@@ -133,7 +135,7 @@ export class Ethereum implements WormholeChain {
       msg.destination.chain.id,
       new Uint8Array(Buffer.from(hexStr, "hex")),
       undefined,
-      this.overrides
+      await this.updateOverrides(msg.sender)
     );
 
     return parseSequenceFromLogEth(receipt, this.coreId);
@@ -144,14 +146,12 @@ export class Ethereum implements WormholeChain {
     receipt: WormholeReceipt,
     asset: WormholeAsset
   ): Promise<WormholeAsset> {
-    console.log("redeeming")
     await redeemOnEth(
       this.tokenBridgeAddress,
       signer,
       receipt.VAA,
-      this.overrides
+      await this.updateOverrides(signer)
     );
-    console.log("redeemed")
     return asset;
   }
 
@@ -163,7 +163,7 @@ export class Ethereum implements WormholeChain {
       this.tokenBridgeAddress,
       signer,
       receipt.VAA,
-      this.overrides
+      await this.updateOverrides(signer)
     );
     return { chain: this, contract: contractAddress };
   }
@@ -176,7 +176,7 @@ export class Ethereum implements WormholeChain {
       this.tokenBridgeAddress,
       signer,
       receipt.VAA,
-      this.overrides
+      await this.updateOverrides(signer)
     );
     return { chain: this, contract: contractAddress };
   }

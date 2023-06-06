@@ -81,7 +81,6 @@ export function getAvaxConnection(): ethers.providers.Provider {
 
 export function getPolygonConnection(): ethers.providers.Provider {
   const url = "https://polygon-mumbai.g.alchemy.com/v2/FaI35t5qVP8XY1SSALBW7S2fO3GsKTZ-"
-  //const url = "https://polygon-rpc.com";
   return new ethers.providers.JsonRpcProvider(url);
 }
 
