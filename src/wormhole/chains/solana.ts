@@ -11,7 +11,6 @@ import {
   transferFromSolana,
   redeemOnSolana,
   createWrappedOnSolana,
-  setDefaultWasm,
   postVaaSolana,
   getEmitterAddressSolana,
   tryNativeToHexString,
@@ -19,8 +18,9 @@ import {
 import { SOL_BRIDGE_ADDRESS, SOL_TOKEN_BRIDGE_ADDRESS } from "../consts";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
-  Token,
   TOKEN_PROGRAM_ID,
+  getAssociatedTokenAddress,
+  createAssociatedTokenAccountInstruction,
 } from "@solana/spl-token";
 import { Connection, Keypair, PublicKey, Transaction } from "@solana/web3.js";
 import {
@@ -35,7 +35,7 @@ import {
 
 import bs58 from "bs58";
 
-setDefaultWasm("node");
+//setDefaultWasm("node");
 
 export class SolanaSigner {
   keypair: Keypair;
@@ -48,12 +48,14 @@ export class SolanaSigner {
   }
 
   async getTokenAddress(token: string): Promise<PublicKey> {
-    return Token.getAssociatedTokenAddress(
-      ASSOCIATED_TOKEN_PROGRAM_ID,
-      TOKEN_PROGRAM_ID,
-      new PublicKey(token),
-      this.keypair.publicKey
-    );
+    return PublicKey.findProgramAddressSync(
+      [
+        this.keypair.publicKey.toBuffer(),
+        TOKEN_PROGRAM_ID.toBuffer(),
+        new PublicKey(token).toBuffer(),
+      ],
+      ASSOCIATED_TOKEN_PROGRAM_ID
+    )[0];
   }
 
   async signTxn(txn: Transaction): Promise<Buffer> {
@@ -76,7 +78,10 @@ export class Solana implements WormholeChain {
   constructor(connection: Connection) {
     this.connection = connection;
   }
-  contractRedeem(destSigner: Signer, receipt: WormholeReceipt): Promise<string> {
+  contractRedeem(
+    destSigner: Signer,
+    receipt: WormholeReceipt
+  ): Promise<string> {
     throw new Error("Method not implemented.");
   }
   contractTransfer(cxfer: WormholeContractTransfer): Promise<string> {
@@ -241,12 +246,12 @@ export class Solana implements WormholeChain {
     );
     if (!associatedAddressInfo) {
       const transaction = new Transaction().add(
-        await Token.createAssociatedTokenAccountInstruction(
+        createAssociatedTokenAccountInstruction(
           ASSOCIATED_TOKEN_PROGRAM_ID,
           TOKEN_PROGRAM_ID,
           new PublicKey(token),
           recipient,
-          signer.keypair.publicKey, // owner
+          signer.keypair.publicKey,
           signer.keypair.publicKey // payer
         )
       );

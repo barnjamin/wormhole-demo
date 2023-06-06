@@ -59,6 +59,6 @@ async function contractTransfer(
     const receipt = await wh.getVAA(seq, originChain, destChain)
   
     console.log(`Redeeming contract transfer on ${destination}`);
-    await destChain.contractRedeem(destSigner, receipt, destAsset)
+    await destChain.contractRedeem(destSigner, receipt)
   }
   

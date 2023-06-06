@@ -9,6 +9,7 @@ import { Ethereum, EthereumSigner } from "./chains/ethereum";
 import { Solana, SolanaSigner } from "./chains/solana";
 import { Avalanche, AvalancheSigner } from "./chains/avalanche";
 import { Coins, LCDClient } from "@terra-money/terra.js";
+import { Polygon } from "./chains/polygon";
 
 type GetSignerFn = (client?: any) => Signer;
 type GetClientFn = () => any;
@@ -41,6 +42,11 @@ export const ChainConfigs: { [key: string]: ChainConfig } = {
     getSigner: getAvaxSigner,
     getClient: getAvaxConnection,
   },
+  polygon: {
+    chain: (client: any) => new Polygon(client),
+    getSigner: getPolygonSigner,
+    getClient: getPolygonConnection,
+  },
 };
 
 export function initChain(cc: ChainConfig): [WormholeChain, Signer] {
@@ -70,6 +76,12 @@ export function getEthConnection(network?: string): ethers.providers.Provider {
 export function getAvaxConnection(): ethers.providers.Provider {
   const url =
     "https://speedy-nodes-nyc.moralis.io/236c92ab480d8cafac91f211/avalanche/testnet";
+  return new ethers.providers.JsonRpcProvider(url);
+}
+
+export function getPolygonConnection(): ethers.providers.Provider {
+  const url = "https://polygon-mumbai.g.alchemy.com/v2/FaI35t5qVP8XY1SSALBW7S2fO3GsKTZ-"
+  //const url = "https://polygon-rpc.com";
   return new ethers.providers.JsonRpcProvider(url);
 }
 
@@ -104,7 +116,9 @@ export function getEthSigner(provider: any): EthereumSigner {
 }
 
 export function getAvaxSigner(provider: any): EthereumSigner {
-  const ETH_PRIVATE_KEY =
-    "0x3f493e59e81db1be4ebbe18b28ba8fdd066ef44139420ead59f37f5dacb80719";
-  return new ethers.Wallet(ETH_PRIVATE_KEY, provider);
+  return getEthSigner(provider);
+}
+
+export function getPolygonSigner(provider: any): EthereumSigner {
+  return getEthSigner(provider)
 }

@@ -6,7 +6,6 @@ import {
   CHAIN_ID_AVAX,
   CHAIN_ID_BSC,
   CHAIN_ID_ETH,
-  CHAIN_ID_ETHEREUM_ROPSTEN,
   CHAIN_ID_FANTOM,
   CHAIN_ID_KARURA,
   CHAIN_ID_OASIS,
@@ -96,10 +95,6 @@ export const CHAINS: ChainInfo[] =
           name: "Ethereum (Goerli)",
         },
         {
-          id: CHAIN_ID_ETHEREUM_ROPSTEN,
-          name: "Ethereum (Ropsten)",
-        },
-        {
           id: CHAIN_ID_FANTOM,
           name: "Fantom",
         },
@@ -152,7 +147,6 @@ export const CHAINS_WITH_NFT_SUPPORT = CHAINS.filter(
     id === CHAIN_ID_AVAX ||
     id === CHAIN_ID_BSC ||
     id === CHAIN_ID_ETH ||
-    id === CHAIN_ID_ETHEREUM_ROPSTEN ||
     id === CHAIN_ID_POLYGON ||
     id === CHAIN_ID_OASIS ||
     id === CHAIN_ID_SOLANA ||
@@ -171,7 +165,7 @@ export const COMING_SOON_CHAINS: ChainInfo[] = [];
 export const getDefaultNativeCurrencySymbol = (chainId: ChainId) =>
   chainId === CHAIN_ID_SOLANA
     ? "SOL"
-    : chainId === CHAIN_ID_ETH || chainId === CHAIN_ID_ETHEREUM_ROPSTEN
+    : chainId === CHAIN_ID_ETH
     ? "ETH"
     : chainId === CHAIN_ID_BSC
     ? "BNB"
@@ -195,7 +189,7 @@ export const getDefaultNativeCurrencySymbol = (chainId: ChainId) =>
     ? "ACA"
     : "";
 export const getExplorerName = (chainId: ChainId) =>
-  chainId === CHAIN_ID_ETH || chainId === CHAIN_ID_ETHEREUM_ROPSTEN
+  chainId === CHAIN_ID_ETH
     ? "Etherscan"
     : chainId === CHAIN_ID_BSC
     ? "BscScan"
@@ -225,8 +219,6 @@ export const WORMHOLE_RPC_HOSTS =
     : ["http://localhost:7071"];
 export const ETH_NETWORK_CHAIN_ID =
   CLUSTER === "mainnet" ? 1 : CLUSTER === "testnet" ? 5 : 1337;
-export const ROPSTEN_ETH_NETWORK_CHAIN_ID =
-  CLUSTER === "mainnet" ? 1 : CLUSTER === "testnet" ? 3 : 1337;
 export const BSC_NETWORK_CHAIN_ID =
   CLUSTER === "mainnet" ? 56 : CLUSTER === "testnet" ? 97 : 1397;
 export const POLYGON_NETWORK_CHAIN_ID =
@@ -250,8 +242,6 @@ export const ACALA_NETWORK_CHAIN_ID =
 export const getEvmChainId = (chainId: ChainId) =>
   chainId === CHAIN_ID_ETH
     ? ETH_NETWORK_CHAIN_ID
-    : chainId === CHAIN_ID_ETHEREUM_ROPSTEN
-    ? ROPSTEN_ETH_NETWORK_CHAIN_ID
     : chainId === CHAIN_ID_BSC
     ? BSC_NETWORK_CHAIN_ID
     : chainId === CHAIN_ID_POLYGON
@@ -533,27 +523,6 @@ export const SOL_TOKEN_BRIDGE_ADDRESS =
     : CLUSTER === "testnet"
     ? "DZnkkTmCiFWfYTfT41X3Rd1kDgozqzxWaHqsw6W4x2oe"
     : "B6RHG3mfcckmrYN1UhmJzyS1XX3fZKbkeUcpJe9Sy3FE";
-export const ROPSTEN_ETH_BRIDGE_ADDRESS = getAddress(
-  CLUSTER === "mainnet"
-    ? "0x98f3c9e6E3fAce36bAAd05FE09d375Ef1464288B"
-    : CLUSTER === "testnet"
-    ? "0x210c5F5e2AF958B4defFe715Dc621b7a3BA888c5"
-    : "0xC89Ce4735882C9F0f0FE26686c53074E09B0D550"
-);
-export const ROPSTEN_ETH_NFT_BRIDGE_ADDRESS = getAddress(
-  CLUSTER === "mainnet"
-    ? "0x6FFd7EdE62328b3Af38FCD61461Bbfc52F5651fE"
-    : CLUSTER === "testnet"
-    ? "0x2b048Da40f69c8dc386a56705915f8E966fe1eba"
-    : "0x26b4afb60d6c903165150c6f0aa14f8016be4aec"
-);
-export const ROPSTEN_ETH_TOKEN_BRIDGE_ADDRESS = getAddress(
-  CLUSTER === "mainnet"
-    ? "0x3ee18B2214AFF97000D974cf647E7C347E8fa585"
-    : CLUSTER === "testnet"
-    ? "0xF174F9A837536C449321df1Ca093Bb96948D5386"
-    : "0x0290FB167208Af455bB137780163b7B7a9a10C16"
-);
 
 export const SOL_CUSTODY_ADDRESS =
   "GugU1tP7doLeTw9hQP51xRJyS8Da1fWxuiy2rVrnMD2m";
@@ -593,8 +562,6 @@ export const getBridgeAddressForChain = (chainId: ChainId) =>
     ? TERRA_BRIDGE_ADDRESS
     : chainId === CHAIN_ID_POLYGON
     ? POLYGON_BRIDGE_ADDRESS
-    : chainId === CHAIN_ID_ETHEREUM_ROPSTEN
-    ? ROPSTEN_ETH_BRIDGE_ADDRESS
     : chainId === CHAIN_ID_AVAX
     ? AVAX_BRIDGE_ADDRESS
     : chainId === CHAIN_ID_OASIS
@@ -617,8 +584,6 @@ export const getNFTBridgeAddressForChain = (chainId: ChainId) =>
     ? BSC_NFT_BRIDGE_ADDRESS
     : chainId === CHAIN_ID_POLYGON
     ? POLYGON_NFT_BRIDGE_ADDRESS
-    : chainId === CHAIN_ID_ETHEREUM_ROPSTEN
-    ? ROPSTEN_ETH_NFT_BRIDGE_ADDRESS
     : chainId === CHAIN_ID_AVAX
     ? AVAX_NFT_BRIDGE_ADDRESS
     : chainId === CHAIN_ID_OASIS
@@ -643,8 +608,6 @@ export const getTokenBridgeAddressForChain = (chainId: ChainId) =>
     ? TERRA_TOKEN_BRIDGE_ADDRESS
     : chainId === CHAIN_ID_POLYGON
     ? POLYGON_TOKEN_BRIDGE_ADDRESS
-    : chainId === CHAIN_ID_ETHEREUM_ROPSTEN
-    ? ROPSTEN_ETH_TOKEN_BRIDGE_ADDRESS
     : chainId === CHAIN_ID_AVAX
     ? AVAX_TOKEN_BRIDGE_ADDRESS
     : chainId === CHAIN_ID_OASIS
@@ -681,7 +644,7 @@ export const COVALENT_GET_TOKENS_URL = (
   noNftMetadata?: boolean
 ) => {
   const chainNum =
-    chainId === CHAIN_ID_ETH || chainId === CHAIN_ID_ETHEREUM_ROPSTEN
+    chainId === CHAIN_ID_ETH
       ? COVALENT_ETHEREUM
       : chainId === CHAIN_ID_BSC
       ? COVALENT_BSC
@@ -735,14 +698,6 @@ export const WMATIC_ADDRESS =
     ? "0x9c3c9283d3e44854697cd22d3faa240cfb032889"
     : "0xDDb64fE46a91D46ee29420539FC25FD07c5FEa3E";
 export const WMATIC_DECIMALS = 18;
-
-export const ROPSTEN_WETH_ADDRESS =
-  CLUSTER === "mainnet"
-    ? "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
-    : CLUSTER === "testnet"
-    ? "0xc778417e063141139fce010982780140aa0cd5ab"
-    : "0xDDb64fE46a91D46ee29420539FC25FD07c5FEa3E";
-export const ROPSTEN_WETH_DECIMALS = 18;
 
 export const WAVAX_ADDRESS =
   CLUSTER === "mainnet"

@@ -12,7 +12,7 @@
     "pingpong": "npx ts-node src/pingpong.ts"
   },
   "dependencies": {
-    "@certusone/wormhole-sdk": "^0.6.2",
+    "@certusone/wormhole-sdk": "^0.9.18",
     "@improbable-eng/grpc-web-node-http-transport": "^0.15.0",
     "algosdk": "^1.15.0",
     "b58": "^4.0.3",

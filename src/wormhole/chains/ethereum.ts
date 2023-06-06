@@ -13,13 +13,13 @@ import {
   getOriginalAssetEth,
   hexToUint8Array,
   getForeignAssetEth,
-  CHAIN_ID_ETHEREUM_ROPSTEN,
   approveEth,
+  CHAIN_ID_ETH,
 } from "@certusone/wormhole-sdk";
 import { ethers } from "ethers";
 import {
-  ROPSTEN_ETH_BRIDGE_ADDRESS,
-  ROPSTEN_ETH_TOKEN_BRIDGE_ADDRESS,
+  ETH_BRIDGE_ADDRESS,
+  ETH_TOKEN_BRIDGE_ADDRESS,
 } from "../consts";
 import {
   WormholeAsset,
@@ -34,9 +34,11 @@ import {
 export type EthereumSigner = ethers.Signer;
 
 export class Ethereum implements WormholeChain {
-  coreId: string = ROPSTEN_ETH_BRIDGE_ADDRESS;
-  tokenBridgeAddress: string = ROPSTEN_ETH_TOKEN_BRIDGE_ADDRESS;
-  id: ChainId = CHAIN_ID_ETHEREUM_ROPSTEN;
+  coreId: string = ETH_BRIDGE_ADDRESS;
+  tokenBridgeAddress: string = ETH_TOKEN_BRIDGE_ADDRESS;
+  id: ChainId = CHAIN_ID_ETH;
+
+  overrides: ethers.Overrides = {};
 
   provider: any;
 
@@ -94,7 +96,8 @@ export class Ethereum implements WormholeChain {
     const receipt = await attestFromEth(
       this.tokenBridgeAddress,
       attestation.sender,
-      attestation.origin.contract
+      attestation.origin.contract,
+      this.overrides,
     );
 
     return parseSequenceFromLogEth(receipt, this.tokenBridgeAddress);
@@ -118,7 +121,8 @@ export class Ethereum implements WormholeChain {
       this.tokenBridgeAddress,
       msg.origin.contract,
       msg.sender,
-      msg.amount
+      msg.amount,
+      this.overrides
     );
 
     const receipt = await transferFromEth(
@@ -127,7 +131,9 @@ export class Ethereum implements WormholeChain {
       msg.origin.contract,
       msg.amount,
       msg.destination.chain.id,
-      new Uint8Array(Buffer.from(hexStr, "hex"))
+      new Uint8Array(Buffer.from(hexStr, "hex")),
+      undefined,
+      this.overrides
     );
 
     return parseSequenceFromLogEth(receipt, this.coreId);
@@ -138,11 +144,14 @@ export class Ethereum implements WormholeChain {
     receipt: WormholeReceipt,
     asset: WormholeAsset
   ): Promise<WormholeAsset> {
-    const { contractAddress } = await redeemOnEth(
+    console.log("redeeming")
+    await redeemOnEth(
       this.tokenBridgeAddress,
       signer,
-      receipt.VAA
+      receipt.VAA,
+      this.overrides
     );
+    console.log("redeemed")
     return asset;
   }
 
@@ -153,10 +162,12 @@ export class Ethereum implements WormholeChain {
     const { contractAddress } = await createWrappedOnEth(
       this.tokenBridgeAddress,
       signer,
-      receipt.VAA
+      receipt.VAA,
+      this.overrides
     );
     return { chain: this, contract: contractAddress };
   }
+
   async updateWrapped(
     signer: ethers.Signer,
     receipt: WormholeReceipt
@@ -164,7 +175,8 @@ export class Ethereum implements WormholeChain {
     const { contractAddress } = await updateWrappedOnEth(
       this.tokenBridgeAddress,
       signer,
-      receipt.VAA
+      receipt.VAA,
+      this.overrides
     );
     return { chain: this, contract: contractAddress };
   }

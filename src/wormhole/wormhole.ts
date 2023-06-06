@@ -134,6 +134,7 @@ export class Wormhole {
     console.time("getvaa")
     if (emitter === undefined)
       emitter = await origin.emitterAddress()
+
     const { vaaBytes } = await getSignedVAAWithRetry(
       this.rpcHosts,
       origin.id,
@@ -141,8 +142,8 @@ export class Wormhole {
       sequence,
       { transport: NodeHttpTransport() }
     );
-
     console.timeEnd("getvaa")
+
     return {
       VAA: vaaBytes,
       origin: origin,
@@ -161,7 +162,12 @@ export class Wormhole {
     chain: WormholeChain
   ): Promise<WormholeAsset> {
     const orig = await asset.chain.lookupOriginal(asset.contract)
-    return await chain.lookupMirrored(uint8ArrayToHex(orig.assetAddress), asset.chain);
+    const mirroredAsset = await chain.lookupMirrored(uint8ArrayToHex(orig.assetAddress), asset.chain);
+
+    if (mirroredAsset.contract === "0x0000000000000000000000000000000000000000") 
+      throw new Error("No wrapped token")
+
+    return mirroredAsset 
   }
 
   // Perform takes a Wormhole Action and performs both sides of the transactions
@@ -176,10 +182,13 @@ export class Wormhole {
       case WormholeActionType.AssetTransfer:
         if (msg.assetTransfer === undefined)
           throw new Error("Type TokenTransfer but was undefined");
+        const receipt = await this.transfer(msg.assetTransfer)
+
+        console.log(receipt)
 
         return await this.claim(
           msg.assetTransfer.receiver,
-          await this.transfer(msg.assetTransfer),
+          receipt,
           msg.assetTransfer.destination
         );
 
@@ -215,23 +224,22 @@ export class Wormhole {
       );
       // its already mirrored, just return it
       return mirrored;
-    } catch (e) {
-      /* todo? */
-    }
+    } catch (e) { /* noop */ }
 
     const origin = attestation.origin.chain;
     const destination = attestation.destination;
 
+    console.log("about to attest")
     const sequence = await origin.attest(attestation);
     const receipt = await this.getVAA(sequence, origin, destination);
+    console.log("attested with receipt", receipt)
 
-    try {
-      return await destination.createWrapped(attestation.receiver, receipt);
-    } catch (e) {
-      /* todo? */
-    }
+    console.log("Creating wrapped")
+    const wrapped = await destination.createWrapped(attestation.receiver, receipt);
+    console.log("Created!")
+    return wrapped
 
-    return await destination.updateWrapped(attestation.receiver, receipt);
+    //return await destination.updateWrapped(attestation.receiver, receipt);
   }
 
   async contractTransfer(

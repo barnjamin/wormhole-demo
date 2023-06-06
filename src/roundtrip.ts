@@ -6,12 +6,15 @@ import {
   WormholeActionType,
   WormholeAssetTransfer,
   WormholeContractTransfer,
+  WormholeAttestation,
 } from "./wormhole/wormhole";
 import { WORMHOLE_RPC_HOSTS } from "./wormhole/consts";
 import { initChain, ChainConfigs } from "./wormhole/helpers";
 
 (async function () {
-  await roundTripAsset(BigInt(0), BigInt(100), "algorand", "solana");
+  //const [pChain, pSigner] = initChain(ChainConfigs["polygon"])
+  //await roundTripAsset(BigInt(0), BigInt(100), "algorand", "solana");
+  await roundTripAsset(BigInt(0), BigInt(100), "algorand", "polygon");
   //await roundTripAsset(BigInt(0), BigInt(100), "algorand", "avalanche");
   //await roundTripAsset(BigInt(0), BigInt(100), "algorand", "ethereum");
 })();
@@ -30,7 +33,25 @@ async function roundTripAsset(
 
   // Get the destination asset
   const originAsset: WormholeAsset = { chain: originChain, contract: asset };
-  const destAsset = await wh.getMirrored(originAsset, destChain);
+
+  let destAsset;
+  try {
+    destAsset = await wh.getMirrored(originAsset, destChain);
+  } catch (e) {
+    console.log("No dest asset, creating wrapped version");
+    console.time("attesting");
+
+    destAsset = await wh.mirror({
+      origin: originAsset,
+      sender: originSigner,
+      destination: destChain,
+      receiver: destSigner,
+    });
+
+    console.timeEnd("attesting");
+  }
+
+  console.log(destAsset);
 
   // Prepare the transfer
   const xfer: WormholeAssetTransfer = {
@@ -43,6 +64,10 @@ async function roundTripAsset(
 
   // Send it
   console.log(`Sending transfer from ${origin} to ${destination}`);
+
+  // const vaa = await wh.getVAA("955", originChain, destChain);
+  // await wh.claim(destSigner, vaa, destAsset);
+
   console.time("xfer");
   await wh.perform({
     action: WormholeActionType.AssetTransfer,
